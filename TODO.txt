@@ -1,1 +1,3 @@
-rename project
+migrate from localStorage to sessionStorage
+
+in AuthContext.tsx, SCRIPT_URL being defined with VITE_* prefix maybe potentially dangerous cuz script url exposing to client blablablalablablalb
