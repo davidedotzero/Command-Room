@@ -1,3 +1,12 @@
 migrate from localStorage to sessionStorage
 
 in AuthContext.tsx, SCRIPT_URL being defined with VITE_* prefix maybe potentially dangerous cuz script url exposing to client blablablalablablalb
+
+bok p pat wa i use clientID from aar proj
+
+ask p pat wa should project id for crm use different format than aar in case project sheet is gonna merge in future
+
+use better authentication and authorization method via @react-oauth/google (authorization code flow) and app-script-oauth library 
+- https://github.com/googleworkspace/apps-script-oauth2
+- https://react-oauth.vercel.app/
+- https://github.com/MomenSherif/react-oauth/issues/12#issuecomment-1131408898

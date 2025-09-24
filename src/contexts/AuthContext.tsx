@@ -17,7 +17,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -36,20 +36,26 @@ const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         try {
             const response = await fetch(SCRIPT_URL, {
                 method: "POST",
-                body: JSON.stringify({ op: "verifyUserByEmail", payload: email }),
+                body: JSON.stringify({ op: "verifyUserByEmail", payload: { email }, }),
                 headers: { "Content-Type": "text/plain;charset=utf-8" }
             });
 
             const result = await response.json();
             if (result.status === 'success' && result.data) {
-                const userData: User = result.data;
+                // const userData: User = result.data;
+                const userData: User = {
+                    email: result.data[0],
+                    role: result.data[1],
+                    name: result.data[2],
+                }
                 setUser(userData);
                 localStorage.setItem('project-crm-user', JSON.stringify(userData));
             } else {
                 throw new Error(result.message || 'User not authorized or not found.');
             }
         } catch (error) {
-            console.log("Login failed.", error);
+            // TODO: show this information in ui
+            console.error("Login failed. User not authorized or not found.", error);
             logout();
         } finally {
             setIsLoading(false);
@@ -66,7 +72,7 @@ const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
-const useAuth = () => {
+export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
         throw new Error('useAuth must be used within an AuthProvider.');
@@ -74,4 +80,3 @@ const useAuth = () => {
     return context;
 }
 
-export default [AuthProvider, useAuth];
