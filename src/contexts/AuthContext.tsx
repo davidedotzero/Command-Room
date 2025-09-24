@@ -2,12 +2,14 @@ import { createContext, useContext, useEffect, useState, type FC, type ReactNode
 
 const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 
+// TODO: abstract to type.tsx file
 interface User {
     email: string;
     name: string;
     role: string;
 }
 
+// TODO: abstract to type.tsx file
 interface AuthContextType {
     user: User | null;
     isLoading: boolean;
@@ -34,6 +36,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         setIsLoading(true);
 
         try {
+            // TODO: migrate this to utils/api & api return value data documentation somewhere
             const response = await fetch(SCRIPT_URL, {
                 method: "POST",
                 body: JSON.stringify({ op: "verifyUserByEmail", payload: { email }, }),

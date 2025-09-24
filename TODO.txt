@@ -6,6 +6,10 @@ bok p pat wa i use clientID from aar proj
 
 ask p pat wa should project id for crm use different format than aar in case project sheet is gonna merge in future
 
+ao project priority mai?
+
+title on iconbutton hover
+
 use better authentication and authorization method via @react-oauth/google (authorization code flow) and app-script-oauth library 
 - https://github.com/googleworkspace/apps-script-oauth2
 - https://react-oauth.vercel.app/
