@@ -6,6 +6,7 @@ import Projects from './pages/Projects'
 import Customers from './pages/Customers'
 import { useAuth } from './contexts/AuthContext'
 import { useGoogleLogin } from '@react-oauth/google'
+import ProjectDetail from './pages/ProjectDetail'
 
 // TODO: abstract this to other file
 function LoadingIndicator({ message }: { message: string }) {
@@ -53,7 +54,7 @@ function LoginPage() {
 
     return (
         <>
-            {/* // yoinked from p' pat XDDDD */}
+            {/* // yoinked from p pat XDDDD */}
             <div className="flex items-center justify-center min-h-screen bg-gray-100">
                 <div className="p-8 bg-white rounded-xl shadow-lg text-center w-full max-w-sm">
                     <h1 className="text-2xl font-bold text-gray-800 mb-2">มิวสิค อาร์ม</h1>
@@ -88,11 +89,12 @@ function AppContent() {
             {/* TODO: change to bg-gray-50 */}
             <div className="w-full flex flex-col h-screen bg-gray-100 font-sans">
                 <Navbar />
-                <main>
+                <main className="w-full p-4 md:p-8 overflow-y-auto flex-grow">
                     <Routes>
                         <Route path="/" element={<Navigate to="/tasks" />}></Route>
                         <Route path="/tasks" element={<Tasks />}></Route>
                         <Route path="/projects" element={<Projects />}></Route>
+                        <Route path="/projects/p/:projectID" element={<ProjectDetail />}></Route>
                         <Route path="/customers" element={<Customers />}></Route>
                     </Routes>
                 </main>
