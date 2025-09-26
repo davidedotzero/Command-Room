@@ -31,6 +31,7 @@ check why some table column do line break while some dont
 
 ask p pat about how many task status are there
 ask p pat about how many PO task status are there
+ask p pat about format of ALL ids
 talk p pat about show log yang ngai in task
 talk p pat about spreadsheet 10M cells limit
 talk p pat task list pagination

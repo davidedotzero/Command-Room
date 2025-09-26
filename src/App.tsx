@@ -7,6 +7,7 @@ import Customers from './pages/Customers'
 import { useAuth } from './contexts/AuthContext'
 import { useGoogleLogin } from '@react-oauth/google'
 import ProjectDetail from './pages/ProjectDetail'
+import CreateTaskModal from './components/modals/CreateTaskModal'
 
 // TODO: abstract this to other file
 function LoadingIndicator({ message }: { message: string }) {
@@ -99,6 +100,9 @@ function AppContent() {
                     </Routes>
                 </main>
             </div >
+
+            {/* render modals here */}
+            <div id="modal-root"></div>
         </>
     );
 }

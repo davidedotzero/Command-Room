@@ -1,6 +1,11 @@
 import { useParams } from "react-router";
 import { PlusIcon, RefreshIcon } from "../components/utils/icons";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import CreateTaskModal from "../components/modals/CreateTaskModal";
+
+import type { Task } from "../utils/types";
+import { leftJoinOne2One, TASK_NAMES, TASK_STATUSES, TASKS, TEAMS } from "../utils/mockdata";
+import TaskDetailModal from "../components/modals/TaskDetailModal";
 
 // TODO: abstract this to other file
 const StatDisplayCard: React.FC<{
@@ -39,6 +44,7 @@ const statDescriptions = {
 };
 
 // TODO: maybe merge this to Status as a "table"?
+// TODO: refactor this
 let StatusColor = new Map<string, string>();
 StatusColor.set("Not Started", "text-gray-500");
 StatusColor.set("In Progress", "text-blue-500");
@@ -46,68 +52,44 @@ StatusColor.set("Help Me", "text-purple-500");
 StatusColor.set("Done", "text-green-500");
 StatusColor.set("Cancelled", "text-red-500");
 
-// TODO: abstract to types.tsx
-// TODO: make this id+name ????
-type Status = "Not Started" | "In Progress" | "Help Me" | "Done" | "Cancelled"; // TODO: me cancel duai mai???
-type POStatus = "PLACEHOLDER" | "PLACEHOLDER2";
-type ProjectTaskName = "ธรรมมะ กระตุกจิตกระชากใจ" | "เพื่อบรรลุอรหันต์" | "มันต้องเป็นแบบนี้ ต้องมีอุปกรณ์" | "อย่างงี้เค้าเรียกชนฉิ่งตีฉิ่ง" | "ท่าอย่างงี้เค้าเรียกว่าkระเd้าคู่" | "คนนี้ที คนนี้ที" | "อย่างงี้เค้าเรียกว่า ดูดuม" | "ดูดขวา ดูดซ้าย";
-type ProjectOwner = "PRODUCT" | "MARKETING" | "AJ-DAENG";
-
-// TODO: abstract to types.tsx
-// TODO: will change this when i know what fields are supposed to be in projectTask
-// TODO: add preview log field
-interface ProjectTask { // should not use "Task" because a collision with JSX's Task
-    taskID: string,
-    projectID: string,
-    name: ProjectTaskName,
-    owner: ProjectOwner,
-    deadline: Date,
-    status: Status,
-    logPreview: string // this should be the "description" of the latest log for the task
+// TODO: abstract this to separate mock api files
+const callApi = {
+    getTasks: async () => {
+        await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
+        return [...TASKS];
+    },
+    addTasks: async (newTask: Task) => {
+        TASKS.push(newTask);
+        return true;
+    }
 };
 
-// TODO: DELETE MOCKUP DATA
-// TODO: add preview log field
-const tasks: ProjectTask[] = [
-    { taskID: "TASK-0001", projectID: "PROJ-CRM-0007", name: "ท่าอย่างงี้เค้าเรียกว่าkระเd้าคู่", owner: "AJ-DAENG", deadline: new Date("2025-12-11"), status: "In Progress", logPreview: "002-PLACEHOLDER" },
-    { taskID: "TASK-0002", projectID: "PROJ-CRM-0002", name: "ดูดขวา ดูดซ้าย", owner: "PRODUCT", deadline: new Date("2025-11-25"), status: "Not Started", logPreview: "003-PLACEHOLDER" },
-    { taskID: "TASK-0003", projectID: "PROJ-CRM-0009", name: "อย่างงี้เค้าเรียกว่า ดูดuม", owner: "MARKETING", deadline: new Date("2025-10-30"), status: "Done", logPreview: "004-PLACEHOLDER" },
-    { taskID: "TASK-0004", projectID: "PROJ-CRM-0001", name: "คนนี้ที คนนี้ที", owner: "AJ-DAENG", deadline: new Date("2025-12-05"), status: "Help Me", logPreview: "005-PLACEHOLDER" },
-    { taskID: "TASK-0005", projectID: "PROJ-CRM-0005", name: "เพื่อบรรลุอรหันต์", owner: "PRODUCT", deadline: new Date("2025-11-18"), status: "In Progress", logPreview: "006-PLACEHOLDER" },
-    { taskID: "TASK-0006", projectID: "PROJ-CRM-0010", name: "ธรรมมะ กระตุกจิตกระชากใจ", owner: "MARKETING", deadline: new Date("2025-10-15"), status: "Not Started", logPreview: "007-PLACEHOLDER" },
-    { taskID: "TASK-0007", projectID: "PROJ-CRM-0003", name: "มันต้องเป็นแบบนี้ ต้องมีอุปกรณ์", owner: "AJ-DAENG", deadline: new Date("2025-12-22"), status: "Done", logPreview: "008-PLACEHOLDER" },
-    { taskID: "TASK-0008", projectID: "PROJ-CRM-0008", name: "อย่างงี้เค้าเรียกชนฉิ่งตีฉิ่ง", owner: "PRODUCT", deadline: new Date("2025-11-02"), status: "In Progress", logPreview: "009-PLACEHOLDER" },
-    { taskID: "TASK-0009", projectID: "PROJ-CRM-0004", name: "ท่าอย่างงี้เค้าเรียกว่าkระเd้าคู่", owner: "MARKETING", deadline: new Date("2025-10-21"), status: "Help Me", logPreview: "010-PLACEHOLDER" },
-    { taskID: "TASK-0010", projectID: "PROJ-CRM-0006", name: "ดูดขวา ดูดซ้าย", owner: "AJ-DAENG", deadline: new Date("2025-12-14"), status: "Not Started", logPreview: "011-PLACEHOLDER" },
-    { taskID: "TASK-0011", projectID: "PROJ-CRM-0001", name: "อย่างงี้เค้าเรียกว่า ดูดuม", owner: "PRODUCT", deadline: new Date("2025-11-09"), status: "Done", logPreview: "012-PLACEHOLDER" },
-    { taskID: "TASK-0012", projectID: "PROJ-CRM-0007", name: "คนนี้ที คนนี้ที", owner: "MARKETING", deadline: new Date("2025-10-28"), status: "In Progress", logPreview: "013-PLACEHOLDER" },
-    { taskID: "TASK-0013", projectID: "PROJ-CRM-0002", name: "เพื่อบรรลุอรหันต์", owner: "AJ-DAENG", deadline: new Date("2025-12-01"), status: "Not Started", logPreview: "014-PLACEHOLDER" },
-    { taskID: "TASK-0014", projectID: "PROJ-CRM-0009", name: "ธรรมมะ กระตุกจิตกระชากใจ", owner: "PRODUCT", deadline: new Date("2025-11-15"), status: "Help Me", logPreview: "015-PLACEHOLDER" },
-    { taskID: "TASK-0015", projectID: "PROJ-CRM-0005", name: "มันต้องเป็นแบบนี้ ต้องมีอุปกรณ์", owner: "MARKETING", deadline: new Date("2025-10-08"), status: "Done", logPreview: "016-PLACEHOLDER" },
-    { taskID: "TASK-0016", projectID: "PROJ-CRM-0010", name: "อย่างงี้เค้าเรียกชนฉิ่งตีฉิ่ง", owner: "AJ-DAENG", deadline: new Date("2025-12-28"), status: "In Progress", logPreview: "017-PLACEHOLDER" },
-    { taskID: "TASK-0017", projectID: "PROJ-CRM-0003", name: "ท่าอย่างงี้เค้าเรียกว่าkระเd้าคู่", owner: "PRODUCT", deadline: new Date("2025-11-20"), status: "Not Started", logPreview: "018-PLACEHOLDER" },
-    { taskID: "TASK-0018", projectID: "PROJ-CRM-0008", name: "ดูดขวา ดูดซ้าย", owner: "MARKETING", deadline: new Date("2025-10-12"), status: "In Progress", logPreview: "019-PLACEHOLDER" },
-    { taskID: "TASK-0019", projectID: "PROJ-CRM-0004", name: "อย่างงี้เค้าเรียกว่า ดูดuม", owner: "AJ-DAENG", deadline: new Date("2025-12-08"), status: "Done", logPreview: "020-PLACEHOLDER" },
-    { taskID: "TASK-0020", projectID: "PROJ-CRM-0006", name: "คนนี้ที คนนี้ที", owner: "PRODUCT", deadline: new Date("2025-11-28"), status: "Help Me", logPreview: "021-PLACEHOLDER" },
-    { taskID: "TASK-0021", projectID: "PROJ-CRM-0001", name: "เพื่อบรรลุอรหันต์", owner: "MARKETING", deadline: new Date("2025-10-19"), status: "Not Started", logPreview: "022-PLACEHOLDER" },
-    { taskID: "TASK-0022", projectID: "PROJ-CRM-0007", name: "ธรรมมะ กระตุกจิตกระชากใจ", owner: "AJ-DAENG", deadline: new Date("2025-12-18"), status: "In Progress", logPreview: "023-PLACEHOLDER" },
-    { taskID: "TASK-0023", projectID: "PROJ-CRM-0002", name: "มันต้องเป็นแบบนี้ ต้องมีอุปกรณ์", owner: "PRODUCT", deadline: new Date("2025-11-05"), status: "Done", logPreview: "024-PLACEHOLDER" },
-    { taskID: "TASK-0024", projectID: "PROJ-CRM-0009", name: "อย่างงี้เค้าเรียกชนฉิ่งตีฉิ่ง", owner: "MARKETING", deadline: new Date("2025-10-25"), status: "In Progress", logPreview: "025-PLACEHOLDER" },
-    { taskID: "TASK-0025", projectID: "PROJ-CRM-0005", name: "ท่าอย่างงี้เค้าเรียกว่าkระเd้าคู่", owner: "AJ-DAENG", deadline: new Date("2025-12-03"), status: "Help Me", logPreview: "026-PLACEHOLDER" },
-    { taskID: "TASK-0026", projectID: "PROJ-CRM-0010", name: "ดูดขวา ดูดซ้าย", owner: "PRODUCT", deadline: new Date("2025-11-12"), status: "Not Started", logPreview: "027-PLACEHOLDER" },
-    { taskID: "TASK-0027", projectID: "PROJ-CRM-0003", name: "อย่างงี้เค้าเรียกว่า ดูดuม", owner: "MARKETING", deadline: new Date("2025-10-05"), status: "Done", logPreview: "028-PLACEHOLDER" },
-    { taskID: "TASK-0028", projectID: "PROJ-CRM-0008", name: "คนนี้ที คนนี้ที", owner: "AJ-DAENG", deadline: new Date("2025-12-25"), status: "In Progress", logPreview: "029-PLACEHOLDER" },
-    { taskID: "TASK-0029", projectID: "PROJ-CRM-0004", name: "เพื่อบรรลุอรหันต์", owner: "PRODUCT", deadline: new Date("2025-11-22"), status: "Help Me", logPreview: "030-PLACEHOLDER" },
-    { taskID: "TASK-0030", projectID: "PROJ-CRM-0006", name: "ธรรมมะ กระตุกจิตกระชากใจ", owner: "MARKETING", deadline: new Date("2025-10-17"), status: "Not Started", logPreview: "031-PLACEHOLDER" }
-];
-
-
+// TODO: fix re-renders on open CreateTaskModal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 function ProjectDetail() {
     let param = useParams();
     const currentProjectID = param.projectID;
-    //
+    const [lnw_task, setLnw_task] = useState<Task[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchTasks = async () => {
+        setIsLoading(true);
+        const data = await callApi.getTasks();
+        setLnw_task(data);
+        setIsLoading(false);
+    }
+
+    useEffect(() => {
+        fetchTasks();
+    }, [])
+
     // TODO: usememo this
-    const tasksByProjectID: ProjectTask[] = tasks.filter(t => t.projectID === currentProjectID);
+    const tasksByProjectID: Task[] = lnw_task.filter((t: Task) => t.projectID === currentProjectID);
+    // TODO: temp mockdata
+    const tasksJoinTaskName = leftJoinOne2One(tasksByProjectID, TASK_NAMES, "taskNameID", "taskNameID", "taskName");
+    const tasksJoinTeam = leftJoinOne2One(tasksJoinTaskName, TEAMS, "teamID", "teamID", "team");
+    const tasksJoinStatus = leftJoinOne2One(tasksJoinTeam, TASK_STATUSES, "statusID", "statusID", "status");
+
+    const processingTasks = tasksJoinStatus;
 
     const statusMetrics = useMemo(() => {
         const DAY_AHEAD: number = 10; // TODO: make this customizable by user or maybe make this global constant
@@ -115,30 +97,30 @@ function ProjectDetail() {
         const WARNING_DATE: Date = new Date(new Date().setDate(TODAY.getDate() + DAY_AHEAD)); // LMAOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 
         let overdue = 0, warning = 0, incomplete = 0, done = 0, helpme = 0;
-        tasksByProjectID.forEach(task => {
+        processingTasks.forEach(task => {
+            // TODO: rewrite this counting logic
             if (task.deadline && task.deadline < TODAY) overdue += 1;
 
             if (task.deadline >= TODAY && task.deadline <= WARNING_DATE) {
                 if (task.deadline) {
-                    console.log(task)
                     warning += 1;
                 }
             }
 
-            if (task.status !== "Done" && task.status !== "Cancelled") incomplete += 1;
-            if (task.status === "Help Me") helpme += 1;
-            if (task.status === "Done") done += 1;
+            if (task.status.statusName !== "Done" && task.status.statusName !== "Cancelled") incomplete += 1;
+            if (task.status.statusName === "Help Me") helpme += 1;
+            if (task.status.statusName === "Done") done += 1;
         });
 
         return { overdue, warning, incomplete, done, helpme }
-    });
+    }, [processingTasks]);
 
     const filteredAndSortedTasks = useMemo(() => {
         const dayAhead = 10; // TODO: make this customizable by user or maybe make this global constant
         const today = new Date();
         const warningDate = new Date().setDate(today.getDate() + dayAhead);
 
-        let tasksToProcess = tasksByProjectID;
+        let filteringTasks = processingTasks;
 
         // if (activeStatFilter) {
         //     const incomplete = tasks.filter(
@@ -198,14 +180,33 @@ function ProjectDetail() {
         //     return 0;
         // });
 
-        let finalFiltered = tasksToProcess;
+        let finalFiltered = filteringTasks;
         return finalFiltered;
     },
-        // [tasks, ownerFilter, statusFilter, searchQuery, activeStatFilter]
-        []
+        [lnw_task]
     );
+
+    const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
+    function openCreateTaskModal() { setIsCreateTaskModalOpen(true); };
+    function closeCreateTaskModal() { setIsCreateTaskModalOpen(false); };
+
+    const [isTaskDetailModalOpen, setIsTaskDetailModalOpen] = useState(false);
+    function openTaskDetailModal() { setIsTaskDetailModalOpen(true); };
+    function closeTaskDetailModal() { setIsTaskDetailModalOpen(false); };
+
+
+    if (isLoading) {
+        return <div>
+            Loading...
+        </div>
+    }
+
+    console.log("filteredAndSortedTasks = = = = = == = = =");
+    console.log(filteredAndSortedTasks);
     return (
         <>
+            <CreateTaskModal isOpen={isCreateTaskModalOpen} onClose={() => { closeCreateTaskModal() }} currentProjectID={currentProjectID} parentUpdateCallback={fetchTasks} />
+            <TaskDetailModal isOpen={isTaskDetailModalOpen} onClose={() => { closeTaskDetailModal() }} />
             <h1>{currentProjectID}</h1> {/* // TODO: remove this */}
             <div className="space-y-6">
                 {/*  TODO: split to separate components */}
@@ -283,9 +284,9 @@ function ProjectDetail() {
                         <h3 className="text-md font-bold text-gray-700">
                             ตัวกรองและเครื่องมือ
                         </h3>
-                        {currentProjectID && currentProjectID !== "ALL" ? (
+                        {currentProjectID ? (
                             <button
-                                // onClick={openCreateTaskModal}
+                                onClick={openCreateTaskModal}
                                 className="flex items-center px-4 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors
                 duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                             >
@@ -395,7 +396,6 @@ function ProjectDetail() {
                     // )
                 }
 
-                {/**/}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
@@ -466,7 +466,7 @@ function ProjectDetail() {
                                 const userCanEdit = true;
                                 return (
                                     <tr key={task.taskID} className="bg-white hover:bg-orange-50 cursor-pointer"
-                                    //onClick={() => openEditModal(task)}
+                                        onClick={() => openTaskDetailModal()}
                                     >
                                         <td className="w-4 p-4">
                                             {/* {userCanEdit ? ( */}
@@ -494,13 +494,15 @@ function ProjectDetail() {
                                             {/* )} */}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {`${task.deadline.getDate()}/${task.deadline.getMonth()}/${task.deadline.getFullYear()}`}
+                                            {`${task.deadline.getDate()}/${task.deadline.getMonth() + 1}/${task.deadline.getFullYear()}`
+                                                // getMonth() + 1 because it starts counting at 0 (January = 0) FOR SOME REASON GOD KNOWS WHY WHY CANT WE JUST NUKE THIS STUPID SHITTY ASS LANGUAGE FROM HUMANITY ALREADY
+                                            }
                                         </td>
                                         <td
                                             className="px-6 py-4 font-medium text-gray-900 max-w-xs truncate"
-                                            title={task.name}
+                                            title={task.taskName.taskNameID}
                                         >
-                                            {task.name}
+                                            {task.taskName.taskNameStr}
                                         </td>
                                         <td
                                             className="px-6 py-4 text-gray-600 max-w-sm truncate"
@@ -510,7 +512,7 @@ function ProjectDetail() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className="px-2.5 py-1 text-xs font-semibold text-orange-800 bg-orange-100 rounded-full">
-                                                {task.owner}
+                                                {task.team.teamName}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 max-w-xs">
@@ -529,9 +531,10 @@ function ProjectDetail() {
                                             {"help detail PLACEHOLDER"}
                                         </td>
                                         <td
-                                            className={`px-6 py-4 font-semibold ${StatusColor.get(task.status) || "text-gray-500"}`}
+                                            // TODO:  make statuscolor index by statusid?
+                                            className={`px-6 py-4 font-semibold ${StatusColor.get(task.status.statusName) || "text-gray-500"}`}
                                         >
-                                            {task.status}
+                                            {task.status.statusName}
                                         </td>
                                         <td className="px-4 py-4 text-center">
                                             {/* <div className="flex items-center justify-center space-x-1"> */}
