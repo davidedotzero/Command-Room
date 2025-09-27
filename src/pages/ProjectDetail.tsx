@@ -1,12 +1,16 @@
-import { useParams } from "react-router";
-import { PlusIcon, RefreshIcon } from "../components/utils/icons";
 import { useEffect, useMemo, useState } from "react";
-import CreateTaskModal from "../components/modals/CreateTaskModal";
+import { useParams } from "react-router";
+
+import { PlusIcon, RefreshIcon } from "../components/utils/icons";
 
 import type { Task } from "../utils/types";
-import { leftJoinOne2One, TASK_NAMES, TASK_STATUSES, TASKS, TEAMS } from "../utils/mockdata";
+import { leftJoinOne2One, PROJECTS, TASK_NAMES, TASK_STATUSES, TASKS, TEAMS } from "../utils/mockdata";
+
 import TaskDetailModal from "../components/modals/TaskDetailModal";
 import TaskDetailDealerModal from "../components/modals/TaskDetailDealerModal";
+import CreateTaskModal from "../components/modals/CreateTaskModal";
+import { StatusColor } from "../utils/constants";
+import { getDateYYYY_MM_DD } from "../utils/functions";
 
 // TODO: abstract this to other file
 const StatDisplayCard: React.FC<{
@@ -44,14 +48,6 @@ const statDescriptions = {
     helpMe: "งานที่ทีมกำลังร้องขอความช่วยเหลือ",
 };
 
-// TODO: maybe merge this to Status as a "table"?
-// TODO: refactor this
-let StatusColor = new Map<string, string>();
-StatusColor.set("Not Started", "text-gray-500");
-StatusColor.set("In Progress", "text-blue-500");
-StatusColor.set("Help Me", "text-purple-500");
-StatusColor.set("Done", "text-green-500");
-StatusColor.set("Cancelled", "text-red-500");
 
 // TODO: abstract this to separate mock api files
 const callApi = {
@@ -62,28 +58,42 @@ const callApi = {
     addTasks: async (newTask: Task) => {
         TASKS.push(newTask);
         return true;
-    }
+    },
+    getProjectNameById: async (projectID: string) => {
+        // TODO: handle when name not found
+        return PROJECTS.find(proj => proj.projectID === projectID)?.projectName!;
+    },
 };
 
 // TODO: fix re-renders on open CreateTaskModal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 function ProjectDetail() {
     let param = useParams();
-    const currentProjectID = param.projectID;
-    const [lnw_task, setLnw_task] = useState<Task[]>([]);
+    if (!param.projectID) {
+        // TODO: better error page
+        return <p>NO PROJECT SELECTED</p>;
+    }
+    const currentProjectID: string = param.projectID; // TODO: should i pass this as props or urlParams?
+    const [currentProjectName, setCurrentProjectName] = useState<string>("");
+    const [lnw_task, setLnw_task] = useState<Task[]>([]); // TODO: rename this
     const [isLoading, setIsLoading] = useState(true);
 
-    const fetchTasks = async () => {
+    const fetchData = async () => {
         setIsLoading(true);
         const data = await callApi.getTasks();
+        const projectName = await callApi.getProjectNameById(currentProjectID);
+
         setLnw_task(data);
+        setCurrentProjectName(projectName);
+
         setIsLoading(false);
     }
 
     useEffect(() => {
-        fetchTasks();
+        fetchData();
     }, [])
 
     // TODO: usememo this
+    // TODO: make select task by projectid an api call
     const tasksByProjectID: Task[] = lnw_task.filter((t: Task) => t.projectID === currentProjectID);
     // TODO: temp mockdata
     const tasksJoinTaskName = leftJoinOne2One(tasksByProjectID, TASK_NAMES, "taskNameID", "taskNameID", "taskName");
@@ -199,6 +209,7 @@ function ProjectDetail() {
     function openTaskDetailDealerModal() { setIsTaskDetailDealerModalOpen(true); };
     function closeTaskDetailDealerModal() { setIsTaskDetailDealerModalOpen(false); };
 
+    const [taskRowData, setTaskRowData] = useState<DOMStringMap>(); // for sending task detail of selected row to task modals
 
     if (isLoading) {
         return <div>
@@ -210,11 +221,12 @@ function ProjectDetail() {
     console.log(filteredAndSortedTasks);
     return (
         <>
-            <CreateTaskModal isOpen={isCreateTaskModalOpen} onClose={() => { closeCreateTaskModal() }} currentProjectID={currentProjectID} parentUpdateCallback={fetchTasks} />
+            <CreateTaskModal isOpen={isCreateTaskModalOpen} onClose={() => { closeCreateTaskModal() }} currentProjectID={currentProjectID} parentUpdateCallback={fetchData} />
             <TaskDetailModal isOpen={isTaskDetailModalOpen} onClose={() => { closeTaskDetailModal() }} />
-            <TaskDetailDealerModal isOpen={isTaskDetailDealerModalOpen} onClose={() => { closeTaskDetailDealerModal() }} />
+            <TaskDetailDealerModal isOpen={isTaskDetailDealerModalOpen} onClose={() => { closeTaskDetailDealerModal() }} taskData={taskRowData} currentProjectName={currentProjectName} />
 
             <h1>{currentProjectID}</h1> {/* // TODO: remove this */}
+            <h1>{currentProjectName}</h1> {/* // TODO: remove this */}
             <div className="space-y-6">
                 {/*  TODO: split to separate components */}
                 {/* KPIs Summary Section */}
@@ -473,11 +485,14 @@ function ProjectDetail() {
                                 const userCanEdit = true;
                                 return (
                                     <tr key={task.taskID} className="bg-white hover:bg-orange-50 cursor-pointer"
-                                        onClick={() => {
-                                            // if(isDealerTask)
-                                            openTaskDetailDealerModal()
-                                            // else
-                                            // openTaskDetailModal()
+                                        data-task-team={task.team.teamName}
+                                        data-selected-task={JSON.stringify(task)} // TODO: SUPER LOW IQ SOLUTION: JUST TAKE ALL ROW DATA, TURN IT TO JSON STRING, THROW TO MODAL AND PARSE THE SHEESH THERE LOLLLLLLLLLLLLLLL
+                                        onClick={(e) => {
+                                            const rowData = e.currentTarget.dataset;
+                                            setTaskRowData(rowData);
+                                            // TODO: should compare by teamID but this works for now
+                                            if (rowData.taskTeam === "DEALER") openTaskDetailDealerModal();
+                                            else openTaskDetailModal();
                                         }}
                                     >
                                         <td className="w-4 p-4">
@@ -506,9 +521,7 @@ function ProjectDetail() {
                                             {/* )} */}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {`${task.deadline.getDate()}/${task.deadline.getMonth() + 1}/${task.deadline.getFullYear()}`
-                                                // getMonth() + 1 because it starts counting at 0 (January = 0) FOR SOME REASON GOD KNOWS WHY WHY CANT WE JUST NUKE THIS STUPID SHITTY ASS LANGUAGE FROM HUMANITY ALREADY
-                                            }
+                                            {getDateYYYY_MM_DD(task.deadline)}
                                         </td>
                                         <td
                                             className="px-6 py-4 font-medium text-gray-900 max-w-xs truncate"
@@ -581,6 +594,7 @@ function ProjectDetail() {
                                 );
                             })}
 
+                            {/* // TODO: show row when no task in project */}
                             {/* {filteredAndSortedTasks.length === 0 && ( */}
                             {/*     <tr> */}
                             {/*         <td colSpan={9} className="text-center py-10 text-gray-500"> */}

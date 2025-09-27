@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import Select from "react-select";
+
 import { createPortal, useFormStatus } from "react-dom";
 import { TASK_NAMES, TASKS, TEAMS } from "../../utils/mockdata";
 
@@ -67,9 +69,9 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
         const deadlineStr = formData.get("FormDeadline");
         const inProgressStatusID = 1; // default to "In Progress"
 
-        // console.log("task: " + task);
-        // console.log("team: " + team);
-        // console.log("deadline: " + deadline);
+        console.log("task: " + taskNameID);
+        console.log("team: " + teamID);
+        console.log("deadline: " + deadlineStr);
 
         // TODO: CALL API: add new task to project
 
@@ -80,7 +82,7 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
         // await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
 
         console.log("sed la");
-        onClose();
+        // onClose();
         parentUpdateCallback();
     }
 
@@ -92,7 +94,9 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
                 //onClick={(e) => e.stopPropagation()} 
                 >
                     <header className="flex justify-between items-center p-6 border-b">
-                        <h2 className="text-xl font-bold text-gray-800">สร้าง Task ใหม่ {currentProjectID}</h2>
+                        <h2 className="text-xl font-bold text-gray-800">สร้าง Task ใหม่</h2>
+                        <h3 className="text-xl font-bold text-gray-800">{currentProjectID}</h3>
+                        {/* // TODO: make above better looking */}
                         <button
                             onClick={onClose}
                             disabled={isLoading}
@@ -104,16 +108,19 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
                     <form action={handleSubmit}>
                         <FormFieldSetWrapper>
                             <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-                                <div className="md:col-span-2"> <FormField label="Task">
-                                    <select
-                                        name="FormTaskName"
-                                        // onChange={handleChange}
-                                        required
-                                        className={baseInputClass}
-                                    >
-                                        {TASK_NAMES.map((taskName) => (<option key={taskName.taskNameID} value={taskName.taskNameID}>{taskName.taskNameStr}</option>))}
-                                    </select>
-                                </FormField> </div>
+                                <div className="md:col-span-2">
+                                    <FormField label="Task">
+                                        <Select
+                                            name="FormTaskName"
+                                            required
+                                            className={"shadow-sm"}
+                                            isClearable={false}
+                                            isSearchable={true}
+                                            placeholder={"เลือกรายการ..."}
+                                            options={TASK_NAMES.map((taskName) => ({ value: taskName.taskNameID, label: taskName.taskNameStr }))}
+                                        />
+                                    </FormField>
+                                </div>
                                 <FormField label="Team">
                                     <select
                                         name="FormTeam"

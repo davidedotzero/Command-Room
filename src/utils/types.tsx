@@ -13,7 +13,15 @@ export interface Task {
     deadline: Date,
     statusID: number, //TaskStatus: statusID
     logPreview: string // this should be the "description" of the latest log for the task
+    teamHelpID: number | null, //Team: teamID
+    helpReqAt: Date | null,
 };
+
+export interface Project {
+    projectID: string;
+    projectName: string;
+    done: boolean;
+}
 
 export interface TaskName {
     taskNameID: number,
