@@ -77,7 +77,7 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
         TASKS.push(
             { taskID: "TASK-0069", projectID: currentProjectID, taskNameID: taskNameID, teamID: teamID, deadline: new Date(deadlineStr), statusID: inProgressStatusID, logPreview: "999-PLACEHOLDER" }
         );
-        await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
+        // await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
 
         console.log("sed la");
         onClose();

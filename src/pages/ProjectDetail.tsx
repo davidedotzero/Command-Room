@@ -6,6 +6,7 @@ import CreateTaskModal from "../components/modals/CreateTaskModal";
 import type { Task } from "../utils/types";
 import { leftJoinOne2One, TASK_NAMES, TASK_STATUSES, TASKS, TEAMS } from "../utils/mockdata";
 import TaskDetailModal from "../components/modals/TaskDetailModal";
+import TaskDetailDealerModal from "../components/modals/TaskDetailDealerModal";
 
 // TODO: abstract this to other file
 const StatDisplayCard: React.FC<{
@@ -55,7 +56,7 @@ StatusColor.set("Cancelled", "text-red-500");
 // TODO: abstract this to separate mock api files
 const callApi = {
     getTasks: async () => {
-        await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
+        // await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
         return [...TASKS];
     },
     addTasks: async (newTask: Task) => {
@@ -194,6 +195,10 @@ function ProjectDetail() {
     function openTaskDetailModal() { setIsTaskDetailModalOpen(true); };
     function closeTaskDetailModal() { setIsTaskDetailModalOpen(false); };
 
+    const [isTaskDetailDealerModalOpen, setIsTaskDetailDealerModalOpen] = useState(false);
+    function openTaskDetailDealerModal() { setIsTaskDetailDealerModalOpen(true); };
+    function closeTaskDetailDealerModal() { setIsTaskDetailDealerModalOpen(false); };
+
 
     if (isLoading) {
         return <div>
@@ -207,6 +212,8 @@ function ProjectDetail() {
         <>
             <CreateTaskModal isOpen={isCreateTaskModalOpen} onClose={() => { closeCreateTaskModal() }} currentProjectID={currentProjectID} parentUpdateCallback={fetchTasks} />
             <TaskDetailModal isOpen={isTaskDetailModalOpen} onClose={() => { closeTaskDetailModal() }} />
+            <TaskDetailDealerModal isOpen={isTaskDetailDealerModalOpen} onClose={() => { closeTaskDetailDealerModal() }} />
+
             <h1>{currentProjectID}</h1> {/* // TODO: remove this */}
             <div className="space-y-6">
                 {/*  TODO: split to separate components */}
@@ -466,7 +473,12 @@ function ProjectDetail() {
                                 const userCanEdit = true;
                                 return (
                                     <tr key={task.taskID} className="bg-white hover:bg-orange-50 cursor-pointer"
-                                        onClick={() => openTaskDetailModal()}
+                                        onClick={() => {
+                                            // if(isDealerTask)
+                                            openTaskDetailDealerModal()
+                                            // else
+                                            // openTaskDetailModal()
+                                        }}
                                     >
                                         <td className="w-4 p-4">
                                             {/* {userCanEdit ? ( */}
