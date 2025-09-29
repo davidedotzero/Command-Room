@@ -190,6 +190,18 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
                                         </div>
                                     )}
 
+                                    {/* // TODO: fix this bodge */}
+                                    {
+                                        // only dealer
+                                        currentTask.teamID === 2 && (
+                                            <div className="md:col-span-2 mt-4">
+                                                <FormField label={"อับโหลดไฟล์"}>
+                                                    <input type="file" />
+                                                </FormField>
+                                            </div>
+                                        )
+                                    }
+
                                     <div className="md:col-span-2 mt-4">
                                         <div className={`p-4 rounded-lg border transition-colors duration-200 bg-yellow-50 border-yellow-400 shadow-md`}>
                                             <FormField label={"รายละเอียดการอัปเดต (จำเป็นต้องกรอก*)'"}>
@@ -207,6 +219,7 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
                                             </p>
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
                         </FormFieldSetWrapper>

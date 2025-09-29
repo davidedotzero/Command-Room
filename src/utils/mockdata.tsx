@@ -5,7 +5,7 @@ import type { EditLog, Project, Task, TaskName, TaskStatus, Team } from "./types
 export let TEAMS: Team[] = [
     { teamID: 1, teamName: "PRODUCTION" },
     { teamID: 2, teamName: "DEALER" },
-    { teamID: 3, teamName: "AJ-DAENG" },
+    { teamID: 3, teamName: "OWO" },
 ]
 
 export let TASK_NAMES: TaskName[] = [

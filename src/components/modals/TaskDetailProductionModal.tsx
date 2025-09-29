@@ -1,26 +1,12 @@
 import { createPortal } from "react-dom";
-import { StatusColor } from "../../utils/constants";
-import { formatDateYYYY_MM_DD } from "../../utils/functions";
-import { useEffect, useState } from "react";
 import EditTaskModal from "./EditTaskModal";
+import { useState } from "react";
 import { DetailItem } from "./forms/FormItems";
+import { formatDateYYYY_MM_DD } from "../../utils/functions";
+import { StatusColor } from "../../utils/constants";
 
-
-function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: any, currentProjectName: string, parentUpdateCallback: () => {} }) {
+function TaskDetailProductionModal({ isOpen, onClose, taskData, currentProjectName, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: any, currentProjectName: string, parentUpdateCallback: () => {} }) {
     if (!isOpen) return null;
-    // Close Modal on ESC key
-    useEffect(() => {
-        const handleKeyDown = (event) => {
-            if (event.key === "Escape") onClose();
-        }
-
-        if (isOpen)
-            document.addEventListener("keydown", handleKeyDown);
-
-        return () => {
-            document.removeEventListener("keydown", handleKeyDown);
-        }
-    }, [isOpen, onClose]);
 
     // TODO: do proper isLoading later
     let isLoading = false;
@@ -64,7 +50,7 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, 
                     {/* // TODO: change from form to normal div???? */}
                     <form action={handleSubmit} className="flex flex-col overflow-hidden flex-1 min-h-0">
                         <div className="overflow-y-auto flex-1">
-                            <TaskDetailsView task={currentTask} currentProjectName={currentProjectName} />
+                            <TaskDetailsView_TEMP task={currentTask} currentProjectName={currentProjectName} />
                         </div>
 
                         <footer className="flex justify-end items-center p-6 border-t bg-gray-50 rounded-b-xl">
@@ -101,7 +87,7 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, 
 
 // TODO: types for selectedTask
 // TODO: abstract to other component file
-function TaskDetailsView(props) {
+function TaskDetailsView_TEMP(props) {
     function calculateLeadTime(deadline: Date, requestDate: Date) {
         const diffTime = deadline.getTime() - requestDate.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -183,9 +169,6 @@ function TaskDetailsView(props) {
                 )}
 
                 {/* // TODO: customer section */}
-                <div className="pb-6 border-b">
-                    ================== ข้อมูล customer ตรงนี้ =========================
-                </div>
 
                 {/* === Section: Log === */}
                 <div className="grid grid-cols-1 gap-y-6">
@@ -201,4 +184,4 @@ function TaskDetailsView(props) {
     );
 };
 
-export default TaskDetailDealerModal;
+export default TaskDetailProductionModal;

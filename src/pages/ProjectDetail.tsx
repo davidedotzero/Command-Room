@@ -6,7 +6,7 @@ import { PlusIcon, RefreshIcon } from "../components/utils/icons";
 import type { Task, Team } from "../utils/types";
 import { leftJoinOne2One, PROJECTS, TASK_NAMES, TASK_STATUSES, TASKS, TEAMS } from "../utils/mockdata";
 
-import TaskDetailModal from "../components/modals/TaskDetailModal";
+import TaskDetailProductionModal from "../components/modals/TaskDetailProductionModal";
 import TaskDetailDealerModal from "../components/modals/TaskDetailDealerModal";
 import CreateTaskModal from "../components/modals/CreateTaskModal";
 import { StatusColor } from "../utils/constants";
@@ -217,7 +217,7 @@ function ProjectDetail() {
     return (
         <>
             <CreateTaskModal isOpen={isCreateTaskModalOpen} onClose={() => { closeCreateTaskModal() }} currentProjectID={currentProjectID} parentUpdateCallback={fetchData} />
-            <TaskDetailModal isOpen={isTaskDetailModalOpen} onClose={() => { closeTaskDetailModal() }} />
+            <TaskDetailProductionModal isOpen={isTaskDetailModalOpen} onClose={() => { closeTaskDetailModal() }} taskData={taskRowData} currentProjectName={currentProjectName} parentUpdateCallback={fetchData} />
             <TaskDetailDealerModal isOpen={isTaskDetailDealerModalOpen} onClose={() => { closeTaskDetailDealerModal() }} taskData={taskRowData} currentProjectName={currentProjectName} parentUpdateCallback={fetchData} />
 
             <h1>{currentProjectID}</h1> {/* // TODO: remove this */}
