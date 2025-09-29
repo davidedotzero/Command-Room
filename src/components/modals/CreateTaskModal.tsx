@@ -5,21 +5,6 @@ import { createPortal, useFormStatus } from "react-dom";
 import { TASK_NAMES, TASKS, TEAMS } from "../../utils/mockdata";
 
 
-// TODO: abstact this sheesh
-const FormField: React.FC<{ label: string; children: React.ReactNode }> = ({
-    label,
-    children,
-}) => {
-    const { pending } = useFormStatus();
-    return (
-        <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-                {label}
-            </label>
-            {children}
-        </div>
-    );
-};
 
 // TODO: abstact this sheesh
 type FormButtonProps = {
@@ -77,12 +62,12 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
 
         // TODO: generate new task id
         TASKS.push(
-            { taskID: "TASK-0069", projectID: currentProjectID, taskNameID: taskNameID, teamID: teamID, deadline: new Date(deadlineStr), statusID: inProgressStatusID, logPreview: "999-PLACEHOLDER" }
+            { taskID: "TASK-0069", projectID: currentProjectID, taskNameID: taskNameID, teamID: teamID, deadline: new Date(deadlineStr), statusID: inProgressStatusID, teamHelpID: null, helpReqAt: null, logPreview: "999-PLACEHOLDER" }
         );
         // await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
 
         console.log("sed la");
-        // onClose();
+        onClose();
         parentUpdateCallback();
     }
 

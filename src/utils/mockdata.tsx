@@ -1,6 +1,6 @@
 // TODO: DELETE MOCKUP DATA
 
-import type { Project, Task, TaskName, TaskStatus, Team } from "./types";
+import type { EditLog, Project, Task, TaskName, TaskStatus, Team } from "./types";
 
 export let TEAMS: Team[] = [
     { teamID: 1, teamName: "PRODUCTION" },
@@ -59,7 +59,8 @@ export let TASKS: Task[] = [
     { taskID: "TASK-0027", projectID: "PROJ-CRM-0003", taskNameID: 7, teamID: 2, deadline: new Date("2025-10-05"), statusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "028-PLACEHOLDER" },
     { taskID: "TASK-0028", projectID: "PROJ-CRM-0008", taskNameID: 6, teamID: 3, deadline: new Date("2025-12-25"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "029-PLACEHOLDER" },
     { taskID: "TASK-0029", projectID: "PROJ-CRM-0004", taskNameID: 2, teamID: 1, deadline: new Date("2025-11-22"), statusID: 3, teamHelpID: 3, helpReqAt: new Date("2024-01-01"), logPreview: "030-PLACEHOLDER" },
-    { taskID: "TASK-0030", projectID: "PROJ-CRM-0006", taskNameID: 1, teamID: 2, deadline: new Date("2025-10-17"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "031-PLACEHOLDER" }
+    { taskID: "TASK-0030", projectID: "PROJ-CRM-0006", taskNameID: 1, teamID: 2, deadline: new Date("2025-10-17"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "031-PLACEHOLDER" },
+    { taskID: "TASK-0030", projectID: "PROJ-CRM-0007", taskNameID: 6, teamID: 2, deadline: new Date("2025-10-28"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "032-PLACEHOLDER" },
 ];
 
 // TODO: DELETE MOCKUP DATA
@@ -79,6 +80,11 @@ export let PROJECTS: Project[] = [
     { projectID: "PROJ-CRM-0013", projectName: "test13", done: true },
 ];
 
+export let EDIT_LOGS: EditLog[] = [
+    { eLogID: "LOG-2025-09-29-00001", taskID: "TASK-0012", userID: "USR-00001", date: new Date("2025-09-29"), reason: "eieieieieieieiieieiei", fromStatusID: null, toStatusID: null, fromDeadline: new Date("2025-08-18"), toDeadline: new Date("2025-09-29") },
+    { eLogID: "LOG-2025-09-29-00002", taskID: "TASK-0012", userID: "USR-00001", date: new Date("2025-09-29"), reason: "eieieieieieieiieieiei", fromStatusID: 1, toStatusID: 2, fromDeadline: null, toDeadline: null },
+];
+
 /**
  * Performs a one-to-many left join on two arrays of objects.
  * @param {object} options - The join configuration.
@@ -91,7 +97,7 @@ export let PROJECTS: Project[] = [
  */
 // TODO: make this sheesh typescript
 // TODO: make this join just the field we want instead of the whole object
-// TODO: make this extension function of Object[]
+// TODO: make this extension function of Object[] or abstact this to other file
 export function leftJoinOne2One(leftArray, rightArray, leftKey, rightKey, newPropName) {
     return leftArray.map(leftItem => {
         // For each item on the left, find all matching items on the right

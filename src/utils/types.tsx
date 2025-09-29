@@ -38,4 +38,22 @@ export interface TaskStatus {
     statusName: string,
 }
 
+export interface User {
+    userID: string;
+    name: string;
+    email: string;
+    roleID: number;
+    isAdmin: boolean;
+}
 
+export interface EditLog {
+    eLogID: string;
+    date: Date;
+    reason: string;
+    fromStatusID: number | null;
+    toStatusID: number | null;
+    fromDeadline: Date | null;
+    toDeadline: Date | null;
+    taskID: string; // Task: taskID
+    userID: string; // UseR: userID
+}

@@ -3,14 +3,15 @@ import { useParams } from "react-router";
 
 import { PlusIcon, RefreshIcon } from "../components/utils/icons";
 
-import type { Task } from "../utils/types";
+import type { Task, Team } from "../utils/types";
 import { leftJoinOne2One, PROJECTS, TASK_NAMES, TASK_STATUSES, TASKS, TEAMS } from "../utils/mockdata";
 
 import TaskDetailModal from "../components/modals/TaskDetailModal";
 import TaskDetailDealerModal from "../components/modals/TaskDetailDealerModal";
 import CreateTaskModal from "../components/modals/CreateTaskModal";
 import { StatusColor } from "../utils/constants";
-import { getDateYYYY_MM_DD } from "../utils/functions";
+import { formatDateYYYY_MM_DD } from "../utils/functions";
+import { API } from "../utils/api";
 
 // TODO: abstract this to other file
 const StatDisplayCard: React.FC<{
@@ -48,23 +49,6 @@ const statDescriptions = {
     helpMe: "งานที่ทีมกำลังร้องขอความช่วยเหลือ",
 };
 
-
-// TODO: abstract this to separate mock api files
-const callApi = {
-    getTasks: async () => {
-        // await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
-        return [...TASKS];
-    },
-    addTasks: async (newTask: Task) => {
-        TASKS.push(newTask);
-        return true;
-    },
-    getProjectNameById: async (projectID: string) => {
-        // TODO: handle when name not found
-        return PROJECTS.find(proj => proj.projectID === projectID)?.projectName!;
-    },
-};
-
 // TODO: fix re-renders on open CreateTaskModal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 function ProjectDetail() {
     let param = useParams();
@@ -74,16 +58,24 @@ function ProjectDetail() {
     }
     const currentProjectID: string = param.projectID; // TODO: should i pass this as props or urlParams?
     const [currentProjectName, setCurrentProjectName] = useState<string>("");
+
     const [lnw_task, setLnw_task] = useState<Task[]>([]); // TODO: rename this
+    const [lnw_team, setLnw_team] = useState<Team[]>([]); // TODO: rename this
+
     const [isLoading, setIsLoading] = useState(true);
+
+    const [activeStatFilter, setActiveStatFilter] = useState<string | null>(null);
+    const [teamFilter, setTeamFilter] = useState<Team | null>(null);
 
     const fetchData = async () => {
         setIsLoading(true);
-        const data = await callApi.getTasks();
-        const projectName = await callApi.getProjectNameById(currentProjectID);
+        const data = await API.getTasks();
+        const projectName = await API.getProjectNameById(currentProjectID);
+        const teams = await API.getAllTeams();
 
         setLnw_task(data);
         setCurrentProjectName(projectName);
+        setLnw_team(teams);
 
         setIsLoading(false);
     }
@@ -113,11 +105,12 @@ function ProjectDetail() {
             if (task.deadline && task.deadline < TODAY) overdue += 1;
 
             if (task.deadline >= TODAY && task.deadline <= WARNING_DATE) {
-                if (task.deadline) {
+                if (task.deadline) { // why this???
                     warning += 1;
                 }
             }
 
+            // TODO: remove cancelled condition
             if (task.status.statusName !== "Done" && task.status.statusName !== "Cancelled") incomplete += 1;
             if (task.status.statusName === "Help Me") helpme += 1;
             if (task.status.statusName === "Done") done += 1;
@@ -127,40 +120,41 @@ function ProjectDetail() {
     }, [processingTasks]);
 
     const filteredAndSortedTasks = useMemo(() => {
-        const dayAhead = 10; // TODO: make this customizable by user or maybe make this global constant
-        const today = new Date();
-        const warningDate = new Date().setDate(today.getDate() + dayAhead);
+        const DAY_AHEAD: number = 10; // TODO: make this customizable by user or maybe make this global constant
+        const TODAY: Date = new Date();
+        const WARNING_DATE: Date = new Date(new Date().setDate(TODAY.getDate() + DAY_AHEAD)); // LMAOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 
         let filteringTasks = processingTasks;
 
-        // if (activeStatFilter) {
-        //     const incomplete = tasks.filter(
-        //         (t) => t.Status !== "Done" && t.Status !== "Cancelled"
-        //     );
-        //     switch (activeStatFilter) {
-        //         case "Overdue":
-        //             tasksToProcess = incomplete.filter(
-        //                 (t) => t.Deadline && t.Deadline < today
-        //             );
-        //             break;
-        //         case "Warning":
-        //             tasksToProcess = incomplete.filter((t) => {
-        //                 if (!t.Deadline) return false;
-        //                 return t.Deadline >= today && t.Deadline <= warningDate;
-        //             });
-        //             break;
-        //         case "Incomplete":
-        //             tasksToProcess = incomplete;
-        //             break;
-        //         case "Done":
-        //             tasksToProcess = tasks.filter((t) => t.Status === "Done");
-        //             break;
-        //         case "Help Me":
-        //             tasksToProcess = tasks.filter((t) => t.Status === "Help Me");
-        //             break;
-        //     }
-        // }
-        //
+        if (activeStatFilter) {
+            const incomplete = filteringTasks.filter(
+                // TODO: remove cancelled condition
+                (t) => t.status.statusName !== "Done" && t.status.statusName !== "Cancelled"
+            );
+            switch (activeStatFilter) {
+                case "Overdue":
+                    filteringTasks = incomplete.filter((t) => t.deadline && t.deadline < TODAY);
+                    break;
+                case "Warning":
+                    filteringTasks = incomplete.filter((t) => {
+                        if (!t.deadline) return false;
+                        return t.deadline >= TODAY && t.deadline <= WARNING_DATE
+                    });
+                    break;
+                case "Incomplete":
+                    filteringTasks = incomplete;
+                    break;
+                case "Done":
+                    filteringTasks = filteringTasks.filter((t) => t.status.statusName === "Done");
+                    break;
+                case "Help Me":
+                    filteringTasks = filteringTasks.filter((t) => t.status.statusName === "Help Me");
+                    break;
+                default:
+                    console.error("PROJECTDETIAL KPI FILTERING UNREACHABLE");
+            }
+        }
+
         // let finalFiltered = tasksToProcess.filter((task) => {
         //     // [✅ แก้ไข] ใช้ task.HelpAssignee โดยตรง (ไม่ต้องใช้ as any เพราะแก้ไข types.ts แล้ว)
         //     const matchesOwner = ownerFilter
@@ -194,7 +188,7 @@ function ProjectDetail() {
         let finalFiltered = filteringTasks;
         return finalFiltered;
     },
-        [lnw_task]
+        [lnw_task, activeStatFilter]
     );
 
     const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
@@ -208,6 +202,7 @@ function ProjectDetail() {
     const [isTaskDetailDealerModalOpen, setIsTaskDetailDealerModalOpen] = useState(false);
     function openTaskDetailDealerModal() { setIsTaskDetailDealerModalOpen(true); };
     function closeTaskDetailDealerModal() { setIsTaskDetailDealerModalOpen(false); };
+
 
     const [taskRowData, setTaskRowData] = useState<DOMStringMap>(); // for sending task detail of selected row to task modals
 
@@ -229,6 +224,7 @@ function ProjectDetail() {
             <h1>{currentProjectName}</h1> {/* // TODO: remove this */}
             <div className="space-y-6">
                 {/*  TODO: split to separate components */}
+
                 {/* KPIs Summary Section */}
                 <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-200">
                     <div className="flex justify-between items-center mb-3">
@@ -248,51 +244,41 @@ function ProjectDetail() {
                             label="Overdue"
                             value={statusMetrics.overdue}
                             color="text-red-500"
-                            // isActive={activeStatFilter === "Overdue"}
-                            // onClick={() => handleStatFilterClick("Overdue")}
+                            isActive={activeStatFilter === "Overdue"}
+                            onClick={() => setActiveStatFilter("Overdue")}
                             description={statDescriptions.overdue}
-                            isActive={false}
-                            onClick={() => { }}
                         />
                         <StatDisplayCard
                             label="Warning"
                             value={statusMetrics.warning}
                             color="text-yellow-500"
-                            // isActive={activeStatFilter === "Warning"}
-                            // onClick={() => handleStatFilterClick("Warning")}
+                            isActive={activeStatFilter === "Warning"}
+                            onClick={() => setActiveStatFilter("Warning")}
                             description={statDescriptions.warning}
-                            isActive={false}
-                            onClick={() => { }}
                         />
                         <StatDisplayCard
                             label="Incomplete"
                             value={statusMetrics.incomplete}
                             color="text-blue-500"
-                            // isActive={activeStatFilter === "Incomplete"}
-                            // onClick={() => handleStatFilterClick("Incomplete")}
+                            isActive={activeStatFilter === "Incomplete"}
+                            onClick={() => setActiveStatFilter("Incomplete")}
                             description={statDescriptions.incomplete}
-                            isActive={false}
-                            onClick={() => { }}
                         />
                         <StatDisplayCard
                             label="Done"
                             value={statusMetrics.done}
                             color="text-green-500"
-                            // isActive={activeStatFilter === "Done"}
-                            // onClick={() => handleStatFilterClick("Done")}
+                            isActive={activeStatFilter === "Done"}
+                            onClick={() => setActiveStatFilter("Done")}
                             description={statDescriptions.done}
-                            isActive={false}
-                            onClick={() => { }}
                         />
                         <StatDisplayCard
                             label="Help Me"
                             value={statusMetrics.helpme}
                             color="text-purple-500"
-                            // isActive={activeStatFilter === "Help Me"}
-                            // onClick={() => handleStatFilterClick("Help Me")}
+                            isActive={activeStatFilter === "Help Me"}
+                            onClick={() => setActiveStatFilter("Help Me")}
                             description={statDescriptions.helpMe}
-                            isActive={false}
-                            onClick={() => { }}
                         />
                     </div>
                 </div>
@@ -321,20 +307,21 @@ function ProjectDetail() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {/* // TODO: abstract this to comboBox component */}
                         <div>
+                            {/* // TODO: change filter???? */}
                             <label className="text-sm font-medium text-gray-700 mb-1 block">
                                 Owner / Assignee
                             </label>
                             <select
                                 // value={ownerFilter}
-                                // onChange={(e) => setOwnerFilter(e.target.value)}
+                                onChange={(e) => setTeamFilter(e.target.value)}
                                 className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                             >
-                                <option value="">-- ทีมทั้งหมด --</option>
-                                {/* {ownerOptions.map((opt) => ( */}
-                                {/*     <option key={opt} value={opt}> */}
-                                {/*         {opt} */}
-                                {/*     </option> */}
-                                {/* ))} */}
+                                <option value={""}>-- ทีมทั้งหมด --</option>
+                                {lnw_team.map((opt) => (
+                                    <option key={opt.teamID} value={opt.teamName}>
+                                        {opt.teamName}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div>
@@ -369,51 +356,6 @@ function ProjectDetail() {
                         </div>
                     </div>
                 </div>
-
-                {/* [✅ เพิ่ม] Bulk Action Bar */}
-                {/* TODO: bulk selection and editing on table */}
-                { //selectedTaskIds.size > 0 && (
-                    //     <div className="p-4 bg-blue-50 rounded-lg shadow-sm border border-blue-300 flex flex-wrap items-center justify-between gap-4 transition-all duration-300 sticky top-0 z-10">
-                    //         <div className="text-sm font-medium text-blue-800">
-                    //             เลือกแล้ว {selectedTaskIds.size} รายการ
-                    //         </div>
-                    //         <div className="flex flex-wrap items-center gap-4">
-                    //             <label
-                    //                 htmlFor="bulk-deadline-input"
-                    //                 className="text-sm font-medium text-gray-700"
-                    //             >
-                    //                 กำหนด Deadline ใหม่:
-                    //             </label>
-                    //             <input
-                    //                 id="bulk-deadline-input"
-                    //                 type="date"
-                    //                 value={newDeadline}
-                    //                 onChange={(e) => setNewDeadline(e.target.value)}
-                    //                 className="px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
-                    //             />
-                    //             <button
-                    //                 onClick={handleBulkUpdate}
-                    //                 disabled={!newDeadline || isBulkUpdating}
-                    //                 className={`px-4 py-2 text-sm font-semibold rounded-md text-white transition-colors duration-200 ${!newDeadline || isBulkUpdating
-                    //                     ? "bg-gray-400 cursor-not-allowed"
-                    //                     : "bg-orange-500 hover:bg-orange-600 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
-                    //                     }`}
-                    //             >
-                    //                 {isBulkUpdating ? "กำลังอัปเดต..." : "ยืนยันการแก้ไข"}
-                    //             </button>
-                    //             <button
-                    //                 onClick={() => {
-                    //                     setSelectedTaskIds(new Set());
-                    //                     setNewDeadline("");
-                    //                 }}
-                    //                 className="text-sm text-gray-600 hover:text-gray-800 transition-colors px-3 py-2 hover:bg-gray-200 rounded-md"
-                    //             >
-                    //                 ยกเลิกการเลือก
-                    //             </button>
-                    //         </div>
-                    //     </div>
-                    // )
-                }
 
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
                     <table className="w-full text-sm">
@@ -521,7 +463,7 @@ function ProjectDetail() {
                                             {/* )} */}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {getDateYYYY_MM_DD(task.deadline)}
+                                            {formatDateYYYY_MM_DD(task.deadline)}
                                         </td>
                                         <td
                                             className="px-6 py-4 font-medium text-gray-900 max-w-xs truncate"

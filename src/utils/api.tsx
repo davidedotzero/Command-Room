@@ -1,7 +1,10 @@
+import { TASKS, PROJECTS, TEAMS, TASK_STATUSES } from "./mockdata";
+import type { Task } from "./types";
+
 const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 //TODO: IMPORTANT!!!!! this file
 
-async function callAPI<T>(op: string, payload: object): Promise<T> {
+export async function callAPI<T>(op: string, payload: object): Promise<T> {
     if (!SCRIPT_URL) throw new Error("VITE_APP_SCRIPT_URL is not defined in env.");
 
     try {
@@ -55,4 +58,23 @@ async function callAPI<T>(op: string, payload: object): Promise<T> {
     }
 }
 
-export default callAPI;
+export const API = {
+    getTasks: async () => {
+        // await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
+        return [...TASKS];
+    },
+    addTasks: async (newTask: Task) => {
+        TASKS.push(newTask);
+        return true;
+    },
+    getProjectNameById: async (projectID: string) => {
+        // TODO: handle when name not found
+        return PROJECTS.find(proj => proj.projectID === projectID)?.projectName!;
+    },
+    getAllTeams: async () => {
+        return [...TEAMS];
+    },
+    getAllTaskStatus: async () => {
+        return [...TASK_STATUSES]
+    }
+}

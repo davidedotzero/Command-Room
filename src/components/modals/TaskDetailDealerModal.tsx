@@ -1,6 +1,9 @@
 import { createPortal } from "react-dom";
 import { StatusColor } from "../../utils/constants";
-import { getDateYYYY_MM_DD } from "../../utils/functions";
+import { formatDateYYYY_MM_DD } from "../../utils/functions";
+import { useState } from "react";
+import EditTaskModal from "./EditTaskModal";
+import { DetailItem } from "./forms/FormItems";
 
 
 function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName }: { isOpen: boolean, onClose: () => void, taskData: any, currentProjectName: string }) {
@@ -17,16 +20,22 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName }
 
     const handleSubmit = async (formData: FormData) => {
         console.log("open edit task dialog here");
+        openEditTaskModal();
     }
+
+    const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
+    function openEditTaskModal() { setIsEditTaskModalOpen(true); };
+    function closeEditTaskModal() { setIsEditTaskModalOpen(false); };
+
 
     return createPortal(
         <>
+            <EditTaskModal isOpen={isEditTaskModalOpen} onClose={() => { closeEditTaskModal() }} taskData={currentTask} />
+
             <div className="fixed inset-0 z-50 bg-white/70 bg-opacity-50 flex items-center justify-center">
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl">
-                    {/* Header */}
                     <header className="flex justify-between items-center p-6 border-b sticky top-0 bg-white z-10">
                         <h2 className="text-xl font-bold text-gray-800">
-                            {/* {currentModeIsView ? "รายละเอียด Task" : "แก้ไข Task"} */}
                             {"รายละเอียด Task"}
                         </h2>
                         <button
@@ -39,6 +48,7 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName }
                     </header>
 
                     {/* // TODO: why overflow is like this????????????????????????? */}
+                    {/* // TODO: change from form to normal div???? */}
                     <form action={handleSubmit} className="flex flex-col overflow-hidden flex-1 min-h-0">
                         <div className="overflow-y-auto flex-1">
                             <TaskDetailsView task={currentTask} currentProjectName={currentProjectName} />
@@ -63,6 +73,7 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName }
                                         // เลื่อนการเปลี่ยน State ออกไป เพื่อให้ Event Loop นี้จบก่อน
                                         // setTimeout(() => setIsEditing(true), 0);
                                         //TODO: EditTaskDialog
+
                                     }}
                                     disabled={isLoading}
                                     className="ml-3 px-6 py-2 text-sm font-medium text-white bg-orange-500 border border-transparent rounded-md shadow-sm hover:bg-orange-600 focus:outline-none disabled:bg-gray-400"
@@ -72,18 +83,6 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName }
                             </div>
                         </footer>
                     </form>
-                    <button onClick={onClose}>CLOSEEEEEE</button>
-                    <p>DEALER</p>
-                    <p>DEALER</p>
-                    <p>DEALER</p>
-                    <p>DEALER</p>
-                    <p>DEALER</p>
-                    <p>DEALER</p>
-                    <p>DEALER</p>
-                    <p>DEALER</p>
-                    <p>DEALER</p>
-                    <p>DEALER</p>
-                    <p>DEALER</p>
                 </div>
             </div >
         </>,
@@ -91,19 +90,8 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName }
     );
 }
 
-
-// TODO: abstract this sheesh component
-const DetailItem: React.FC<{ label: string; children: React.ReactNode }> = ({
-    label,
-    children,
-}) => (
-    <div>
-        <p className="text-sm font-medium text-gray-500">{label}</p>
-        <div className="mt-1 text-gray-900">{children}</div>
-    </div>
-);
-
 // TODO: types for selectedTask
+// TODO: abstract to other component file
 function TaskDetailsView(props) {
     function calculateLeadTime(deadline: Date, requestDate: Date) {
         const diffTime = deadline.getTime() - requestDate.getTime();
@@ -111,8 +99,8 @@ function TaskDetailsView(props) {
         return diffDays;
     }
 
-    const selectedTask = props.task;
-    const helpLeadTime = calculateLeadTime(new Date(selectedTask.deadline), new Date(selectedTask.helpReqAt));
+    const currentTask = props.task;
+    const helpLeadTime = calculateLeadTime(new Date(currentTask.deadline), new Date(currentTask.helpReqAt));
 
     return (
         <>
@@ -121,7 +109,7 @@ function TaskDetailsView(props) {
                 <div className="pb-6 border-b">
                     <div className="md:col-span-2 mb-6">
                         <DetailItem label="Task">
-                            <p className="text-xl font-bold text-gray-800">{selectedTask.taskName.taskNameStr || "-"}</p>
+                            <p className="text-xl font-bold text-gray-800">{currentTask.taskName.taskNameStr || "-"}</p>
                             <strong>ของ Project:</strong>
                             <p>{props.currentProjectName}</p>
                         </DetailItem>
@@ -129,19 +117,19 @@ function TaskDetailsView(props) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                         <DetailItem label="Team">
                             <span className="px-2.5 py-1 text-sm font-semibold text-orange-800 bg-orange-100 rounded-full">
-                                {selectedTask.team.teamName}
+                                {currentTask.team.teamName}
                             </span>
                         </DetailItem>
 
                         <DetailItem label="Status">
-                            <p className={`font-bold text-base ${StatusColor.get(selectedTask.status.statusName) || "text-gray-500"}`}>
-                                {selectedTask.status.statusName}
+                            <p className={`font-bold text-base ${StatusColor.get(currentTask.status.statusName) || "text-gray-500"}`}>
+                                {currentTask.status.statusName}
                             </p>
                         </DetailItem>
 
                         <DetailItem label="Deadline">
                             <p className="text-base">
-                                {getDateYYYY_MM_DD(new Date(selectedTask.deadline))}
+                                {formatDateYYYY_MM_DD(new Date(currentTask.deadline))}
                             </p>
                         </DetailItem>
 
@@ -149,58 +137,55 @@ function TaskDetailsView(props) {
                             <p className="text-base">
                                 {/* // TODO: fetch this properly later */}
                                 {"-"}
-                                {/* {selectedTask.} */}
                             </p>
                         </DetailItem>
                     </div>
                 </div>
-            </div>
-            <p>{helpLeadTime}</p>
+
+                {/* // TODO: abstract this to separate component */}
+                {currentTask.status.statusName === "Help Me" && ( // TODO: compare by ID
+                    <div className="p-5 bg-purple-50 border-l-4 border-purple-400 rounded-r-lg">
+                        <h4 className="text-md font-bold text-purple-800 mb-4">
+                            รายละเอียดการร้องขอความช่วยเหลือ
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5">
+                            <DetailItem label="วันที่ร้องขอ">
+                                <p className="font-semibold">
+                                    {formatDateYYYY_MM_DD(new Date(currentTask.helpReqAt) || "-")}
+                                </p>
+                            </DetailItem>
+                            <DetailItem label="ขอความช่วยเหลือจาก">
+                                <span className="px-2.5 py-1 text-sm font-semibold text-purple-800 bg-purple-200 rounded-full">
+                                    {/* {task.HelpAssignee || "-"} */}
+                                </span>
+                            </DetailItem>
+                            <DetailItem label="ขอความช่วยเหลือล่วงหน้า">
+                                <p className="font-bold text-purple-800">{helpLeadTime}</p>
+                            </DetailItem>
+                            <div className="md:col-span-3">
+                                <DetailItem label="รายละเอียด">
+                                    <p className="p-3 bg-purple-100 rounded-md border border-purple-200 min-h-[50px] whitespace-pre-wrap">
+                                        {/* {task.HelpDetails || "-"} */}
+                                    </p>
+                                </DetailItem>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* // TODO: customer section */}
+
+                {/* === Section: Log === */}
+                <div className="grid grid-cols-1 gap-y-6">
+                    <DetailItem label="Notes / Result (Log)">
+                        <p className="p-3 bg-gray-50 rounded-md border min-h-[100px] whitespace-pre-wrap disabled">
+                            {/* // TODO: fetch this properly later */}
+                            {currentTask["Notes / Result"] || "-"}
+                        </p>
+                    </DetailItem>
+                </div>
+            </div >
         </>
-        //     {/* === Section: Help Me (ถ้ามี) === (โค้ดเดิม) */}
-        //     {task.Status === "Help Me" && (
-        //         <div className="p-5 bg-purple-50 border-l-4 border-purple-400 rounded-r-lg">
-        //             <h4 className="text-md font-bold text-purple-800 mb-4">
-        //                 รายละเอียดการร้องขอความช่วยเหลือ
-        //             </h4>
-        //             <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5">
-        //                 <DetailItem label="วันที่ร้องขอ">
-        //                     <p className="font-semibold">
-        //                         {formatDateToDDMMYYYY(task.HelpRequestedAt) || "-"}
-        //                     </p>
-        //                 </DetailItem>
-        //                 <DetailItem label="ขอความช่วยเหลือจาก">
-        //                     <span className="px-2.5 py-1 text-sm font-semibold text-purple-800 bg-purple-200 rounded-full">
-        //                         {task.HelpAssignee || "-"}
-        //                     </span>
-        //                 </DetailItem>
-        //                 <DetailItem label="ขอความช่วยเหลือล่วงหน้า">
-        //                     <p className="font-bold text-purple-800">{helpLeadTime}</p>
-        //                 </DetailItem>
-        //                 <div className="md:col-span-3">
-        //                     <DetailItem label="รายละเอียด">
-        //                         <p className="p-3 bg-purple-100 rounded-md border border-purple-200 min-h-[50px] whitespace-pre-wrap">
-        //                             {task.HelpDetails || "-"}
-        //                         </p>
-        //                     </DetailItem>
-        //                 </div>
-        //             </div>
-        //         </div>
-        //     )}
-        //
-        //     {/* === Section: Feedback และผลลัพธ์ === */}
-        //     <div className="grid grid-cols-1 gap-y-6">
-        //         <DetailItem label="ผู้ปฏิบัติงาน (To Team)">
-        //             <AssigneeLabels text={task["Feedback to Team"]} />
-        //         </DetailItem>
-        //
-        //         <DetailItem label="Notes / Result (Log)">
-        //             <p className="p-3 bg-gray-50 rounded-md border min-h-[100px] whitespace-pre-wrap">
-        //                 {task["Notes / Result"] || "-"}
-        //             </p>
-        //         </DetailItem>
-        //     </div>
-        // </div>
     );
 };
 

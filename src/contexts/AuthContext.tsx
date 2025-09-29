@@ -1,13 +1,7 @@
 import { createContext, useContext, useEffect, useState, type FC, type ReactNode } from "react";
+import type { User } from "../utils/types";
 
 const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
-
-// TODO: abstract to type.tsx file
-interface User {
-    email: string;
-    name: string;
-    role: string;
-}
 
 // TODO: abstract to type.tsx file
 interface AuthContextType {
@@ -37,6 +31,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
         try {
             // TODO: migrate this to utils/api & api return value data documentation somewhere
+            // TODO: abstract this to api file
             const response = await fetch(SCRIPT_URL, {
                 method: "POST",
                 body: JSON.stringify({ op: "verifyUserByEmail", payload: { email }, }),
@@ -47,9 +42,11 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
             if (result.status === 'success' && result.data) {
                 // const userData: User = result.data;
                 const userData: User = {
-                    email: result.data[0],
-                    role: result.data[1],
-                    name: result.data[2],
+                    userID: result.data[0],
+                    name: result.data[1],
+                    email: result.data[2],
+                    roleID: Number(result.data[3]),
+                    isAdmin: Boolean(result.data[4])
                 }
                 setUser(userData);
                 localStorage.setItem('project-crm-user', JSON.stringify(userData));
