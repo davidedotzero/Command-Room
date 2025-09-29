@@ -1,48 +1,32 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import Select from "react-select";
 
 import { createPortal, useFormStatus } from "react-dom";
 import { TASK_NAMES, TASKS, TEAMS } from "../../utils/mockdata";
+import { FormButton, FormField, FormFieldSetWrapper } from "./forms/FormItems";
 
 
 
-// TODO: abstact this sheesh
-type FormButtonProps = {
-    type?: "submit" | "reset" | "button";
-    className: string;
-    children: ReactNode;
-    onClick?: () => void;
-    disabledText?: string;
-}
 
-// TODO: abstact this sheesh
-const FormButton: React.FC<FormButtonProps> = (({ type, className, children, onClick, disabledText }) => {
-    const { pending } = useFormStatus();
-    return (
-        <button
-            type={type}
-            disabled={pending}
-            className={className}
-            onClick={onClick}
-        >
-            {pending ? disabledText ? disabledText : children : children}
-            {/* // LMAOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO */}
-        </button>
-    );
-});
-
-const FormFieldSetWrapper: React.FC<{ children: ReactNode }> = (({ children }) => {
-    const { pending } = useFormStatus();
-    return (
-        <fieldset disabled={pending}>{children}</fieldset>
-    );
-});
 
 // TODO: move this somewhere else better
 const baseInputClass = "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm ...";
 
 function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallback, children }: { isOpen: boolean, onClose: () => void, currentProjectID: string, parentUpdateCallback: () => {}, children?: ReactNode }) {
     if (!isOpen) return null;
+    // Close Modal on ESC key
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === "Escape") onClose();
+        }
+
+        if (isOpen)
+            document.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+        }
+    }, [isOpen, onClose]);
 
     // TODO: do proper isLoading later
     let isLoading = false;

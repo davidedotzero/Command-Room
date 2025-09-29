@@ -1,13 +1,26 @@
 import { createPortal } from "react-dom";
 import { StatusColor } from "../../utils/constants";
 import { formatDateYYYY_MM_DD } from "../../utils/functions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EditTaskModal from "./EditTaskModal";
 import { DetailItem } from "./forms/FormItems";
 
 
 function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName }: { isOpen: boolean, onClose: () => void, taskData: any, currentProjectName: string }) {
     if (!isOpen) return null;
+    // Close Modal on ESC key
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === "Escape") onClose();
+        }
+
+        if (isOpen)
+            document.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+        }
+    }, [isOpen, onClose]);
 
     // TODO: do proper isLoading later
     let isLoading = false;
@@ -20,6 +33,7 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName }
 
     const handleSubmit = async (formData: FormData) => {
         console.log("open edit task dialog here");
+        // TODO: switch to using task modal stack
         openEditTaskModal();
     }
 
@@ -54,33 +68,29 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName }
                             <TaskDetailsView task={currentTask} currentProjectName={currentProjectName} />
                         </div>
 
-                        <footer className="flex justify-between items-center p-6 border-t bg-gray-50 rounded-b-xl">
-                            <div>
-                                <button
-                                    type="button"
-                                    onClick={onClose}
-                                    disabled={isLoading}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none disabled:opacity-50"
-                                >
-                                    ปิด
-                                </button>
-                                {/* // TODO: is there a scenario where this modal will be accessed as View only??? */}
-                                <button
-                                    type="submit"
-                                    // [⭐ BUG FIX] ใช้ onClick + setTimeout(0) เพื่อป้องกัน Race Condition ในทุกกรณี (รวมถึง "Help Me")
-                                    // TODO: race condition arai ni?
-                                    onClick={() => {
-                                        // เลื่อนการเปลี่ยน State ออกไป เพื่อให้ Event Loop นี้จบก่อน
-                                        // setTimeout(() => setIsEditing(true), 0);
-                                        //TODO: EditTaskDialog
+                        <footer className="flex justify-end items-center p-6 border-t bg-gray-50 rounded-b-xl">
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none disabled:opacity-50"
+                            >
+                                ปิด
+                            </button>
+                            {/* // TODO: is there a scenario where this modal will be accessed as View only??? */}
+                            <button
+                                type="submit"
+                                // [⭐ BUG FIX] ใช้ onClick + setTimeout(0) เพื่อป้องกัน Race Condition ในทุกกรณี (รวมถึง "Help Me")
+                                // TODO: race condition arai ni?
+                                onClick={() => {
+                                    // เลื่อนการเปลี่ยน State ออกไป เพื่อให้ Event Loop นี้จบก่อน
+                                    // setTimeout(() => setIsEditing(true), 0);
+                                    //TODO: EditTaskDialog
 
-                                    }}
-                                    disabled={isLoading}
-                                    className="ml-3 px-6 py-2 text-sm font-medium text-white bg-orange-500 border border-transparent rounded-md shadow-sm hover:bg-orange-600 focus:outline-none disabled:bg-gray-400"
-                                >
-                                    แก้ไข Task
-                                </button>
-                            </div>
+                                }}
+                                className="ml-3 px-6 py-2 text-sm font-medium text-white bg-orange-500 border border-transparent rounded-md shadow-sm hover:bg-orange-600 focus:outline-none disabled:bg-gray-400"
+                            >
+                                แก้ไข Task
+                            </button>
                         </footer>
                     </form>
                 </div>

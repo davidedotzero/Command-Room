@@ -1,5 +1,5 @@
-import { TASKS, PROJECTS, TEAMS, TASK_STATUSES } from "./mockdata";
-import type { Task } from "./types";
+import { TASKS, PROJECTS, TEAMS, TASK_STATUSES, EDIT_LOGS } from "./mockdata";
+import type { EditLog, Task } from "./types";
 
 const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 //TODO: IMPORTANT!!!!! this file
@@ -63,10 +63,6 @@ export const API = {
         // await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
         return [...TASKS];
     },
-    addTasks: async (newTask: Task) => {
-        TASKS.push(newTask);
-        return true;
-    },
     getProjectNameById: async (projectID: string) => {
         // TODO: handle when name not found
         return PROJECTS.find(proj => proj.projectID === projectID)?.projectName!;
@@ -76,5 +72,28 @@ export const API = {
     },
     getAllTaskStatus: async () => {
         return [...TASK_STATUSES]
+    },
+
+
+    addTasks: async (newTask: Task) => {
+        TASKS.push(newTask);
+        return true;
+    },
+    addEditLog: async (newLog: EditLog) => {
+        EDIT_LOGS.push(newLog);
+        return true;
+    },
+
+
+    updateTask: async (taskID: string, deadline: Date | null, teamHelpID: number | null, helpReqAt: Date | null, taskStatusID: number | null) => {
+        for (let task of TASKS) {
+            if (taskID === task.taskID) {
+                task.deadline = deadline ?? task.deadline;
+                task.teamHelpID = teamHelpID ?? task.teamHelpID;
+                task.helpReqAt = helpReqAt ?? task.helpReqAt;
+                task.statusID = taskStatusID ?? task.statusID;
+                break;
+            }
+        }
     }
 }

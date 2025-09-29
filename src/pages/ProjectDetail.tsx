@@ -312,7 +312,6 @@ function ProjectDetail() {
                                 Owner / Assignee
                             </label>
                             <select
-                                // value={ownerFilter}
                                 onChange={(e) => setTeamFilter(e.target.value)}
                                 className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                             >
@@ -412,9 +411,6 @@ function ProjectDetail() {
                                 <th scope="col" className="px-6 py-3 font-medium text-left">
                                     Status
                                 </th>
-                                <th scope="col" className="px-4 py-3 font-medium text-center">
-                                    Actions
-                                </th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -502,35 +498,6 @@ function ProjectDetail() {
                                             className={`px-6 py-4 font-semibold ${StatusColor.get(task.status.statusName) || "text-gray-500"}`}
                                         >
                                             {task.status.statusName}
-                                        </td>
-                                        <td className="px-4 py-4 text-center">
-                                            {/* <div className="flex items-center justify-center space-x-1"> */}
-                                            {/*     <button */}
-                                            {/*         onClick={() => onTaskView(task)} */}
-                                            {/*         className="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-blue-100" */}
-                                            {/*         aria-label="View Task Details" */}
-                                            {/*     > */}
-                                            {/*         <ViewIcon /> */}
-                                            {/*     </button> */}
-                                            {/*     {userCanEdit && ( */}
-                                            {/*         <> */}
-                                            {/*             <button */}
-                                            {/*                 onClick={() => onEditTask(task)} */}
-                                            {/*                 className="text-gray-500 hover:text-orange-600 p-2 rounded-full hover:bg-orange-100" */}
-                                            {/*                 aria-label="Edit Task" */}
-                                            {/*             > */}
-                                            {/*                 <EditIcon /> */}
-                                            {/*             </button> */}
-                                            {/*             <button */}
-                                            {/*                 onClick={() => onDeleteTask(task)} */}
-                                            {/*                 className="text-gray-500 hover:text-red-600 p-2 rounded-full hover:bg-red-100" */}
-                                            {/*                 aria-label="Delete Task" */}
-                                            {/*             > */}
-                                            {/*                 <DeleteIcon /> */}
-                                            {/*             </button> */}
-                                            {/*         </> */}
-                                            {/*     )} */}
-                                            {/* </div> */}
                                         </td>
                                     </tr>
                                 );

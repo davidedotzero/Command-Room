@@ -39,6 +39,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
             });
 
             const result = await response.json();
+            console.log(result);
             if (result.status === 'success' && result.data) {
                 // const userData: User = result.data;
                 const userData: User = {

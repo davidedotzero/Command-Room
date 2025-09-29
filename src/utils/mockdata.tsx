@@ -23,7 +23,7 @@ export let TASK_STATUSES: TaskStatus[] = [
     { statusID: 1, statusName: "In Progress" },
     { statusID: 2, statusName: "Done" },
     { statusID: 3, statusName: "Help Me" },
-    { statusID: 4, statusName: "Cancelled" },
+    // { statusID: 4, statusName: "Cancelled" },
 ];
 
 
