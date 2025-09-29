@@ -6,7 +6,7 @@ import { API } from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
 import { EDIT_LOGS, TASKS } from "../../utils/mockdata";
 
-function EditTaskModal({ isOpen, onClose, taskData }: { isOpen: boolean, onClose: () => void, taskData: any }) {
+function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: any, parentUpdateCallback: () => {} }) {
     if (!isOpen) return null;
     // Close Modal on ESC key
     useEffect(() => {
@@ -87,6 +87,8 @@ function EditTaskModal({ isOpen, onClose, taskData }: { isOpen: boolean, onClose
         await API.addEditLog(newLog);
         await API.updateTask(currentTask.taskID, null, teamHelpID, helpReqAt, toStatusID); // toDeadline is null for now
 
+        onClose();
+        parentUpdateCallback();
         console.log(EDIT_LOGS);
         console.log(TASKS.find(task => task.taskID === currentTask.taskID));
     }

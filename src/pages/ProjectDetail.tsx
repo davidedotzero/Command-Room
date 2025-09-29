@@ -218,7 +218,7 @@ function ProjectDetail() {
         <>
             <CreateTaskModal isOpen={isCreateTaskModalOpen} onClose={() => { closeCreateTaskModal() }} currentProjectID={currentProjectID} parentUpdateCallback={fetchData} />
             <TaskDetailModal isOpen={isTaskDetailModalOpen} onClose={() => { closeTaskDetailModal() }} />
-            <TaskDetailDealerModal isOpen={isTaskDetailDealerModalOpen} onClose={() => { closeTaskDetailDealerModal() }} taskData={taskRowData} currentProjectName={currentProjectName} />
+            <TaskDetailDealerModal isOpen={isTaskDetailDealerModalOpen} onClose={() => { closeTaskDetailDealerModal() }} taskData={taskRowData} currentProjectName={currentProjectName} parentUpdateCallback={fetchData} />
 
             <h1>{currentProjectID}</h1> {/* // TODO: remove this */}
             <h1>{currentProjectName}</h1> {/* // TODO: remove this */}

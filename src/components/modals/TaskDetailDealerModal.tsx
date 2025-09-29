@@ -6,7 +6,7 @@ import EditTaskModal from "./EditTaskModal";
 import { DetailItem } from "./forms/FormItems";
 
 
-function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName }: { isOpen: boolean, onClose: () => void, taskData: any, currentProjectName: string }) {
+function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: any, currentProjectName: string, parentUpdateCallback: () => {} }) {
     if (!isOpen) return null;
     // Close Modal on ESC key
     useEffect(() => {
@@ -44,7 +44,7 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName }
 
     return createPortal(
         <>
-            <EditTaskModal isOpen={isEditTaskModalOpen} onClose={() => { closeEditTaskModal() }} taskData={currentTask} />
+            <EditTaskModal isOpen={isEditTaskModalOpen} onClose={() => { closeEditTaskModal() }} taskData={currentTask} parentUpdateCallback={parentUpdateCallback} />
 
             <div className="fixed inset-0 z-50 bg-white/70 bg-opacity-50 flex items-center justify-center">
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl">
