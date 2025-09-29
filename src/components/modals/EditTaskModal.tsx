@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import type { EditLog, TaskStatus } from "../../utils/types";
 import { API } from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
-import { EDIT_LOGS, TASKS } from "../../utils/mockdata";
+import { EDIT_LOGS, TASKS, TEAMS } from "../../utils/mockdata";
+import { calculateLeadTime, formatDateYYYY_MM_DD, truncateText } from "../../utils/functions";
+import Select from "react-select";
 
 function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: any, parentUpdateCallback: () => {} }) {
     if (!isOpen) return null;
@@ -29,6 +31,8 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
     console.log(currentTask);
     console.log(currentTask.statusID);
 
+    const helpLeadTime = calculateLeadTime(new Date(currentTask.deadline), new Date(currentTask.helpReqAt));
+
     const { user } = useAuth();
     console.log(user.userID);
 
@@ -45,7 +49,8 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
 
     useEffect(() => {
         fetchData();
-    }, [])
+    }, []);
+
 
     const handleSubmit = async (formData: FormData) => {
         console.log("EDIT TASK LAEW JAAAAAA");
@@ -53,6 +58,7 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
 
         // TODO: check null all of this
         const reason: string = formData.get("FormLogReason")!.toString();
+        const logPreview: string = truncateText(reason);
         let toStatusID: number | null = Number(formData.get("FormTaskStatus"));
         let toDeadline: Date | null = new Date(formData.get("FormDeadline")!.toString());
         let teamHelpID: number | null = null;
@@ -85,10 +91,12 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
 
         // TODO: handle api correctly
         await API.addEditLog(newLog);
-        await API.updateTask(currentTask.taskID, null, teamHelpID, helpReqAt, toStatusID); // toDeadline is null for now
+        await API.updateTask(currentTask.taskID, null, teamHelpID, helpReqAt, toStatusID, logPreview); // BUG: toDeadline is null for now
 
         onClose();
         parentUpdateCallback();
+
+        // TODO: loading and confirm dialog and successful dialog
         console.log(EDIT_LOGS);
         console.log(TASKS.find(task => task.taskID === currentTask.taskID));
     }
@@ -162,31 +170,31 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
                                     {/* // TODO: change this to enum maybe */}
                                     {selectedStatus === 3 && (
                                         <div className="p-5 bg-purple-50 border-l-4 border-purple-400 rounded-r-lg">
-                                            <h4 className="text-md font-bold text-purple-800 mb-4">
-                                                รายละเอียดการร้องขอความช่วยเหลือ
-                                            </h4>
-                                            {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5"> */}
-                                            {/*     <DetailItem label="วันที่ร้องขอ"> */}
-                                            {/*         <p className="font-semibold"> */}
-                                            {/*             {formatDateToDDMMYYYY(task.HelpRequestedAt) || "-"} */}
-                                            {/*         </p> */}
-                                            {/*     </DetailItem> */}
-                                            {/*     <DetailItem label="ขอความช่วยเหลือจาก"> */}
-                                            {/*         <span className="px-2.5 py-1 text-sm font-semibold text-purple-800 bg-purple-200 rounded-full"> */}
-                                            {/*             {task.HelpAssignee || "-"} */}
-                                            {/*         </span> */}
-                                            {/*     </DetailItem> */}
-                                            {/*     <DetailItem label="ขอความช่วยเหลือล่วงหน้า"> */}
-                                            {/*         <p className="font-bold text-purple-800">{helpLeadTime}</p> */}
-                                            {/*     </DetailItem> */}
-                                            {/*     <div className="md:col-span-3"> */}
-                                            {/*         <DetailItem label="รายละเอียด"> */}
-                                            {/*             <p className="p-3 bg-purple-100 rounded-md border border-purple-200 min-h-[50px] whitespace-pre-wrap"> */}
-                                            {/*                 {task.HelpDetails || "-"} */}
-                                            {/*             </p> */}
-                                            {/*         </DetailItem> */}
-                                            {/*     </div> */}
-                                            {/* </div> */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+                                                <DetailItem label="วันที่ร้องขอ">
+                                                    <p className="font-semibold">
+                                                        {formatDateYYYY_MM_DD(new Date(currentTask.helpReqAt)) || "-"}
+                                                    </p>
+                                                </DetailItem>
+                                                <DetailItem label="ขอความช่วยเหลือล่วงหน้า">
+                                                    <p className="font-bold text-purple-800">{helpLeadTime} วัน</p>
+                                                </DetailItem>
+                                                <div className="md:col-span-3">
+                                                    <FormField label="ผู้ช่วยเหลือ (Help Assignee)">
+                                                        <Select
+                                                            // TODO: defaultValue based from what task i clicked
+                                                            name="FormTeamHelp"
+                                                            required
+                                                            className={"shadow-sm"}
+                                                            isClearable={false}
+                                                            isSearchable={true}
+                                                            placeholder={"เลือกทีมที่ต้องการให้ช่วยเหลือ..."}
+                                                            // TODO: make this from api call
+                                                            options={TEAMS.map((team) => ({ value: team.teamID, label: team.teamName }))}
+                                                        />
+                                                    </FormField>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
 

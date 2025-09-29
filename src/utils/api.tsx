@@ -63,17 +63,16 @@ export const API = {
         // await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
         return [...TASKS];
     },
-    getProjectNameById: async (projectID: string) => {
-        // TODO: handle when name not found
-        return PROJECTS.find(proj => proj.projectID === projectID)?.projectName!;
-    },
     getAllTeams: async () => {
         return [...TEAMS];
     },
     getAllTaskStatus: async () => {
         return [...TASK_STATUSES]
     },
-
+    getProjectNameById: async (projectID: string) => {
+        // TODO: handle when name not found
+        return PROJECTS.find(proj => proj.projectID === projectID)?.projectName!;
+    },
 
     addTasks: async (newTask: Task) => {
         TASKS.push(newTask);
@@ -85,13 +84,14 @@ export const API = {
     },
 
 
-    updateTask: async (taskID: string, deadline: Date | null, teamHelpID: number | null, helpReqAt: Date | null, taskStatusID: number | null) => {
+    updateTask: async (taskID: string, deadline: Date | null, teamHelpID: number | null, helpReqAt: Date | null, taskStatusID: number | null, logPreview: string) => {
         for (let task of TASKS) {
             if (taskID === task.taskID) {
                 task.deadline = deadline ?? task.deadline;
                 task.teamHelpID = teamHelpID ?? task.teamHelpID;
                 task.helpReqAt = helpReqAt ?? task.helpReqAt;
                 task.statusID = taskStatusID ?? task.statusID;
+                task.logPreview = logPreview;
                 break;
             }
         }

@@ -6,9 +6,6 @@ import { TASK_NAMES, TASKS, TEAMS } from "../../utils/mockdata";
 import { FormButton, FormField, FormFieldSetWrapper } from "./forms/FormItems";
 
 
-
-
-
 // TODO: move this somewhere else better
 const baseInputClass = "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm ...";
 

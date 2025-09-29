@@ -12,6 +12,7 @@ import CreateTaskModal from "../components/modals/CreateTaskModal";
 import { StatusColor } from "../utils/constants";
 import { formatDateYYYY_MM_DD } from "../utils/functions";
 import { API } from "../utils/api";
+import { AssigneeLabels } from "../components/utils/AssigneeLabels";
 
 // TODO: abstract this to other file
 const StatDisplayCard: React.FC<{
@@ -68,6 +69,7 @@ function ProjectDetail() {
     const [teamFilter, setTeamFilter] = useState<Team | null>(null);
 
     const fetchData = async () => {
+        console.log("projectdetail fetchdata called");
         setIsLoading(true);
         const data = await API.getTasks();
         const projectName = await API.getProjectNameById(currentProjectID);
@@ -78,6 +80,9 @@ function ProjectDetail() {
         setLnw_team(teams);
 
         setIsLoading(false);
+
+        console.log("bindaiiii");
+        console.log(lnw_task);
     }
 
     useEffect(() => {
@@ -86,13 +91,15 @@ function ProjectDetail() {
 
     // TODO: usememo this
     // TODO: make select task by projectid an api call
+    // TODO: abstract all this to api.tsx
     const tasksByProjectID: Task[] = lnw_task.filter((t: Task) => t.projectID === currentProjectID);
     // TODO: temp mockdata
     const tasksJoinTaskName = leftJoinOne2One(tasksByProjectID, TASK_NAMES, "taskNameID", "taskNameID", "taskName");
     const tasksJoinTeam = leftJoinOne2One(tasksJoinTaskName, TEAMS, "teamID", "teamID", "team");
     const tasksJoinStatus = leftJoinOne2One(tasksJoinTeam, TASK_STATUSES, "statusID", "statusID", "status");
+    const tasksJoinTeam_TeamHelp = leftJoinOne2One(tasksJoinStatus, TEAMS, "teamHelpID", "teamID", "teamHelp");
 
-    const processingTasks = tasksJoinStatus;
+    const processingTasks = tasksJoinTeam_TeamHelp;
 
     const statusMetrics = useMemo(() => {
         const DAY_AHEAD: number = 10; // TODO: make this customizable by user or maybe make this global constant
@@ -120,6 +127,8 @@ function ProjectDetail() {
     }, [processingTasks]);
 
     const filteredAndSortedTasks = useMemo(() => {
+        // TODO: return to useMemo and rewrite filtering logic
+        // const filteredAndSortedTasks = (() => {
         const DAY_AHEAD: number = 10; // TODO: make this customizable by user or maybe make this global constant
         const TODAY: Date = new Date();
         const WARNING_DATE: Date = new Date(new Date().setDate(TODAY.getDate() + DAY_AHEAD)); // LMAOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
@@ -155,6 +164,10 @@ function ProjectDetail() {
             }
         }
 
+        if (teamFilter) {
+            filteringTasks = filteringTasks.filter((t) => t.teamID === Number(teamFilter));
+        }
+
         // let finalFiltered = tasksToProcess.filter((task) => {
         //     // [✅ แก้ไข] ใช้ task.HelpAssignee โดยตรง (ไม่ต้องใช้ as any เพราะแก้ไข types.ts แล้ว)
         //     const matchesOwner = ownerFilter
@@ -188,7 +201,7 @@ function ProjectDetail() {
         let finalFiltered = filteringTasks;
         return finalFiltered;
     },
-        [lnw_task, activeStatFilter]
+        [lnw_task, activeStatFilter, teamFilter]
     );
 
     const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
@@ -212,16 +225,16 @@ function ProjectDetail() {
         </div>
     }
 
-    console.log("filteredAndSortedTasks = = = = = == = = =");
-    console.log(filteredAndSortedTasks);
+    // console.log("filteredAndSortedTasks = = = = = == = = =");
+    // console.log(filteredAndSortedTasks);
     return (
         <>
             <CreateTaskModal isOpen={isCreateTaskModalOpen} onClose={() => { closeCreateTaskModal() }} currentProjectID={currentProjectID} parentUpdateCallback={fetchData} />
             <TaskDetailProductionModal isOpen={isTaskDetailModalOpen} onClose={() => { closeTaskDetailModal() }} taskData={taskRowData} currentProjectName={currentProjectName} parentUpdateCallback={fetchData} />
             <TaskDetailDealerModal isOpen={isTaskDetailDealerModalOpen} onClose={() => { closeTaskDetailDealerModal() }} taskData={taskRowData} currentProjectName={currentProjectName} parentUpdateCallback={fetchData} />
 
-            <h1>{currentProjectID}</h1> {/* // TODO: remove this */}
-            <h1>{currentProjectName}</h1> {/* // TODO: remove this */}
+            <h1 className="text-2xl font-bold text-gray-800"> {currentProjectName}</h1> {/* // TODO: remove this */}
+            <h1 className="text-2sm text-gray-800 mb-6"> {currentProjectID}</h1> {/* // TODO: remove this */}
             <div className="space-y-6">
                 {/*  TODO: split to separate components */}
 
@@ -304,7 +317,7 @@ function ProjectDetail() {
                             </div>
                         )}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* // TODO: abstract this to comboBox component */}
                         <div>
                             {/* // TODO: change filter???? */}
@@ -317,27 +330,10 @@ function ProjectDetail() {
                             >
                                 <option value={""}>-- ทีมทั้งหมด --</option>
                                 {lnw_team.map((opt) => (
-                                    <option key={opt.teamID} value={opt.teamName}>
+                                    <option key={opt.teamID} value={opt.teamID}>
                                         {opt.teamName}
                                     </option>
                                 ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="text-sm font-medium text-gray-700 mb-1 block">
-                                Status
-                            </label>
-                            <select
-                                // value={statusFilter}
-                                // onChange={(e) => setStatusFilter(e.target.value)}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
-                            >
-                                <option value="">-- ทุกสถานะ --</option>
-                                {/* {statusOptions.map((opt) => ( */}
-                                {/*     <option key={opt} value={opt}> */}
-                                {/*         {opt} */}
-                                {/*     </option> */}
-                                {/* ))} */}
                             </select>
                         </div>
                         <div>
@@ -397,17 +393,17 @@ function ProjectDetail() {
                                     Note/Result
                                 </th>
                                 <th scope="col" className="px-6 py-3 font-medium text-left">
-                                    Owner
+                                    Team
                                 </th>
                                 <th scope="col" className="px-6 py-3 font-medium text-left">
-                                    To Team
+                                    Worker
                                 </th>
                                 <th scope="col" className="px-6 py-3 font-medium text-left">
                                     Help Assignee
                                 </th>
-                                <th scope="col" className="px-6 py-3 font-medium text-left">
-                                    Help Details
-                                </th>
+                                {/* <th scope="col" className="px-6 py-3 font-medium text-left"> */}
+                                {/*     Help Details */}
+                                {/* </th> */}
                                 <th scope="col" className="px-6 py-3 font-medium text-left">
                                     Status
                                 </th>
@@ -471,7 +467,7 @@ function ProjectDetail() {
                                             className="px-6 py-4 text-gray-600 max-w-sm truncate"
                                             title={task.logPreview} // TODO: maybe title is not need?
                                         >
-                                            {task.logPreview + " / " + task.projectID}
+                                            {task.logPreview}
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className="px-2.5 py-1 text-xs font-semibold text-orange-800 bg-orange-100 rounded-full">
@@ -479,20 +475,20 @@ function ProjectDetail() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 max-w-xs">
-                                            {/* <AssigneeLabels text={task["Feedback to Team"]} /> */}
-                                            {"feedback PLACEHOLDER"}
+                                            {"PLACEHOLDER - DO / " + task.taskID}
+                                            {/* <AssigneeLabels text={task.userID || "-"} /> */}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-700 font-medium">
                                             {/* {task.HelpAssignee || "-"} */}
-                                            {"help assignee PLACEHOLDER"}
+                                            {task.teamHelp ? task.teamHelp.teamName : "-"}
                                         </td>
-                                        <td
-                                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 truncate max-w-xs"
-                                        // title={task.HelpDetails || undefined}
-                                        >
-                                            {/* {truncateText(task.HelpDetails, 10)} */}
-                                            {"help detail PLACEHOLDER"}
-                                        </td>
+                                        {/* <td */}
+                                        {/*     className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 truncate max-w-xs" */}
+                                        {/* // title={task.HelpDetails || undefined} */}
+                                        {/* > */}
+                                        {/* {truncateText(task.HelpDetails, 10)} */}
+                                        {/*     {"help detail PLACEHOLDER"} */}
+                                        {/* </td> */}
                                         <td
                                             // TODO:  make statuscolor index by statusid?
                                             className={`px-6 py-4 font-semibold ${StatusColor.get(task.status.statusName) || "text-gray-500"}`}
