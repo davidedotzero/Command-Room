@@ -9,14 +9,14 @@ export let TEAMS: Team[] = [
 ]
 
 export let TASK_NAMES: TaskName[] = [
-    { taskNameID: 1, taskNameStr: "ธรรมมะ กระตุกจิตกระชากใจ" },
-    { taskNameID: 2, taskNameStr: "เพื่อบรรลุอรหันต์" },
-    { taskNameID: 3, taskNameStr: "มันต้องเป็นแบบนี้ ต้องมีอุปกรณ์" },
-    { taskNameID: 4, taskNameStr: "อย่างงี้เค้าเรียกชนฉิ่งตีฉิ่ง" },
-    { taskNameID: 5, taskNameStr: "ท่าอย่างงี้เค้าเรียกว่าkระเd้าคู่" },
-    { taskNameID: 6, taskNameStr: "คนนี้ที คนนี้ที" },
-    { taskNameID: 7, taskNameStr: "อย่างงี้เค้าเรียกว่า ดูดuม" },
-    { taskNameID: 8, taskNameStr: "ดูดขวา ดูดซ้าย" },
+    { taskNameID: 1, taskNameStr: "default-task-1" },
+    { taskNameID: 2, taskNameStr: "default-task-2" },
+    { taskNameID: 3, taskNameStr: "default-task-3" },
+    { taskNameID: 4, taskNameStr: "default-task-4" },
+    { taskNameID: 5, taskNameStr: "default-task-5" },
+    { taskNameID: 6, taskNameStr: "default-task-6" },
+    { taskNameID: 7, taskNameStr: "default-task-7" },
+    { taskNameID: 8, taskNameStr: "default-task-8" },
 ]
 
 export let TASK_STATUSES: TaskStatus[] = [
