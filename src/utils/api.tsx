@@ -1,5 +1,5 @@
-import { TASKS, PROJECTS, TEAMS, TASK_STATUSES, EDIT_LOGS } from "./mockdata";
-import type { EditLog, Task } from "./types";
+import { TASKS, PROJECTS, TEAMS, TASK_STATUSES, EDIT_LOGS, ROLES, PO_STATUSES, TASK_NAMES, leftJoinOne2One } from "./mockdata";
+import type { EditLog, FilteringTask, Task } from "./types";
 
 const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 //TODO: IMPORTANT!!!!! this file
@@ -59,20 +59,54 @@ export async function callAPI<T>(op: string, payload: object): Promise<T> {
 }
 
 export const API = {
-    getTasks: async () => {
+    getAllTasks: async () => {
         // await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
         return [...TASKS];
+    },
+    getAllTasksDetailed: async () => {
+        const eiei = [...TASKS];
+        const tasksJoinTaskName = leftJoinOne2One(eiei, TASK_NAMES, "taskNameID", "taskNameID", "taskName");
+        const tasksJoinTeam = leftJoinOne2One(tasksJoinTaskName, TEAMS, "teamID", "teamID", "team");
+        const tasksJoinStatus = leftJoinOne2One(tasksJoinTeam, TASK_STATUSES, "statusID", "statusID", "status");
+        const tasksJoinTeam_TeamHelp = leftJoinOne2One(tasksJoinStatus, TEAMS, "teamHelpID", "teamID", "teamHelp");
+        return tasksJoinTeam_TeamHelp;
+    },
+    getAllTaskNames: async () => {
+        return [...TASK_NAMES];
     },
     getAllTeams: async () => {
         return [...TEAMS];
     },
-    getAllTaskStatus: async () => {
+    getAllRoles: async () => {
+        return [...ROLES];
+    },
+    getAllTaskStatuses: async () => {
         return [...TASK_STATUSES]
     },
+    getAllPoStatuses: async () => {
+        return [...PO_STATUSES]
+    },
+
     getProjectNameById: async (projectID: string) => {
         // TODO: handle when name not found
         return PROJECTS.find(proj => proj.projectID === projectID)?.projectName!;
     },
+    getLogsByTaskIdDesc: async (taskID: string) => {
+        return EDIT_LOGS.filter(log => log.taskID === taskID).sort((a: EditLog, b: EditLog) => +b.date - +a.date);
+    },
+    getTasksByProjectId: async (projectID: string) => {
+        return TASKS.filter((t) => t.projectID === projectID);
+    },
+    getTasksByProjectIdDetailed: async (projectID: string): Promise<FilteringTask[]> => {
+        const tasksByProjectID = TASKS.filter((t) => t.projectID === projectID);
+        const tasksJoinTaskName = leftJoinOne2One(tasksByProjectID, TASK_NAMES, "taskNameID", "taskNameID", "taskName");
+        const tasksJoinTeam = leftJoinOne2One(tasksJoinTaskName, TEAMS, "teamID", "teamID", "team");
+        const tasksJoinStatus = leftJoinOne2One(tasksJoinTeam, TASK_STATUSES, "statusID", "statusID", "status");
+        const tasksJoinTeam_TeamHelp = leftJoinOne2One(tasksJoinStatus, TEAMS, "teamHelpID", "teamID", "teamHelp");
+        return tasksJoinTeam_TeamHelp;
+    },
+
+
 
     addTasks: async (newTask: Task) => {
         TASKS.push(newTask);
@@ -95,5 +129,10 @@ export const API = {
                 break;
             }
         }
+    },
+
+
+    isProjectIDExists: async (projectID: string) => {
+        return PROJECTS.some(proj => proj.projectID === projectID);
     }
 }

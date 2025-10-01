@@ -61,7 +61,6 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
                 >
                     <header className="flex justify-between items-center p-6 border-b">
                         <h2 className="text-xl font-bold text-gray-800">สร้าง Task ใหม่</h2>
-                        <h3 className="text-xl font-bold text-gray-800">{currentProjectID}</h3>
                         {/* // TODO: make above better looking */}
                         <button
                             onClick={onClose}

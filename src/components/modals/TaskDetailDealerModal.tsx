@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import EditTaskModal from "./EditTaskModal";
 import { DetailItem } from "./forms/FormItems";
 import TaskDetailsView from "./task_detail/TaskDetailsView";
+import type { FilteringTask } from "../../utils/types";
 
 
 function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: any, currentProjectName: string, parentUpdateCallback: () => {} }) {
@@ -30,7 +31,7 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, 
     // data-lnw-juan-za = taskData.lnwJuanZa
     // and its always string
     // noice html :thumbs_up:
-    const currentTask = JSON.parse(taskData.selectedTask);
+    const currentTask: FilteringTask = JSON.parse(taskData.selectedTask);
 
     const handleSubmit = async (formData: FormData) => {
         console.log("open edit task dialog here");
@@ -54,7 +55,7 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, 
             <EditTaskModal isOpen={isEditTaskModalOpen} onClose={() => { closeEditTaskModal() }} taskData={currentTask} parentUpdateCallback={parentUpdateCallback_eiei} />
 
             <div className="fixed inset-0 z-50 bg-white/70 bg-opacity-50 flex items-center justify-center">
-                <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl">
+                <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-y-auto max-h-[90vh]">
                     <header className="flex justify-between items-center p-6 border-b sticky top-0 bg-white z-10">
                         <h2 className="text-xl font-bold text-gray-800">
                             {"รายละเอียด Task"}
@@ -73,7 +74,12 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, 
                     <form action={handleSubmit} className="flex flex-col overflow-hidden flex-1 min-h-0">
                         <div className="overflow-y-auto flex-1">
                             <TaskDetailsView task={currentTask} currentProjectName={currentProjectName} />
+                            {/* // TODO: customer section */}
+                            <div className="pb-6 border-b">
+                                ================== ข้อมูล customer ตรงนี้ =========================
+                            </div>
                         </div>
+
 
                         <footer className="flex justify-end items-center p-6 border-t bg-gray-50 rounded-b-xl">
                             <button

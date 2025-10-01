@@ -1,11 +1,20 @@
 // TODO: DELETE MOCKUP DATA
 
-import type { EditLog, Project, Task, TaskName, TaskStatus, Team } from "./types";
+import type { EditLog, PoStatus, Project, Role, Task, TaskName, TaskStatus, Team } from "./types";
 
 export let TEAMS: Team[] = [
     { teamID: 1, teamName: "PRODUCTION" },
     { teamID: 2, teamName: "DEALER" },
     { teamID: 3, teamName: "OWO" },
+]
+
+export let ROLES: Role[] = [
+    { roleID: 1, teamID: 1, roleName: "PROD_TUDTOR" },
+    { roleID: 2, teamID: 1, roleName: "PROD_GRAPHIC" },
+    { roleID: 3, teamID: 2, roleName: "DEALER_1" },
+    { roleID: 4, teamID: 2, roleName: "DEALER_2" },
+    { roleID: 5, teamID: 3, roleName: "OWO_1" },
+    { roleID: 6, teamID: 3, roleName: "OWO_2" },
 ]
 
 export let TASK_NAMES: TaskName[] = [
@@ -24,6 +33,15 @@ export let TASK_STATUSES: TaskStatus[] = [
     { statusID: 2, statusName: "Done" },
     { statusID: 3, statusName: "Help Me" },
     // { statusID: 4, statusName: "Cancelled" },
+];
+
+// TODO: content TBD
+export let PO_STATUSES: PoStatus[] = [
+    { poStatusID: 1, poStatusName: "open po" },
+    { poStatusID: 2, poStatusName: "dealing" },
+    { poStatusID: 3, poStatusName: "closed" },
+    { poStatusID: 4, poStatusName: "failed" },
+    { poStatusID: 5, poStatusName: "backlog" },
 ];
 
 

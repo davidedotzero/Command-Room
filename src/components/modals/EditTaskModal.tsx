@@ -5,8 +5,9 @@ import type { EditLog, TaskStatus } from "../../utils/types";
 import { API } from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
 import { EDIT_LOGS, TASKS, TEAMS } from "../../utils/mockdata";
-import { calculateLeadTime, formatDateYYYY_MM_DD, truncateText } from "../../utils/functions";
+import { calculateLeadTime, formatDateYYYY_MM_DD, isOnlyDateEqual, truncateText } from "../../utils/functions";
 import Select from "react-select";
+import { useDbConst } from "../../contexts/DbConstDataContext";
 
 function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: any, parentUpdateCallback: () => {} }) {
     if (!isOpen) return null;
@@ -27,23 +28,21 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
 
     // because we pass it in as a json from TaskDetailXXXModal
     const currentTask = taskData;
-    console.log("lnwjuanza + ");
-    console.log(currentTask);
-    console.log(currentTask.statusID);
 
     const helpLeadTime = calculateLeadTime(new Date(currentTask.deadline), new Date(currentTask.helpReqAt));
 
     const { user } = useAuth();
-    console.log(user.userID);
 
-    const [taskStatuses, setTaskStatuses] = useState<TaskStatus[]>([]);
+    // change this to useDbConst
+    // const [taskStatuses, setTaskStatuses] = useState<TaskStatus[]>([]);
+    const { TASK_STATUSES } = useDbConst();
     const [selectedStatus, setSelectedStatus] = useState<number>(currentTask.statusID);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const fetchData = async () => {
         setIsLoading(true);
-        const statuses = await API.getAllTaskStatus();
-        setTaskStatuses(statuses);
+        // const statuses = await API.getAllTaskStatuses();
+        // setTaskStatuses(statuses);
         setIsLoading(false);
     }
 
@@ -55,6 +54,9 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
     const handleSubmit = async (formData: FormData) => {
         console.log("EDIT TASK LAEW JAAAAAA");
         console.log(formData);
+        console.log("currentTask ======");
+        console.log(currentTask);
+        console.log(currentTask.deadline);
 
         // TODO: check null all of this
         const reason: string = formData.get("FormLogReason")!.toString();
@@ -65,11 +67,9 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
         let helpReqAt: Date | null = null;
 
         if (toStatusID === currentTask.statusID) toStatusID = null;
-        if (toDeadline === currentTask.deadline) toDeadline = null; // BUG: this doesn't work
+        if (isOnlyDateEqual(toDeadline, new Date(currentTask.deadline))) toDeadline = null;
 
-        //check if status is edited
-        //check if deadline is edited
-
+        // BUG: changing to help me doesn't work properly
         // TODO: handle if toStatusID is HELPME
         if (toStatusID === 3) { // handle help me
             teamHelpID = Number(formData.get("FormTeamHelp"));
@@ -91,7 +91,7 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
 
         // TODO: handle api correctly
         await API.addEditLog(newLog);
-        await API.updateTask(currentTask.taskID, null, teamHelpID, helpReqAt, toStatusID, logPreview); // BUG: toDeadline is null for now
+        await API.updateTask(currentTask.taskID, toDeadline, teamHelpID, helpReqAt, toStatusID, logPreview);
 
         onClose();
         parentUpdateCallback();
@@ -157,7 +157,7 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
                                                 className={baseInputClass}
                                                 defaultValue={currentTask.statusID}
                                             >
-                                                {taskStatuses.map((opt) => (
+                                                {TASK_STATUSES.map((opt) => (
                                                     <option key={opt.statusID} value={opt.statusID}>
                                                         {opt.statusName}
                                                     </option>

@@ -1,16 +1,8 @@
-migrate from localStorage to sessionStorage
-
 in AuthContext.tsx, SCRIPT_URL being defined with VITE_* prefix maybe potentially dangerous cuz script url exposing to client blablablalablablalb
-
-ask p pat wa should project id for crm use different format than aar in case project sheet is gonna merge in future /ye
-
-ao project priority mai?
 
 title on iconbutton hover
 
 is PO tasks just about POs or its regular task but with POs / every tasks can upload multiple POs and random files
-
-when edit tasks it should force to enter reason no matter what!!! and also log whos editing
 
 every edit and delete and add action must have confirm dialog
 
@@ -23,19 +15,22 @@ force upload PO file pdf, jpeg
 
 MAKE DATABASE SWITCHING MECHANISM FOR TESTING AFTER DEPLOYMENT
 
-tasks names are pre listed
-
 in ProjectDetail tasks that need help just highlight the row in purple and show it in detaildialog instead of showing in the table
 
 check why some table column do line break while some dont
 
-ask p pat about how many task status are there
-ask p pat about how many PO task status are there
-ask p pat about format of ALL ids
-talk p pat about show log yang ngai in task
-talk p pat about spreadsheet 10M cells limit
+ask p pat about how many PO task status are there / NOT SURE YET
 talk p pat task list pagination
 
+edittaskdialog: reason should only be entered || visible when 
+    - deadline is edited
+    - status change to anything thats not "Done" (if we change status from * -> done, log will always be "REASON: Task done.");
+    - new file upload
+
+IMPORTANT MAKE HELPME WORK PROPERLY 
+***************************create project can only set tasks' deadline not more than date we gumnod (mindate, maxdate);
+
+in projectdetails page, separate team/assignee combobox to two?????
 
 
 // EditTask for Dealer flow

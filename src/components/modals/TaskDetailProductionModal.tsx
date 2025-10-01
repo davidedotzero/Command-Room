@@ -19,7 +19,6 @@ function TaskDetailProductionModal({ isOpen, onClose, taskData, currentProjectNa
     const currentTask = JSON.parse(taskData.selectedTask);
 
     const handleSubmit = async (formData: FormData) => {
-        console.log("open edit task dialog here");
         // TODO: switch to using task modal stack
         openEditTaskModal();
     }

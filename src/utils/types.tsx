@@ -33,9 +33,20 @@ export interface Team {
     teamName: string,
 }
 
+export interface Role {
+    roleID: number,
+    teamID: number,
+    roleName: string,
+}
+
 export interface TaskStatus {
     statusID: number,
     statusName: string,
+}
+
+export interface PoStatus {
+    poStatusID: number,
+    poStatusName: string,
 }
 
 export interface User {
@@ -48,12 +59,20 @@ export interface User {
 
 export interface EditLog {
     eLogID: string;
+    taskID: string; // Task: taskID
+    userID: string; // UseR: userID
     date: Date;
     reason: string;
     fromStatusID: number | null;
     toStatusID: number | null;
     fromDeadline: Date | null;
     toDeadline: Date | null;
-    taskID: string; // Task: taskID
-    userID: string; // UseR: userID
+}
+
+// Task[] after joining with necessary tables
+export interface FilteringTask extends Task {
+    taskName: TaskName;
+    team: Team;
+    status: TaskStatus;
+    teamHelp: Team;
 }

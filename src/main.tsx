@@ -5,6 +5,7 @@ import App from './App.tsx'
 import { BrowserRouter } from 'react-router'
 import { AuthProvider } from './contexts/AuthContext.tsx'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+import { DbConstProvider } from './contexts/DbConstDataContext.tsx'
 
 const GOOGLE_CLIENT_ID =
     "1019548241968-chonpm3nid1osgbc1drr5ks3qnkgjt40.apps.googleusercontent.com";
@@ -12,11 +13,13 @@ const GOOGLE_CLIENT_ID =
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <BrowserRouter>
-            <AuthProvider>
-                <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-                    <App />
-                </GoogleOAuthProvider>
-            </AuthProvider>
+            <DbConstProvider>
+                <AuthProvider>
+                    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+                        <App />
+                    </GoogleOAuthProvider>
+                </AuthProvider>
+            </DbConstProvider>
         </BrowserRouter>
     </StrictMode>,
 )

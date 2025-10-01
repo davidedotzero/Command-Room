@@ -1,54 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import { PlusIcon, RefreshIcon } from "../components/utils/icons";
+import { PlusIcon } from "../components/utils/icons";
 
-import type { Task, Team } from "../utils/types";
-import { leftJoinOne2One, PROJECTS, TASK_NAMES, TASK_STATUSES, TASKS, TEAMS } from "../utils/mockdata";
+import type { Team, FilteringTask } from "../utils/types";
 
 import TaskDetailProductionModal from "../components/modals/TaskDetailProductionModal";
 import TaskDetailDealerModal from "../components/modals/TaskDetailDealerModal";
 import CreateTaskModal from "../components/modals/CreateTaskModal";
-import { StatusColor } from "../utils/constants";
-import { formatDateYYYY_MM_DD } from "../utils/functions";
 import { API } from "../utils/api";
 import { AssigneeLabels } from "../components/utils/AssigneeLabels";
-
-// TODO: abstract this to other file
-const StatDisplayCard: React.FC<{
-    label: string;
-    value: number;
-    color: string;
-    isActive: boolean;
-    onClick: () => void;
-    description: string;
-}> = ({ label, value, color, isActive, onClick, description }) => (
-    <div className="relative group flex justify-center">
-        <button
-            onClick={onClick}
-            // TODO: change bg-gray to maybe lighter?
-            className={`flex items-center space-x-2 p-3 bg-gray-100 rounded-lg w-full text-left transition-all duration-200 ${isActive ? "ring-2 ring-orange-500 shadow-md" : "hover:bg-gray-200"
-                }`}
-        >
-            <span className={`font-bold text-xl ${color}`}>{value}</span>
-            <span className="text-sm text-gray-600">{label}</span>
-        </button>
-
-        {/* Tooltip */}
-        <div className="absolute bottom-full mb-2 w-max max-w-xs p-2 px-3 text-xs font-medium text-white bg-gray-900 rounded-md shadow-sm scale-0 group-hover:scale-100 transition-transform origin-bottom z-10">
-            {description}
-            <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-900"></div>
-        </div>
-    </div>
-);
-
-const statDescriptions = {
-    overdue: "งานที่ยังไม่เสร็จและเลยกำหนดส่งแล้ว",
-    warning: "งานที่ยังไม่เสร็จและใกล้ถึงกำหนดส่งใน 10 วัน",
-    incomplete: "งานทั้งหมดที่ยังต้องดำเนินการ (สถานะไม่ใช่ 'เสร็จสิ้น' หรือ 'ยกเลิก')",
-    done: "งานทั้งหมดที่มีสถานะ 'เสร็จสิ้น'",
-    helpMe: "งานที่ทีมกำลังร้องขอความช่วยเหลือ",
-};
+import KPISummarySection from "../components/TaskFilters/KPISummarySection/KPISummarySection";
+import FieldFiltersAndAdd from "../components/TaskFilters/FieldFiltersAndAdd/FieldFiltersAndAdd";
+import TableDisplay from "../components/TaskFilters/TableDisplay/TableDisplay";
+import { useFilteredTasks } from "../functions/TaskFilters/filters";
 
 // TODO: fix re-renders on open CreateTaskModal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 function ProjectDetail() {
@@ -57,167 +22,62 @@ function ProjectDetail() {
         // TODO: better error page
         return <p>NO PROJECT SELECTED</p>;
     }
+
     const currentProjectID: string = param.projectID; // TODO: should i pass this as props or urlParams?
+    let isCurrentProjectIDValid: boolean = false;
     const [currentProjectName, setCurrentProjectName] = useState<string>("");
 
-    const [lnw_task, setLnw_task] = useState<Task[]>([]); // TODO: rename this
+    const [tasksByProjectIDDetailed, setTasksByProjectIDDetailed] = useState<FilteringTask[]>([]); // TODO: rename this
     const [lnw_team, setLnw_team] = useState<Team[]>([]); // TODO: rename this
+    const [taskRowData, setTaskRowData] = useState<DOMStringMap>(); // for sending task detail of selected row to task modals
 
     const [isLoading, setIsLoading] = useState(true);
 
     const [activeStatFilter, setActiveStatFilter] = useState<string | null>(null);
-    const [teamFilter, setTeamFilter] = useState<Team | null>(null);
+    const [teamIDFilter, setTeamIDFilter] = useState<number | null>(null);
+    const [searchFilter, setSearchFilter] = useState<string>("");
 
     const fetchData = async () => {
-        console.log("projectdetail fetchdata called");
         setIsLoading(true);
-        const data = await API.getTasks();
+        const data = await API.getTasksByProjectIdDetailed(currentProjectID);
         const projectName = await API.getProjectNameById(currentProjectID);
         const teams = await API.getAllTeams();
+        isCurrentProjectIDValid = await API.isProjectIDExists(currentProjectID);
 
-        setLnw_task(data);
+        setTasksByProjectIDDetailed(data);
         setCurrentProjectName(projectName);
         setLnw_team(teams);
 
         setIsLoading(false);
-
-        console.log("bindaiiii");
-        console.log(lnw_task);
     }
 
     useEffect(() => {
         fetchData();
-    }, [])
+    }, []);
 
-    // TODO: usememo this
-    // TODO: make select task by projectid an api call
-    // TODO: abstract all this to api.tsx
-    const tasksByProjectID: Task[] = lnw_task.filter((t: Task) => t.projectID === currentProjectID);
-    // TODO: temp mockdata
-    const tasksJoinTaskName = leftJoinOne2One(tasksByProjectID, TASK_NAMES, "taskNameID", "taskNameID", "taskName");
-    const tasksJoinTeam = leftJoinOne2One(tasksJoinTaskName, TEAMS, "teamID", "teamID", "team");
-    const tasksJoinStatus = leftJoinOne2One(tasksJoinTeam, TASK_STATUSES, "statusID", "statusID", "status");
-    const tasksJoinTeam_TeamHelp = leftJoinOne2One(tasksJoinStatus, TEAMS, "teamHelpID", "teamID", "teamHelp");
 
-    const processingTasks = tasksJoinTeam_TeamHelp;
+    // TODO: separate filtering tasks to multiple steps so we can useMemo separately
+    // 1. filter by kpi
+    // 2. filter by team
+    // 3. filter by taskname, note
+    // const tasksFilteredByKPI: FilteringTask[] = useMemo(() => {
+    //
+    // }, [tasksByProjectIDDetailed, activeStatFilter]);
 
-    const statusMetrics = useMemo(() => {
-        const DAY_AHEAD: number = 10; // TODO: make this customizable by user or maybe make this global constant
-        const TODAY: Date = new Date();
-        const WARNING_DATE: Date = new Date(new Date().setDate(TODAY.getDate() + DAY_AHEAD)); // LMAOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-
-        let overdue = 0, warning = 0, incomplete = 0, done = 0, helpme = 0;
-        processingTasks.forEach(task => {
-            // TODO: rewrite this counting logic
-            if (task.deadline && task.deadline < TODAY) overdue += 1;
-
-            if (task.deadline >= TODAY && task.deadline <= WARNING_DATE) {
-                if (task.deadline) { // why this???
-                    warning += 1;
-                }
-            }
-
-            // TODO: remove cancelled condition
-            if (task.status.statusName !== "Done" && task.status.statusName !== "Cancelled") incomplete += 1;
-            if (task.status.statusName === "Help Me") helpme += 1;
-            if (task.status.statusName === "Done") done += 1;
-        });
-
-        return { overdue, warning, incomplete, done, helpme }
-    }, [processingTasks]);
-
-    const filteredAndSortedTasks = useMemo(() => {
-        // TODO: return to useMemo and rewrite filtering logic
-        // const filteredAndSortedTasks = (() => {
-        const DAY_AHEAD: number = 10; // TODO: make this customizable by user or maybe make this global constant
-        const TODAY: Date = new Date();
-        const WARNING_DATE: Date = new Date(new Date().setDate(TODAY.getDate() + DAY_AHEAD)); // LMAOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-
-        let filteringTasks = processingTasks;
-
-        if (activeStatFilter) {
-            const incomplete = filteringTasks.filter(
-                // TODO: remove cancelled condition
-                (t) => t.status.statusName !== "Done" && t.status.statusName !== "Cancelled"
-            );
-            switch (activeStatFilter) {
-                case "Overdue":
-                    filteringTasks = incomplete.filter((t) => t.deadline && t.deadline < TODAY);
-                    break;
-                case "Warning":
-                    filteringTasks = incomplete.filter((t) => {
-                        if (!t.deadline) return false;
-                        return t.deadline >= TODAY && t.deadline <= WARNING_DATE
-                    });
-                    break;
-                case "Incomplete":
-                    filteringTasks = incomplete;
-                    break;
-                case "Done":
-                    filteringTasks = filteringTasks.filter((t) => t.status.statusName === "Done");
-                    break;
-                case "Help Me":
-                    filteringTasks = filteringTasks.filter((t) => t.status.statusName === "Help Me");
-                    break;
-                default:
-                    console.error("PROJECTDETIAL KPI FILTERING UNREACHABLE");
-            }
-        }
-
-        if (teamFilter) {
-            filteringTasks = filteringTasks.filter((t) => t.teamID === Number(teamFilter));
-        }
-
-        // let finalFiltered = tasksToProcess.filter((task) => {
-        //     // [✅ แก้ไข] ใช้ task.HelpAssignee โดยตรง (ไม่ต้องใช้ as any เพราะแก้ไข types.ts แล้ว)
-        //     const matchesOwner = ownerFilter
-        //         ? task.Owner === ownerFilter || task.HelpAssignee === ownerFilter
-        //         : true;
-        //     const matchesStatus = statusFilter ? task.Status === statusFilter : true;
-        //     const matchesSearch = searchQuery
-        //         ? task.Task.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        //         (task["Notes / Result"] || "")
-        //             .toLowerCase()
-        //             .includes(searchQuery.toLowerCase())
-        //         : true;
-        //     return matchesOwner && matchesStatus && matchesSearch;
-        // });
-        //
-        // finalFiltered.sort((a, b) => {
-        //     const aHasDeadline = a.Deadline != null && a.Deadline !== "";
-        //     const bHasDeadline = b.Deadline != null && b.Deadline !== "";
-        //
-        //     // จัดการ Null/Empty (เรียงตามลำดับ Ascending: มี Deadline ก่อน)
-        //     if (aHasDeadline && !bHasDeadline) return -1;
-        //     if (!aHasDeadline && bHasDeadline) return 1;
-        //     if (!aHasDeadline && !bHasDeadline) return 0;
-        //
-        //     // ใช้การเปรียบเทียบ String (YYYY-MM-DD)
-        //     if (a.Deadline! < b.Deadline!) return -1;
-        //     if (a.Deadline! > b.Deadline!) return 1;
-        //     return 0;
-        // });
-
-        let finalFiltered = filteringTasks;
-        return finalFiltered;
-    },
-        [lnw_task, activeStatFilter, teamFilter]
-    );
+    const filteredAndSortedTasks: FilteringTask[] = useFilteredTasks(tasksByProjectIDDetailed, activeStatFilter, teamIDFilter, searchFilter);
 
     const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
     function openCreateTaskModal() { setIsCreateTaskModalOpen(true); };
     function closeCreateTaskModal() { setIsCreateTaskModalOpen(false); };
 
-    const [isTaskDetailModalOpen, setIsTaskDetailModalOpen] = useState(false);
-    function openTaskDetailModal() { setIsTaskDetailModalOpen(true); };
-    function closeTaskDetailModal() { setIsTaskDetailModalOpen(false); };
+    const [isTaskDetailProductionModalOpen, setIsTaskDetailProductionModalOpen] = useState(false);
+    function openTaskDetailProductionModal() { setIsTaskDetailProductionModalOpen(true); };
+    function closeTaskDetailProductionModal() { setIsTaskDetailProductionModalOpen(false); };
 
     const [isTaskDetailDealerModalOpen, setIsTaskDetailDealerModalOpen] = useState(false);
     function openTaskDetailDealerModal() { setIsTaskDetailDealerModalOpen(true); };
     function closeTaskDetailDealerModal() { setIsTaskDetailDealerModalOpen(false); };
 
-
-    const [taskRowData, setTaskRowData] = useState<DOMStringMap>(); // for sending task detail of selected row to task modals
 
     if (isLoading) {
         return <div>
@@ -225,292 +85,33 @@ function ProjectDetail() {
         </div>
     }
 
-    // console.log("filteredAndSortedTasks = = = = = == = = =");
-    // console.log(filteredAndSortedTasks);
     return (
         <>
             <CreateTaskModal isOpen={isCreateTaskModalOpen} onClose={() => { closeCreateTaskModal() }} currentProjectID={currentProjectID} parentUpdateCallback={fetchData} />
-            <TaskDetailProductionModal isOpen={isTaskDetailModalOpen} onClose={() => { closeTaskDetailModal() }} taskData={taskRowData} currentProjectName={currentProjectName} parentUpdateCallback={fetchData} />
+            <TaskDetailProductionModal isOpen={isTaskDetailProductionModalOpen} onClose={() => { closeTaskDetailProductionModal() }} taskData={taskRowData} currentProjectName={currentProjectName} parentUpdateCallback={fetchData} />
             <TaskDetailDealerModal isOpen={isTaskDetailDealerModalOpen} onClose={() => { closeTaskDetailDealerModal() }} taskData={taskRowData} currentProjectName={currentProjectName} parentUpdateCallback={fetchData} />
 
             <h1 className="text-2xl font-bold text-gray-800"> {currentProjectName}</h1> {/* // TODO: remove this */}
             <h1 className="text-2sm text-gray-800 mb-6"> {currentProjectID}</h1> {/* // TODO: remove this */}
             <div className="space-y-6">
                 {/*  TODO: split to separate components */}
-
-                {/* KPIs Summary Section */}
-                <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex justify-between items-center mb-3">
-                        <h3 className="text-md font-bold text-gray-700">
-                            สรุปสถานะ Task ของโปรเจกต์นี้
-                        </h3>
+                <KPISummarySection activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={tasksByProjectIDDetailed} />
+                <FieldFiltersAndAdd teamIDFilterState={[teamIDFilter, setTeamIDFilter]} searchFilterState={[searchFilter, setSearchFilter]} teamNameList={lnw_team} createNewTaskButton={
+                    isCurrentProjectIDValid ? (
                         <button
-                            // onClick={refreshAllData}
-                            className="p-2 text-gray-500 hover:text-orange-600 hover:bg-orange-100 rounded-full transition-colors"
-                            aria-label="Refresh data"
+                            onClick={openCreateTaskModal}
+                            className="flex items-center px-4 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                         >
-                            <RefreshIcon className="w-5 h-5" />
+                            <PlusIcon className="w-4 h-4" />
+                            <span className="ml-2">เพิ่ม Task</span>
                         </button>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                        <StatDisplayCard
-                            label="Overdue"
-                            value={statusMetrics.overdue}
-                            color="text-red-500"
-                            isActive={activeStatFilter === "Overdue"}
-                            onClick={() => setActiveStatFilter("Overdue")}
-                            description={statDescriptions.overdue}
-                        />
-                        <StatDisplayCard
-                            label="Warning"
-                            value={statusMetrics.warning}
-                            color="text-yellow-500"
-                            isActive={activeStatFilter === "Warning"}
-                            onClick={() => setActiveStatFilter("Warning")}
-                            description={statDescriptions.warning}
-                        />
-                        <StatDisplayCard
-                            label="Incomplete"
-                            value={statusMetrics.incomplete}
-                            color="text-blue-500"
-                            isActive={activeStatFilter === "Incomplete"}
-                            onClick={() => setActiveStatFilter("Incomplete")}
-                            description={statDescriptions.incomplete}
-                        />
-                        <StatDisplayCard
-                            label="Done"
-                            value={statusMetrics.done}
-                            color="text-green-500"
-                            isActive={activeStatFilter === "Done"}
-                            onClick={() => setActiveStatFilter("Done")}
-                            description={statDescriptions.done}
-                        />
-                        <StatDisplayCard
-                            label="Help Me"
-                            value={statusMetrics.helpme}
-                            color="text-purple-500"
-                            isActive={activeStatFilter === "Help Me"}
-                            onClick={() => setActiveStatFilter("Help Me")}
-                            description={statDescriptions.helpMe}
-                        />
-                    </div>
-                </div>
-
-                {/* Filter Section */}
-                <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-md font-bold text-gray-700">
-                            ตัวกรองและเครื่องมือ
-                        </h3>
-                        {currentProjectID ? (
-                            <button
-                                onClick={openCreateTaskModal}
-                                className="flex items-center px-4 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors
-                duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                            >
-                                <PlusIcon className="w-4 h-4" />
-                                <span className="ml-2">เพิ่ม Task</span>
-                            </button>
-                        ) : (
-                            <div className="text-sm text-gray-500 italic">
-                                (เลือกโปรเจกต์เพื่อเพิ่ม Task)
-                            </div>
-                        )}
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* // TODO: abstract this to comboBox component */}
-                        <div>
-                            {/* // TODO: change filter???? */}
-                            <label className="text-sm font-medium text-gray-700 mb-1 block">
-                                Owner / Assignee
-                            </label>
-                            <select
-                                onChange={(e) => setTeamFilter(e.target.value)}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
-                            >
-                                <option value={""}>-- ทีมทั้งหมด --</option>
-                                {lnw_team.map((opt) => (
-                                    <option key={opt.teamID} value={opt.teamID}>
-                                        {opt.teamName}
-                                    </option>
-                                ))}
-                            </select>
+                    ) : (
+                        <div className="text-sm text-gray-500 italic">
+                            (เลือกโปรเจกต์เพื่อเพิ่ม Task)
                         </div>
-                        <div>
-                            <label className="text-sm font-medium text-gray-700 mb-1 block">
-                                ค้นหา Task / Note
-                            </label>
-                            <input
-                                type="text"
-                                placeholder="ค้นหา..."
-                                // value={searchQuery}
-                                // onChange={(e) => setSearchQuery(e.target.value)}
-                                onChange={() => { }}
-                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                            <tr>
-                                <th scope="col" className="p-4">
-                                    <div className="flex items-center">
-                                        <input
-                                            id="checkbox-all-search"
-                                            type="checkbox"
-                                            // checked={isAllSelected}
-                                            // onChange={handleSelectAll}
-                                            // [✅ เพิ่ม] จัดการ Indeterminate state โดยใช้ Callback Ref
-                                            // ref={(input) => {
-                                            //     if (input) {
-                                            //         input.indeterminate = isPartialSelected;
-                                            //     }
-                                            // }}
-                                            // Disable ถ้าไม่มี Task ที่แก้ไขได้เลย
-                                            // disabled={editableTasksInView.length === 0}
-                                            className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 disabled:opacity-50 cursor-pointer"
-                                        // title={
-                                        // editableTasksInView.length === 0
-                                        // ? "ไม่มี Task ที่คุณแก้ไขได้ในมุมมองนี้"
-                                        // : "เลือกทั้งหมด (ที่แก้ไขได้)"
-                                        // }
-                                        />
-                                        <label htmlFor="checkbox-all-search" className="sr-only">
-                                            เลือกทั้งหมด
-                                        </label>
-                                    </div>
-                                </th>
-                                <th scope="col" className="px-6 py-3 font-medium text-left">
-                                    Deadline
-                                </th>
-                                <th scope="col" className="px-6 py-3 font-medium text-left">
-                                    Task
-                                </th>
-                                <th scope="col" className="px-6 py-3 font-medium text-left">
-                                    Note/Result
-                                </th>
-                                <th scope="col" className="px-6 py-3 font-medium text-left">
-                                    Team
-                                </th>
-                                <th scope="col" className="px-6 py-3 font-medium text-left">
-                                    Worker
-                                </th>
-                                <th scope="col" className="px-6 py-3 font-medium text-left">
-                                    Help Assignee
-                                </th>
-                                {/* <th scope="col" className="px-6 py-3 font-medium text-left"> */}
-                                {/*     Help Details */}
-                                {/* </th> */}
-                                <th scope="col" className="px-6 py-3 font-medium text-left">
-                                    Status
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {filteredAndSortedTasks.map((task) => {
-                                {/* // [✅ เพิ่ม] ตรวจสอบสิทธิ์การแก้ไข */ }
-                                {/* const userCanEdit = canEditTask(user, task); */ }
-                                {/* const isSelected = selectedTaskIds.has(task._id); */ }
-
-                                // TODO: remove this
-                                const userCanEdit = true;
-                                return (
-                                    <tr key={task.taskID} className="bg-white hover:bg-orange-50 cursor-pointer"
-                                        data-task-team={task.team.teamName}
-                                        data-selected-task={JSON.stringify(task)} // TODO: SUPER LOW IQ SOLUTION: JUST TAKE ALL ROW DATA, TURN IT TO JSON STRING, THROW TO MODAL AND PARSE THE SHEESH THERE LOLLLLLLLLLLLLLLL
-                                        onClick={(e) => {
-                                            const rowData = e.currentTarget.dataset;
-                                            setTaskRowData(rowData);
-                                            // TODO: should compare by teamID but this works for now
-                                            if (rowData.taskTeam === "DEALER") openTaskDetailDealerModal();
-                                            else openTaskDetailModal();
-                                        }}
-                                    >
-                                        <td className="w-4 p-4">
-                                            {/* {userCanEdit ? ( */}
-                                            {/*     <div className="flex items-center"> */}
-                                            {/*         <input */}
-                                            {/*             id={`checkbox-table-search-${task.taskID}`} */}
-                                            {/*             type="checkbox" */}
-                                            {/*             checked={isSelected} */}
-                                            {/*             onChange={() => handleSelectOne(task.taskID)} */}
-                                            {/*             className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 cursor-pointer" */}
-                                            {/*         /> */}
-                                            {/*         <label */}
-                                            {/*             htmlFor={`checkbox-table-search-${task.taskID}`} */}
-                                            {/*             className="sr-only" */}
-                                            {/*         > */}
-                                            {/*             checkbox */}
-                                            {/*         </label> */}
-                                            {/*     </div> */}
-                                            {/* ) : ( */}
-                                            {/*     // แสดงช่องว่างถ้าแก้ไขไม่ได้ เพื่อให้ Layout ไม่เลื่อน */}
-                                            {/*     <div */}
-                                            {/*         className="w-4 h-4" */}
-                                            {/*         title="คุณไม่มีสิทธิ์แก้ไข Task นี้" */}
-                                            {/*     ></div> */}
-                                            {/* )} */}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {formatDateYYYY_MM_DD(task.deadline)}
-                                        </td>
-                                        <td
-                                            className="px-6 py-4 font-medium text-gray-900 max-w-xs truncate"
-                                            title={task.taskName.taskNameID}
-                                        >
-                                            {task.taskName.taskNameStr}
-                                        </td>
-                                        <td
-                                            className="px-6 py-4 text-gray-600 max-w-sm truncate"
-                                            title={task.logPreview} // TODO: maybe title is not need?
-                                        >
-                                            {task.logPreview}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className="px-2.5 py-1 text-xs font-semibold text-orange-800 bg-orange-100 rounded-full">
-                                                {task.team.teamName}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 max-w-xs">
-                                            {"PLACEHOLDER - DO / " + task.taskID}
-                                            {/* <AssigneeLabels text={task.userID || "-"} /> */}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-700 font-medium">
-                                            {/* {task.HelpAssignee || "-"} */}
-                                            {task.teamHelp ? task.teamHelp.teamName : "-"}
-                                        </td>
-                                        {/* <td */}
-                                        {/*     className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 truncate max-w-xs" */}
-                                        {/* // title={task.HelpDetails || undefined} */}
-                                        {/* > */}
-                                        {/* {truncateText(task.HelpDetails, 10)} */}
-                                        {/*     {"help detail PLACEHOLDER"} */}
-                                        {/* </td> */}
-                                        <td
-                                            // TODO:  make statuscolor index by statusid?
-                                            className={`px-6 py-4 font-semibold ${StatusColor.get(task.status.statusName) || "text-gray-500"}`}
-                                        >
-                                            {task.status.statusName}
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-
-                            {/* // TODO: show row when no task in project */}
-                            {/* {filteredAndSortedTasks.length === 0 && ( */}
-                            {/*     <tr> */}
-                            {/*         <td colSpan={9} className="text-center py-10 text-gray-500"> */}
-                            {/*             กำลังอัปเดต Task ที่ตรงกับเกณฑ์ */}
-                            {/*         </td> */}
-                            {/*     </tr> */}
-                            {/* )} */}
-
-                        </tbody>
-                    </table>
-                </div>
+                    )
+                } />
+                <TableDisplay filteredAndSortedTasks={filteredAndSortedTasks} setTaskRowData={setTaskRowData} openTaskDetailDealerModal={openTaskDetailDealerModal} openTaskDetailProductionModal={openTaskDetailProductionModal} />
             </div>
         </>
     );
