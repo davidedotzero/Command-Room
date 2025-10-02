@@ -1,13 +1,13 @@
 import { useMemo } from "react";
 import type { FilteringTask } from "../../utils/types";
 
-export function useFilteredTasks(tasksByProjectIDDetailed: FilteringTask[], activeStatFilter: string | null, teamIDFilter: number | null, searchFilter: string) {
+export function useFilteredTasks(tasksDetailed: FilteringTask[], activeStatFilter: string | null, teamIDFilter: number | null, searchFilter: string) {
     const filteredAndSortedTasks: FilteringTask[] = useMemo(() => {
         const DAY_AHEAD: number = 10; // TODO: make this customizable by user or maybe make this global constant
         const TODAY: Date = new Date();
         const WARNING_DATE: Date = new Date(new Date().setDate(TODAY.getDate() + DAY_AHEAD)); // getDate +DAY_AHEAD day(s) from now LMAOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 
-        let filteringTasks = tasksByProjectIDDetailed;
+        let filteringTasks = tasksDetailed;
 
         if (activeStatFilter) {
             const incomplete = filteringTasks.filter(
@@ -20,7 +20,6 @@ export function useFilteredTasks(tasksByProjectIDDetailed: FilteringTask[], acti
                     break;
                 case "Warning":
                     filteringTasks = incomplete.filter((t) => {
-                        if (!t.deadline) return false;
                         return t.deadline >= TODAY && t.deadline <= WARNING_DATE
                     });
                     break;
@@ -54,7 +53,7 @@ export function useFilteredTasks(tasksByProjectIDDetailed: FilteringTask[], acti
 
         return filteringTasks;
     },
-        [tasksByProjectIDDetailed, activeStatFilter, teamIDFilter, searchFilter]
+        [tasksDetailed, activeStatFilter, teamIDFilter, searchFilter]
     );
 
     return filteredAndSortedTasks;

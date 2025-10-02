@@ -12,6 +12,7 @@ function Tasks() {
     const [allTasks, setAllTasks] = useState<FilteringTask[]>([]); // TODO: rename this
     const [lnw_team, setLnw_team] = useState<Team[]>([]); // TODO: rename this
     const [taskRowData, setTaskRowData] = useState<DOMStringMap>(); // for sending task detail of selected row to task modals
+    const [avgHelpLeadDays, setAvgHelpLeadDays] = useState<number>(0);
     const [isLoading, setIsLoading] = useState(true);
 
     const [activeStatFilter, setActiveStatFilter] = useState<string | null>(null);
@@ -22,9 +23,11 @@ function Tasks() {
         setIsLoading(true);
         const data = await API.getAllTasksDetailed();
         const teams = await API.getAllTeams();
+        const avgHelp = await API.getAvgHelpLeadDaysBeforeDeadline();
 
         setAllTasks(data);
         setLnw_team(teams);
+        setAvgHelpLeadDays(Number(avgHelp));
 
         setIsLoading(false);
     }
@@ -33,13 +36,7 @@ function Tasks() {
         fetchData();
     }, []);
 
-    if (isLoading) {
-        return <div>
-            Loading...
-        </div>
-    }
-
-    // const filteredAndSortedTasks: FilteringTask[] = useFilteredTasks(allTasks, activeStatFilter, teamIDFilter, searchFilter);
+    const filteredAndSortedTasks: FilteringTask[] = useFilteredTasks(allTasks, activeStatFilter, teamIDFilter, searchFilter);
 
     const [isTaskDetailProductionModalOpen, setIsTaskDetailProductionModalOpen] = useState(false);
     function openTaskDetailProductionModal() { setIsTaskDetailProductionModalOpen(true); };
@@ -49,15 +46,24 @@ function Tasks() {
     function openTaskDetailDealerModal() { setIsTaskDetailDealerModalOpen(true); };
     function closeTaskDetailDealerModal() { setIsTaskDetailDealerModalOpen(false); };
 
+    // let filteredAndSortedTasks: FilteringTask[] = [
+    //     { taskID: "lnw", taskNameID: 1, teamID: 1, statusID: 1, projectID: "asd", deadline: new Date("2025-10-1"), logPreview: "1234", teamHelpID: null, helpReqAt: null, team: { teamID: 1, teamName: "eiei" }, status: { statusID: 1, statusName: "eiei" }, taskName: { taskNameID: 1, taskNameStr: "eiei" }, teamHelp: { teamID: 1, teamName: "192" } }
+    // ];
+
+    if (isLoading) {
+        return <div>
+            Loading...
+        </div>
+    }
+
     return (
         <>
-            {/* <TaskDetailProductionModal isOpen={isTaskDetailProductionModalOpen} onClose={() => { closeTaskDetailProductionModal() }} taskData={taskRowData} currentProjectName={"PLACEHOLDER-NO PROJECTNAME"} parentUpdateCallback={fetchData} /> */}
-            {/* <TaskDetailDealerModal isOpen={isTaskDetailDealerModalOpen} onClose={() => { closeTaskDetailDealerModal() }} taskData={taskRowData} currentProjectName={"PLACEHOLDER-NO PROJECTNAME"} parentUpdateCallback={fetchData} /> */}
+            <TaskDetailProductionModal isOpen={isTaskDetailProductionModalOpen} onClose={() => { closeTaskDetailProductionModal() }} taskData={taskRowData} currentProjectName={"PLACEHOLDER-NO PROJECTNAME"} parentUpdateCallback={fetchData} />
+            <TaskDetailDealerModal isOpen={isTaskDetailDealerModalOpen} onClose={() => { closeTaskDetailDealerModal() }} taskData={taskRowData} currentProjectName={"PLACEHOLDER-NO PROJECTNAME"} parentUpdateCallback={fetchData} />
 
             <div className="space-y-6">
-                {/*  TODO: split to separate components */}
-                <KPISummarySection activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={filteredAndSortedTasks} />
-                <FieldFiltersAndAdd teamIDFilterState={[teamIDFilter, setTeamIDFilter]} searchFilterState={[searchFilter, setSearchFilter]} teamNameList={lnw_team} />
+                <KPISummarySection activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={allTasks} avgHelpLeadDays={avgHelpLeadDays} />
+                <FieldFiltersAndAdd teamIDFilterState={[teamIDFilter, setTeamIDFilter]} searchFilterState={[searchFilter, setSearchFilter]} teamNameList={lnw_team} tasksLength={filteredAndSortedTasks.length} />
                 <TableDisplay filteredAndSortedTasks={filteredAndSortedTasks} setTaskRowData={setTaskRowData} openTaskDetailDealerModal={openTaskDetailDealerModal} openTaskDetailProductionModal={openTaskDetailProductionModal} />
             </div>
         </>

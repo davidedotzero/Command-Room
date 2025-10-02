@@ -11,7 +11,7 @@ const statDescriptions = {
     helpMe: "งานที่ทีมกำลังร้องขอความช่วยเหลือ",
 };
 
-function KPISummarySection({ activeStatFilterState, tasks }: { activeStatFilterState: [string | null, React.Dispatch<React.SetStateAction<string | null>>], tasks: FilteringTask[] }) {
+function KPISummarySection({ activeStatFilterState, tasks, avgHelpLeadDays }: { activeStatFilterState: [string | null, React.Dispatch<React.SetStateAction<string | null>>], tasks: FilteringTask[], avgHelpLeadDays?: number }) {
     const [activeStatFilter, setActiveStatFilter] = activeStatFilterState;
 
     const toggleActiveStatFilter = (stat: string) => {
@@ -28,10 +28,8 @@ function KPISummarySection({ activeStatFilterState, tasks }: { activeStatFilterS
             // TODO: rewrite this counting logic
             if (task.deadline && task.deadline < TODAY) overdue += 1;
 
-            if (task.deadline >= TODAY && task.deadline <= WARNING_DATE) {
-                if (task.deadline) { // why this???
-                    warning += 1;
-                }
+            if (task.deadline >= TODAY && task.deadline <= WARNING_DATE && task.status.statusName !== "Done") {
+                warning += 1;
             }
 
             if (task.status.statusName !== "Done") incomplete += 1;
@@ -99,6 +97,21 @@ function KPISummarySection({ activeStatFilterState, tasks }: { activeStatFilterS
                         description={statDescriptions.helpMe}
                     />
                 </div>
+                {
+                    avgHelpLeadDays && (
+                        <div className="mt-4 pt-4 border-t">
+                            <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <span className="text-sm font-medium text-gray-700">
+                                    ระยะเวลาเฉลี่ยที่ขอความช่วยเหลือก่อน Deadline:
+                                </span>
+                                <span className="ml-2 font-bold text-lg text-gray-800">
+                                    {avgHelpLeadDays}
+                                </span>
+                                <span className="ml-1 text-sm text-gray-600">วัน</span>
+                            </div>
+                        </div>
+                    )
+                }
             </div>
         </>
     );

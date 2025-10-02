@@ -2,12 +2,14 @@ import type { ReactElement } from "react";
 import type { Team } from "../../../utils/types";
 
 function FieldFiltersAndAdd(
-    { teamIDFilterState, searchFilterState, teamNameList, createNewTaskButton }:
+    { teamIDFilterState, searchFilterState, teamNameList, createNewTaskButton, resetFiltersCallback, tasksLength }:
         {
             teamIDFilterState: [number | null, React.Dispatch<React.SetStateAction<number | null>>],
             searchFilterState: [string, React.Dispatch<React.SetStateAction<string>>],
             teamNameList: Team[],
-            createNewTaskButton?: ReactElement
+            createNewTaskButton?: ReactElement,
+            resetFilterCallback?: () => void,
+            tasksLength: number
         }) {
 
     const [teamIDFilter, setTeamIDFilter] = teamIDFilterState;
@@ -26,7 +28,7 @@ function FieldFiltersAndAdd(
                     {/* // TODO: abstract this to comboBox component */}
                     <div>
                         <label className="text-sm font-medium text-gray-700 mb-1 block">
-                            Team / Help Assignee
+                            Team / Assignee
                         </label>
                         <select
                             onChange={(e) => setTeamIDFilter(Number(e.target.value))}
@@ -53,7 +55,23 @@ function FieldFiltersAndAdd(
                         />
                     </div>
                 </div>
-            </div>
+
+                <div className="flex justify-between items-center pt-4 border-t mt-6">
+                    <p className="text-lg font-semibold text-gray-800">
+                        พบผลลัพธ์:{" "}
+                        <span className="text-orange-500">{tasksLength}</span>{" "}
+                        รายการ
+                    </p>
+                    <button
+                        onClick={() => {
+                            // resetFilters();
+                        }}
+                        className="px-4 py-2 text-sm text-gray-600 hover:text-orange-500 transition duration-150 disabled:opacity-40"
+                    >
+                        ล้างตัวกรองทั้งหมด
+                    </button>
+                </div>
+            </div >
         </>
     )
 }

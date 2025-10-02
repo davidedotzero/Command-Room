@@ -1,3 +1,4 @@
+import { getOnlyDate, msToDay } from "./functions";
 import { TASKS, PROJECTS, TEAMS, TASK_STATUSES, EDIT_LOGS, ROLES, PO_STATUSES, TASK_NAMES, leftJoinOne2One } from "./mockdata";
 import type { EditLog, FilteringTask, Task } from "./types";
 
@@ -63,8 +64,8 @@ export const API = {
         // await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
         return [...TASKS];
     },
-    getAllTasksDetailed: async () => {
-        const eiei = [...TASKS];
+    getAllTasksDetailed: async (): Promise<FilteringTask[]> => {
+        const eiei = [...TASKS]
         const tasksJoinTaskName = leftJoinOne2One(eiei, TASK_NAMES, "taskNameID", "taskNameID", "taskName");
         const tasksJoinTeam = leftJoinOne2One(tasksJoinTaskName, TEAMS, "teamID", "teamID", "team");
         const tasksJoinStatus = leftJoinOne2One(tasksJoinTeam, TASK_STATUSES, "statusID", "statusID", "status");
@@ -86,6 +87,9 @@ export const API = {
     getAllPoStatuses: async () => {
         return [...PO_STATUSES]
     },
+    getAllProjects: async () => {
+        return [...PROJECTS];
+    },
 
     getProjectNameById: async (projectID: string) => {
         // TODO: handle when name not found
@@ -104,6 +108,22 @@ export const API = {
         const tasksJoinStatus = leftJoinOne2One(tasksJoinTeam, TASK_STATUSES, "statusID", "statusID", "status");
         const tasksJoinTeam_TeamHelp = leftJoinOne2One(tasksJoinStatus, TEAMS, "teamHelpID", "teamID", "teamHelp");
         return tasksJoinTeam_TeamHelp;
+    },
+
+    getAvgHelpLeadDaysBeforeDeadline: async () => {
+        const today = new Date();
+        const tasksNeedsHelpButNotOverdue = [...TASKS]
+            .filter(task => task.helpReqAt)
+            .filter(task => task.deadline > today);
+
+        const totalHelpLeadDay = tasksNeedsHelpButNotOverdue
+            .reduce((acc, task) => {
+                return acc + msToDay(+getOnlyDate(task.deadline) - +getOnlyDate(today))
+            }, 0);
+
+        const avgHelpLeadDaysBeforeDeadline = totalHelpLeadDay / tasksNeedsHelpButNotOverdue.length;
+
+        return avgHelpLeadDaysBeforeDeadline.toFixed(1);
     },
 
 

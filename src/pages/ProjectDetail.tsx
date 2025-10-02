@@ -96,21 +96,22 @@ function ProjectDetail() {
             <div className="space-y-6">
                 {/*  TODO: split to separate components */}
                 <KPISummarySection activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={tasksByProjectIDDetailed} />
-                <FieldFiltersAndAdd teamIDFilterState={[teamIDFilter, setTeamIDFilter]} searchFilterState={[searchFilter, setSearchFilter]} teamNameList={lnw_team} createNewTaskButton={
-                    isCurrentProjectIDValid ? (
-                        <button
-                            onClick={openCreateTaskModal}
-                            className="flex items-center px-4 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                        >
-                            <PlusIcon className="w-4 h-4" />
-                            <span className="ml-2">เพิ่ม Task</span>
-                        </button>
-                    ) : (
-                        <div className="text-sm text-gray-500 italic">
-                            (เลือกโปรเจกต์เพื่อเพิ่ม Task)
-                        </div>
-                    )
-                } />
+                <FieldFiltersAndAdd teamIDFilterState={[teamIDFilter, setTeamIDFilter]} searchFilterState={[searchFilter, setSearchFilter]} teamNameList={lnw_team} tasksLength={filteredAndSortedTasks.length}
+                    createNewTaskButton={
+                        isCurrentProjectIDValid ? (
+                            <button
+                                onClick={openCreateTaskModal}
+                                className="flex items-center px-4 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                            >
+                                <PlusIcon className="w-4 h-4" />
+                                <span className="ml-2">เพิ่ม Task</span>
+                            </button>
+                        ) : (
+                            <div className="text-sm text-gray-500 italic">
+                                (เลือกโปรเจกต์เพื่อเพิ่ม Task)
+                            </div>
+                        )
+                    } />
                 <TableDisplay filteredAndSortedTasks={filteredAndSortedTasks} setTaskRowData={setTaskRowData} openTaskDetailDealerModal={openTaskDetailDealerModal} openTaskDetailProductionModal={openTaskDetailProductionModal} />
             </div>
         </>

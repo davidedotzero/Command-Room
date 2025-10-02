@@ -1,5 +1,5 @@
 export function formatDateYYYY_MM_DD(date: Date): string {
-    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
+    return `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear().toString().padStart(2, "0")}`
     // getMonth() + 1 because it starts counting at 0 (January = 0) FOR SOME REASON GOD KNOWS WHY WHY CANT WE JUST NUKE THIS STUPID SHITTY ASS LANGUAGE FROM HUMANITY ALREADY
 }
 
@@ -27,4 +27,12 @@ export function isOnlyDateEqual(date1: Date, date2: Date) {
         date1.getMonth() === date2.getMonth() &&
         date1.getFullYear() === date2.getFullYear()
     );
+}
+
+export function getOnlyDate(date: Date) {
+    return new Date(date.setHours(0, 0, 0, 0));
+}
+
+export function msToDay(ms: number): number {
+    return ms / (1000 * 60 * 60 * 24);
 }
