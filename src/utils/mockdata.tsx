@@ -116,19 +116,19 @@ export let TASKS: Task[] = [
 
 // TODO: DELETE MOCKUP DATA
 export let PROJECTS: Project[] = [
-    { projectID: "PROJ-CRM-0001", projectName: "test1", done: false },
-    { projectID: "PROJ-CRM-0002", projectName: "test2", done: false },
-    { projectID: "PROJ-CRM-0003", projectName: "test3", done: false },
-    { projectID: "PROJ-CRM-0004", projectName: "test4", done: false },
-    { projectID: "PROJ-CRM-0005", projectName: "test5", done: false },
-    { projectID: "PROJ-CRM-0006", projectName: "test6", done: false },
-    { projectID: "PROJ-CRM-0007", projectName: "test7", done: false },
-    { projectID: "PROJ-CRM-0008", projectName: "test8", done: false },
-    { projectID: "PROJ-CRM-0009", projectName: "test9", done: false },
-    { projectID: "PROJ-CRM-0010", projectName: "test10", done: false },
-    { projectID: "PROJ-CRM-0011", projectName: "test11", done: true },
-    { projectID: "PROJ-CRM-0012", projectName: "test12", done: false },
-    { projectID: "PROJ-CRM-0013", projectName: "test13", done: true },
+    { projectID: "PROJ-CRM-0001", projectName: "test1", isArchived: false },
+    { projectID: "PROJ-CRM-0002", projectName: "test2", isArchived: false },
+    { projectID: "PROJ-CRM-0003", projectName: "test3", isArchived: false },
+    { projectID: "PROJ-CRM-0004", projectName: "test4", isArchived: false },
+    { projectID: "PROJ-CRM-0005", projectName: "test5", isArchived: false },
+    { projectID: "PROJ-CRM-0006", projectName: "test6", isArchived: false },
+    { projectID: "PROJ-CRM-0007", projectName: "test7", isArchived: false },
+    { projectID: "PROJ-CRM-0008", projectName: "test8", isArchived: false },
+    { projectID: "PROJ-CRM-0009", projectName: "test9", isArchived: false },
+    { projectID: "PROJ-CRM-0010", projectName: "test10", isArchived: false },
+    { projectID: "PROJ-CRM-0011", projectName: "test11", isArchived: true },
+    { projectID: "PROJ-CRM-0012", projectName: "test12", isArchived: false },
+    { projectID: "PROJ-CRM-0013", projectName: "test13", isArchived: true },
 ];
 
 export let EDIT_LOGS: EditLog[] = [

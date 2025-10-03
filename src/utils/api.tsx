@@ -91,6 +91,9 @@ export const API = {
     },
 
 
+    getAllActiveProjects: async () => {
+        return PROJECTS.filter(p => p.isArchived === false);
+    },
     getProjectNameById: async (projectID: string) => {
         // TODO: handle when name not found
         return PROJECTS.find(proj => proj.projectID === projectID)?.projectName!;
@@ -184,6 +187,19 @@ export const API = {
         for (let project of PROJECTS) {
             if (projectID === project.projectID) {
                 project.projectName = newProjectName;
+                break;
+            }
+        }
+        return true;
+    },
+
+    deleteProjectById: async (projectID: string) => {
+        let found = PROJECTS.find(project => project.projectID === projectID);
+        if (!found) return false;
+
+        for (let project of PROJECTS) {
+            if (projectID === project.projectID) {
+                project.isArchived = true;
                 break;
             }
         }

@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { DeleteIcon, EditIcon } from "../components/utils/icons";
-import { PROJECTS } from "../utils/mockdata";
 import type { Project } from "../utils/types";
 import { API } from "../utils/api";
 import CreateProjectModal from "../components/modals/projects/CreateProjectModal";
 import EditProjectModal from "../components/modals/EditProjectModal";
-import DeleteProjectModal from "../components/modals/DeleteProjectModal";
+import ConfirmModal from "../components/modals/ConfirmModal";
 
 function Projects() {
     const navigate = useNavigate();
@@ -19,8 +18,22 @@ function Projects() {
 
     const fetchData = async () => {
         setIsLoading(true);
-        const data = await API.getAllProjects();
+        const data = await API.getAllActiveProjects();
         setProjectsList(data);
+        setIsLoading(false);
+    }
+
+    const deleteSelectedProject = async () => {
+        setIsLoading(true);
+        if (!selectedProjectID) {
+            // TODO: better error handling
+            console.error("NO PROJECT SELECTED FOR DELETION.");
+            return;
+        }
+
+        const res = await API.deleteProjectById(selectedProjectID);
+        console.log(res);
+        fetchData();
         setIsLoading(false);
     }
 
@@ -62,7 +75,7 @@ function Projects() {
         <>
             <CreateProjectModal isOpen={isCreateProjectModalOpen} onClose={closeCreateProjectModal} />
             <EditProjectModal isOpen={isEditProjectModalOpen} onClose={closeEditProjectModal} selectedProjectID={selectedProjectID} selectedProjectName={selectedProjectName} parentUpdateCallback={fetchData} />
-            <DeleteProjectModal />
+            <ConfirmModal isOpen={isDeleteProjectModalOpen} onClose={closeDeleteProjectModal} callback={deleteSelectedProject} />
             {/* // TODO: separate these to each components */}
 
             <div className="space-y-8">
@@ -129,7 +142,8 @@ function Projects() {
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                // onDeleteProject(p);
+                                                setSelectedProjectID(p.projectID);
+                                                openDeleteProjectModal();
                                             }}
                                             className="text-gray-500 hover:text-red-600 p-2 rounded-full hover:bg-red-100"
                                             aria-label="Delete Project"

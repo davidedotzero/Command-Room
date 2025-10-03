@@ -22,7 +22,7 @@ export interface Task {
 export interface Project {
     projectID: string;
     projectName: string;
-    done: boolean;
+    isArchived: boolean;
 }
 
 export interface Team {
