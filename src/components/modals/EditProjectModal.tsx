@@ -25,6 +25,7 @@ function EditProjectModal(
 
     const handleSubmit = async () => {
         // TODO: confirmation dialog
+        // TODO: dont send api if nothing has changed
 
         // TODO: better api error handling
         const res = await API.updateProjectNameAtId(selectedProjectID, projectName);
