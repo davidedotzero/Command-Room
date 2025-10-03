@@ -47,7 +47,7 @@ function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, cu
                 <div className="pb-6 border-b">
                     <div className="md:col-span-2 mb-6">
                         <DetailItem label="Task">
-                            <p className="text-xl font-bold text-gray-800">{currentTask.taskName.taskNameStr || "-"}</p>
+                            <p className="text-xl font-bold text-gray-800">{currentTask.taskName || "-"}</p>
                             <strong>ของ Project:</strong>
                             <p>{currentProjectName}</p>
                         </DetailItem>
@@ -105,7 +105,7 @@ function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, cu
                                     <DetailItem label="รายละเอียด">
                                         <p className="p-3 bg-purple-100 rounded-md border border-purple-200 min-h-[50px] whitespace-pre-wrap">
                                             {/* // TODO: fetch latest help log or all log? */}
-                                            {/* {task.HelpDetails || "-"} */}
+                                            {task.helpReqReason || "-"}
                                         </p>
                                     </DetailItem>
                                 </div>

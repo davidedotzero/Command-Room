@@ -27,7 +27,7 @@ export const FormField: React.FC<{ label: string; children: React.ReactNode }> =
     const { pending } = useFormStatus();
     return (
         <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mt-3 block text-sm font-medium text-gray-700 mb-1">
                 {label}
             </label>
             {children}

@@ -32,6 +32,8 @@ IMPORTANT MAKE HELPME WORK PROPERLY
 
 in projectdetails page, separate team/assignee combobox to two?????
 
+translate to thai all
+
 
 // EditTask for Dealer flow
 Of course. Here is a recommended user journey for your "Edit Dealer's Task" form, focusing on clarity, efficiency, and providing good user feedback.

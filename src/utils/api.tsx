@@ -1,6 +1,6 @@
 import { getOnlyDate, msToDay } from "./functions";
-import { TASKS, PROJECTS, TEAMS, TASK_STATUSES, EDIT_LOGS, ROLES, PO_STATUSES, TASK_NAMES, leftJoinOne2One } from "./mockdata";
-import type { EditLog, FilteringTask, Task } from "./types";
+import { TASKS, PROJECTS, TEAMS, TASK_STATUSES, EDIT_LOGS, ROLES, PO_STATUSES, leftJoinOne2One, DEFAULT_TASK_NAMES } from "./mockdata";
+import type { EditLog, FilteringTask, Project, Task } from "./types";
 
 const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 //TODO: IMPORTANT!!!!! this file
@@ -66,14 +66,10 @@ export const API = {
     },
     getAllTasksDetailed: async (): Promise<FilteringTask[]> => {
         const eiei = [...TASKS]
-        const tasksJoinTaskName = leftJoinOne2One(eiei, TASK_NAMES, "taskNameID", "taskNameID", "taskName");
-        const tasksJoinTeam = leftJoinOne2One(tasksJoinTaskName, TEAMS, "teamID", "teamID", "team");
+        const tasksJoinTeam = leftJoinOne2One(eiei, TEAMS, "teamID", "teamID", "team");
         const tasksJoinStatus = leftJoinOne2One(tasksJoinTeam, TASK_STATUSES, "statusID", "statusID", "status");
         const tasksJoinTeam_TeamHelp = leftJoinOne2One(tasksJoinStatus, TEAMS, "teamHelpID", "teamID", "teamHelp");
         return tasksJoinTeam_TeamHelp;
-    },
-    getAllTaskNames: async () => {
-        return [...TASK_NAMES];
     },
     getAllTeams: async () => {
         return [...TEAMS];
@@ -90,6 +86,10 @@ export const API = {
     getAllProjects: async () => {
         return [...PROJECTS];
     },
+    getAllDefaultTaskNames: async () => {
+        return [...DEFAULT_TASK_NAMES];
+    },
+
 
     getProjectNameById: async (projectID: string) => {
         // TODO: handle when name not found
@@ -103,12 +103,17 @@ export const API = {
     },
     getTasksByProjectIdDetailed: async (projectID: string): Promise<FilteringTask[]> => {
         const tasksByProjectID = TASKS.filter((t) => t.projectID === projectID);
-        const tasksJoinTaskName = leftJoinOne2One(tasksByProjectID, TASK_NAMES, "taskNameID", "taskNameID", "taskName");
-        const tasksJoinTeam = leftJoinOne2One(tasksJoinTaskName, TEAMS, "teamID", "teamID", "team");
+        const tasksJoinTeam = leftJoinOne2One(tasksByProjectID, TEAMS, "teamID", "teamID", "team");
         const tasksJoinStatus = leftJoinOne2One(tasksJoinTeam, TASK_STATUSES, "statusID", "statusID", "status");
         const tasksJoinTeam_TeamHelp = leftJoinOne2One(tasksJoinStatus, TEAMS, "teamHelpID", "teamID", "teamHelp");
         return tasksJoinTeam_TeamHelp;
     },
+
+    getLatestTaskID: async () => {
+        const tasksSorted = TASKS.sort((a, b) => +b.createdAt - +a.createdAt);
+        return tasksSorted[0].taskID;
+    },
+
 
     getAvgHelpLeadDaysBeforeDeadline: async () => {
         const today = new Date();
@@ -127,23 +132,48 @@ export const API = {
     },
 
 
-
-    addTasks: async (newTask: Task) => {
+    addTask: async (newTask: Task) => {
         TASKS.push(newTask);
+        return true;
+    },
+    addTasks: async (tasks: Task[]) => {
+        for (let task of tasks) {
+            TASKS.push(task);
+        }
         return true;
     },
     addEditLog: async (newLog: EditLog) => {
         EDIT_LOGS.push(newLog);
         return true;
     },
+    addProject: async (newProject: Project) => {
+        PROJECTS.push(newProject);
+        return true;
+    },
 
 
-    updateTask: async (taskID: string, deadline: Date | null, teamHelpID: number | null, helpReqAt: Date | null, taskStatusID: number | null, logPreview: string) => {
+    updateTask: async (
+        taskID: string,
+        taskName: string,
+        teamID: number,
+        deadline: Date | null,
+        teamHelpID: number | null,
+        helpReqAt: Date | null,
+        taskStatusID: number | null,
+        logPreview: string,
+        helpReqReason: string | null) => {
+
+        console.log("in updatetask");
+        console.log(teamHelpID);
+        console.log(teamHelpID ?? "kuy");
         for (let task of TASKS) {
             if (taskID === task.taskID) {
+                task.taskName = taskName;
+                task.teamID = teamID;
                 task.deadline = deadline ?? task.deadline;
-                task.teamHelpID = teamHelpID ?? task.teamHelpID;
-                task.helpReqAt = helpReqAt ?? task.helpReqAt;
+                task.teamHelpID = teamHelpID;
+                task.helpReqAt = helpReqAt;
+                task.helpReqReason = helpReqReason;
                 task.statusID = taskStatusID ?? task.statusID;
                 task.logPreview = logPreview;
                 break;

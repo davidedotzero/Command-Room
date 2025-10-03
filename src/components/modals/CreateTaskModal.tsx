@@ -1,9 +1,14 @@
-import { useEffect, type ReactNode } from "react";
-import Select from "react-select";
+import { useEffect, useState, type ReactNode } from "react";
+import Select, { type SingleValue } from "react-select";
 
 import { createPortal, useFormStatus } from "react-dom";
-import { TASK_NAMES, TASKS, TEAMS } from "../../utils/mockdata";
+import { TASKS, TEAMS } from "../../utils/mockdata";
 import { FormButton, FormField, FormFieldSetWrapper } from "./forms/FormItems";
+import CreatableSelect from "react-select/creatable";
+import { useDbConst } from "../../contexts/DbConstDataContext";
+import DatePicker from "react-datepicker";
+import { API } from "../../utils/api";
+import { genSingleNewID, getOnlyDate } from "../../utils/functions";
 
 
 // TODO: move this somewhere else better
@@ -11,6 +16,7 @@ const baseInputClass = "mt-1 block w-full px-3 py-2 bg-white border border-gray-
 
 function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallback, children }: { isOpen: boolean, onClose: () => void, currentProjectID: string, parentUpdateCallback: () => {}, children?: ReactNode }) {
     if (!isOpen) return null;
+    //
     // Close Modal on ESC key
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -25,31 +31,76 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
         }
     }, [isOpen, onClose]);
 
+    const { DEFAULT_TASK_NAMES, TEAMS } = useDbConst();
+
+    const [selectedTask, setSelectedTask] = useState<{ value: string, label: string } | null>(null);
+    const [selectedTeamID, setSelectedTeamID] = useState<{ value: number, label: string } | null>(null);
+    const [selectedDeadline, setSelectedDate] = useState<Date | null>(null);
+
     // TODO: do proper isLoading later
     let isLoading = false;
 
     const handleSubmit = async (formData: FormData) => {
         // IMPORTANT: FormData.get() return string | File so we need to parse it to Number and blabla
-        const taskNameID: number = Number(formData.get("FormTaskName"));
-        const teamID: number = Number(formData.get("FormTeam"));
-        const deadlineStr = formData.get("FormDeadline");
+
+        // const taskName: string = formData.get("FormTaskName")!;
+        // const teamID: number = Number(formData.get("FormTeam"));
+        // const deadlineStr = formData.get("FormDeadline");
         const inProgressStatusID = 1; // default to "In Progress"
 
-        console.log("task: " + taskNameID);
-        console.log("team: " + teamID);
-        console.log("deadline: " + deadlineStr);
+        // console.log("task: " + taskName);
+        // console.log("team: " + teamID);
+        // console.log("deadline: " + deadlineStr);
 
-        // TODO: CALL API: add new task to project
+        if (!selectedTask || !selectedTeamID || !selectedDeadline) {
+            // TODO: better error handling when backend is setup
+            console.error("form grok mai krob dai ngai wa")
+            return;
+        }
+
+        let a = await API.getLatestTaskID();
+        let newTaskID = genSingleNewID(a);
 
         // TODO: generate new task id
-        TASKS.push(
-            { taskID: "TASK-0069", projectID: currentProjectID, taskNameID: taskNameID, teamID: teamID, deadline: new Date(deadlineStr), statusID: inProgressStatusID, teamHelpID: null, helpReqAt: null, logPreview: "999-PLACEHOLDER" }
-        );
+        const newTask =
+        {
+            taskID: newTaskID,
+            projectID: currentProjectID,
+            taskName: selectedTask.value,
+            teamID: selectedTeamID.value,
+            deadline: getOnlyDate(selectedDeadline),
+            statusID: inProgressStatusID,
+            teamHelpID: null,
+            helpReqAt: null,
+            logPreview: "",
+            createdAt: new Date()
+        };
+
+        const res = await API.addTask(newTask);
+        // TODO: handle result
         // await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
 
         console.log("sed la");
         onClose();
         parentUpdateCallback();
+    }
+
+    const handleTaskChange = async (e: SingleValue<{ value: string, label: string }>) => {
+        setSelectedTask(e);
+        if (!e) {
+            setSelectedTeamID(null);
+            return;
+        }
+
+        const foundTask = DEFAULT_TASK_NAMES.find(x => x.taskName === e.value);
+
+        if (!foundTask) {
+            setSelectedTeamID(null);
+            return;
+        }
+
+        // TODO: spaghetti asf
+        setSelectedTeamID({ value: foundTask.teamID, label: TEAMS.find(x => x.teamID === foundTask.teamID)!.teamName })
     }
 
     // TODO: when pending make controls to grey-ish or better color than this eieiei 
@@ -75,36 +126,43 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
                             <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                                 <div className="md:col-span-2">
                                     <FormField label="Task">
-                                        <Select
+                                        <CreatableSelect
                                             name="FormTaskName"
-                                            required
                                             className={"shadow-sm"}
-                                            isClearable={false}
+                                            required
+                                            isClearable={true}
                                             isSearchable={true}
-                                            placeholder={"เลือกรายการ..."}
-                                            options={TASK_NAMES.map((taskName) => ({ value: taskName.taskNameID, label: taskName.taskNameStr }))}
+                                            placeholder={"กรอกชื่อ Task ใหม่หรือเลือกรายการจากที่มีอยู่..."}
+                                            options={DEFAULT_TASK_NAMES.map(t => ({ value: t.taskName, label: t.taskName }))}
+                                            value={selectedTask}
+                                            onChange={e => handleTaskChange(e)}
                                         />
                                     </FormField>
                                 </div>
                                 <FormField label="Team">
-                                    <select
+                                    <Select
                                         name="FormTeam"
-                                        // onChange={handleChange}
-                                        className={baseInputClass}
-                                    >
-                                        {TEAMS.map((team) => (<option key={team.teamID} value={team.teamID}> {team.teamName} </option>))}
-                                    </select>
+                                        className={"shadow-sm"}
+                                        required
+                                        isClearable={false}
+                                        isSearchable={true}
+                                        placeholder={"เลือกทีมที่รับผิดชอบ..."}
+                                        options={TEAMS.map(t => ({ value: t.teamID, label: t.teamName }))}
+                                        value={selectedTeamID}
+                                        onChange={e => setSelectedTeamID(e)}
+                                    />
                                 </FormField>
                                 <FormField label="Deadline">
-                                    <input
-                                        // TODO: change display format to yyyy-mm-dd
-                                        // TODO: change border color when submit without input this boi
-                                        type="date"
+                                    <DatePicker
                                         name="FormDeadline"
+                                        className={"shadow-sm"}
                                         required
-                                        // value={formData.Deadline || ""}
-                                        // onChange={handleChange}
-                                        className={baseInputClass}
+                                        filterDate={(date) => { return date.getDay() !== 0 }}
+                                        isClearable={true}
+                                        placeholderText={"dd/MM/yyyy"}
+                                        minDate={new Date()}
+                                        selected={selectedDeadline}
+                                        onChange={e => setSelectedDate(e)}
                                     />
                                 </FormField>
                             </div>

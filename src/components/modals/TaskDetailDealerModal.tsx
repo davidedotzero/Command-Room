@@ -8,8 +8,10 @@ import TaskDetailsView from "./task_detail/TaskDetailsView";
 import type { FilteringTask } from "../../utils/types";
 
 
-function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: any, currentProjectName: string, parentUpdateCallback: () => {} }) {
+function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: FilteringTask | null, currentProjectName: string, parentUpdateCallback: () => {} }) {
     if (!isOpen) return null;
+    if (!taskData) return null;
+
     // Close Modal on ESC key
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -31,7 +33,7 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, 
     // data-lnw-juan-za = taskData.lnwJuanZa
     // and its always string
     // noice html :thumbs_up:
-    const currentTask: FilteringTask = JSON.parse(taskData.selectedTask);
+    const currentTask: FilteringTask = taskData;
 
     const handleSubmit = async (formData: FormData) => {
         console.log("open edit task dialog here");

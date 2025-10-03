@@ -1,7 +1,16 @@
 import { useMemo } from "react";
 import type { FilteringTask } from "../../utils/types";
+import { getOnlyDate } from "../../utils/functions";
 
-export function useFilteredTasks(tasksDetailed: FilteringTask[], activeStatFilter: string | null, teamIDFilter: number | null, searchFilter: string) {
+export function useFilteredTasks(
+    tasksDetailed: FilteringTask[],
+    activeStatFilter: string | null,
+    teamIDFilter: number | null,
+    searchFilter: string,
+    startDateFilter: Date | null,
+    endDateFilter: Date | null,
+    projectFilter?: string | null,
+) {
     const filteredAndSortedTasks: FilteringTask[] = useMemo(() => {
         const DAY_AHEAD: number = 10; // TODO: make this customizable by user or maybe make this global constant
         const TODAY: Date = new Date();
@@ -44,16 +53,28 @@ export function useFilteredTasks(tasksDetailed: FilteringTask[], activeStatFilte
         if (searchFilter) {
             let lowerSearchFilter = searchFilter.toLowerCase();
             filteringTasks = filteringTasks.filter((t) =>
-                t.taskName.taskNameStr.toLowerCase().includes(lowerSearchFilter) ||
+                t.taskName.toLowerCase().includes(lowerSearchFilter) ||
                 t.logPreview.toLowerCase().includes(lowerSearchFilter) // TODO: should be search on full log but this will do for now
             );
+        }
+
+        if (projectFilter) {
+            filteringTasks = filteringTasks.filter((t) => t.projectID === projectFilter);
+        }
+
+        if (startDateFilter) {
+            filteringTasks = filteringTasks.filter((t) => getOnlyDate(t.deadline) >= getOnlyDate(startDateFilter));
+        }
+
+        if (endDateFilter) {
+            filteringTasks = filteringTasks.filter((t) => getOnlyDate(t.deadline) <= getOnlyDate(endDateFilter));
         }
 
         filteringTasks.sort((a: FilteringTask, b: FilteringTask) => +a.deadline - +b.deadline); // using unary "+" operator here to "cast" deadline(Date) to timestamp(number)
 
         return filteringTasks;
     },
-        [tasksDetailed, activeStatFilter, teamIDFilter, searchFilter]
+        [tasksDetailed, activeStatFilter, teamIDFilter, searchFilter, projectFilter, startDateFilter, endDateFilter]
     );
 
     return filteredAndSortedTasks;

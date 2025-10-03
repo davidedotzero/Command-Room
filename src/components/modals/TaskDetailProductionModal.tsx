@@ -5,9 +5,11 @@ import { DetailItem } from "./forms/FormItems";
 import { formatDateYYYY_MM_DD } from "../../utils/functions";
 import { StatusColor } from "../../utils/constants";
 import TaskDetailsView from "./task_detail/TaskDetailsView";
+import type { FilteringTask } from "../../utils/types";
 
-function TaskDetailProductionModal({ isOpen, onClose, taskData, currentProjectName, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: any, currentProjectName: string, parentUpdateCallback: () => {} }) {
+function TaskDetailProductionModal({ isOpen, onClose, taskData, currentProjectName, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: FilteringTask | null, currentProjectName: string, parentUpdateCallback: () => {} }) {
     if (!isOpen) return null;
+    if (!taskData) return null;
 
     // TODO: do proper isLoading later
     let isLoading = false;
@@ -16,7 +18,7 @@ function TaskDetailProductionModal({ isOpen, onClose, taskData, currentProjectNa
     // data-lnw-juan-za = taskData.lnwJuanZa
     // and its always string
     // noice html :thumbs_up:
-    const currentTask = JSON.parse(taskData.selectedTask);
+    const currentTask = taskData;
 
     const handleSubmit = async (formData: FormData) => {
         // TODO: switch to using task modal stack

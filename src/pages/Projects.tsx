@@ -3,33 +3,19 @@ import { useNavigate } from "react-router";
 import { DeleteIcon, EditIcon } from "../components/utils/icons";
 import { PROJECTS } from "../utils/mockdata";
 import type { Project } from "../utils/types";
-
-// TODO: abstract this to separate mock api files
-const callApi = {
-    getOngoingProject: async () => {
-        const eiei = PROJECTS.filter(project => !project.done);
-        return [...eiei];
-    },
-    addProject: async (newProj: Project) => {
-        PROJECTS.push(newProj);
-        return true;
-    },
-    getAllProject: async () => {
-        // await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
-        return [...PROJECTS];
-    },
-};
+import { API } from "../utils/api";
+import CreateProjectModal from "../components/modals/projects/CreateProjectModal";
 
 function Projects() {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
-    const [lnw_project, setLnw_Project] = useState<Project[]>([]);
+    const [projectsList, setProjectsList] = useState<Project[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchProjects = async () => {
         setIsLoading(true);
-        const data = await callApi.getAllProject();
-        setLnw_Project(data);
+        const data = await API.getAllProjects();
+        setProjectsList(data);
         setIsLoading(false);
     }
 
@@ -39,12 +25,17 @@ function Projects() {
 
     const filteredProjects = useMemo(() => {
         if (!searchQuery) {
-            return lnw_project;
+            return projectsList;
         }
-        return lnw_project.filter(p =>
+
+        return projectsList.filter(p =>
             p.projectName.toLowerCase().includes(searchQuery.toLowerCase())
         );
-    }, [lnw_project, searchQuery]);
+    }, [projectsList, searchQuery]);
+
+    const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState<boolean>(false);
+    function openCreateProjectModal() { setIsCreateProjectModalOpen(true) }
+    function closeCreateProjectModal() { setIsCreateProjectModalOpen(false) }
 
     // TODO: show only not done project (toggled by a checkbox or smth)
 
@@ -56,7 +47,8 @@ function Projects() {
 
     return (
         <>
-            {/* // TODO: split these to each components */}
+            <CreateProjectModal isOpen={isCreateProjectModalOpen} onClose={closeCreateProjectModal} />
+            {/* // TODO: separate these to each components */}
 
             <div className="space-y-8">
                 <div className="flex flex-wrap gap-4 justify-between items-center">
@@ -65,7 +57,7 @@ function Projects() {
                     </h1>
                     {/* // TODO: create project button enable only for admin role */}
                     <button
-                        // onClick={openCreateProjectModal}
+                        onClick={openCreateProjectModal}
                         className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-150"
                     >
                         + สร้างโปรเจกต์
@@ -82,8 +74,8 @@ function Projects() {
                             id="project-search"
                             type="text"
                             placeholder="พิมพ์ชื่อโปรเจกต์ที่ต้องการค้นหา..."
-                            // value={searchQuery}
-                            // onChange={(e) => setSearchQuery(e.target.value)}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                         />
                     </div>

@@ -6,7 +6,7 @@ function TableDisplay(
     { filteredAndSortedTasks, setTaskRowData, openTaskDetailDealerModal, openTaskDetailProductionModal }:
         {
             filteredAndSortedTasks: FilteringTask[],
-            setTaskRowData: React.Dispatch<React.SetStateAction<DOMStringMap | undefined>>,
+            setTaskRowData: React.Dispatch<React.SetStateAction<FilteringTask | null>>,
             openTaskDetailDealerModal: () => void,
             openTaskDetailProductionModal: () => void,
         }) {
@@ -81,8 +81,8 @@ function TableDisplay(
                                 <tr key={task.taskID} className={`hover:bg-orange-50 cursor-pointer ${task.statusID === 3 ? "bg-purple-200" : "bg-white"}`} // highlight help me row
                                     data-selected-task={JSON.stringify(task)} // TODO: SUPER LOW IQ SOLUTION: JUST TAKE ALL ROW DATA, TURN IT TO JSON STRING, THROW TO MODAL AND PARSE THE SHEESH THERE LOLLLLLLLLLLLLLLL
                                     onClick={(e) => {
-                                        const rowData = e.currentTarget.dataset;
-                                        setTaskRowData(rowData);
+                                        // const rowData = e.currentTarget.dataset;
+                                        setTaskRowData(task);
 
                                         // TODO: should compare by teamID but this works for now
                                         if (task.team.teamName === "DEALER") {
@@ -124,9 +124,9 @@ function TableDisplay(
                                     </td>
                                     <td
                                         className="px-6 py-4 font-medium text-gray-900 max-w-xs truncate"
-                                        title={task.taskName.taskNameStr}
+                                        title={task.taskName}
                                     >
-                                        {task.taskName.taskNameStr}
+                                        {task.taskName}
                                     </td>
                                     <td
                                         className="px-6 py-4 text-gray-600 max-w-sm truncate"

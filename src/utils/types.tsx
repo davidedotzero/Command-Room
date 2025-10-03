@@ -8,24 +8,21 @@ type POStatus = "PLACEHOLDER" | "PLACEHOLDER2";
 export interface Task {
     taskID: string,
     projectID: string,
-    taskNameID: number, //TaskName: taskNameID (should be number)
+    taskName: string,
     teamID: number, //Team: teamID
     deadline: Date,
     statusID: number, //TaskStatus: statusID
     logPreview: string // this should be the "description" of the latest log for the task
     teamHelpID: number | null, //Team: teamID
     helpReqAt: Date | null,
+    helpReqReason: string | null,
+    createdAt: Date
 };
 
 export interface Project {
     projectID: string;
     projectName: string;
     done: boolean;
-}
-
-export interface TaskName {
-    taskNameID: number,
-    taskNameStr: string
 }
 
 export interface Team {
@@ -71,8 +68,19 @@ export interface EditLog {
 
 // Task[] after joining with necessary tables
 export interface FilteringTask extends Task {
-    taskName: TaskName;
     team: Team;
     status: TaskStatus;
     teamHelp: Team;
+}
+
+export interface DefaultTaskName {
+    taskName: string;
+    teamID: number;
+}
+
+// format PREFIX-YYYYMMDD-XXXXXX
+// PROJ-20251001-000001
+// TASK-20251001-000001
+export interface MaxIDS {
+    task: number;
 }

@@ -11,13 +11,16 @@ import TableDisplay from "../components/TaskFilters/TableDisplay/TableDisplay";
 function Tasks() {
     const [allTasks, setAllTasks] = useState<FilteringTask[]>([]); // TODO: rename this
     const [lnw_team, setLnw_team] = useState<Team[]>([]); // TODO: rename this
-    const [taskRowData, setTaskRowData] = useState<DOMStringMap>(); // for sending task detail of selected row to task modals
+    const [taskRowData, setTaskRowData] = useState<FilteringTask | null>(null); // for sending task detail of selected row to task modals
     const [avgHelpLeadDays, setAvgHelpLeadDays] = useState<number>(0);
     const [isLoading, setIsLoading] = useState(true);
 
     const [activeStatFilter, setActiveStatFilter] = useState<string | null>(null);
     const [teamIDFilter, setTeamIDFilter] = useState<number | null>(null);
     const [searchFilter, setSearchFilter] = useState<string>("");
+    const [projectFilter, setProjectFilter] = useState<string | null>("");
+    const [startDateFilter, setStartDateFilter] = useState<Date | null>(null);
+    const [endDateFilter, setEndDateFilter] = useState<Date | null>(null);
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -36,7 +39,7 @@ function Tasks() {
         fetchData();
     }, []);
 
-    const filteredAndSortedTasks: FilteringTask[] = useFilteredTasks(allTasks, activeStatFilter, teamIDFilter, searchFilter);
+    const filteredAndSortedTasks: FilteringTask[] = useFilteredTasks(allTasks, activeStatFilter, teamIDFilter, searchFilter, startDateFilter, endDateFilter, projectFilter);
 
     const [isTaskDetailProductionModalOpen, setIsTaskDetailProductionModalOpen] = useState(false);
     function openTaskDetailProductionModal() { setIsTaskDetailProductionModalOpen(true); };
@@ -61,9 +64,18 @@ function Tasks() {
             <TaskDetailProductionModal isOpen={isTaskDetailProductionModalOpen} onClose={() => { closeTaskDetailProductionModal() }} taskData={taskRowData} currentProjectName={"PLACEHOLDER-NO PROJECTNAME"} parentUpdateCallback={fetchData} />
             <TaskDetailDealerModal isOpen={isTaskDetailDealerModalOpen} onClose={() => { closeTaskDetailDealerModal() }} taskData={taskRowData} currentProjectName={"PLACEHOLDER-NO PROJECTNAME"} parentUpdateCallback={fetchData} />
 
+            <h1 className="text-2xl font-bold text-gray-800 mb-6">
+                Dashboard & Global Filters
+            </h1>
             <div className="space-y-6">
-                <KPISummarySection activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={allTasks} avgHelpLeadDays={avgHelpLeadDays} />
-                <FieldFiltersAndAdd teamIDFilterState={[teamIDFilter, setTeamIDFilter]} searchFilterState={[searchFilter, setSearchFilter]} teamNameList={lnw_team} tasksLength={filteredAndSortedTasks.length} />
+                <KPISummarySection title={"สรุปสถานะ Task ทั้งหมด"} activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={allTasks} avgHelpLeadDays={avgHelpLeadDays} />
+                <FieldFiltersAndAdd
+                    teamIDFilterState={[teamIDFilter, setTeamIDFilter]}
+                    searchFilterState={[searchFilter, setSearchFilter]}
+                    projectIDFilterState={[projectFilter, setProjectFilter]}
+                    startDateFilterState={[startDateFilter, setStartDateFilter]}
+                    endDateFilterState={[endDateFilter, setEndDateFilter]}
+                    tasksLength={filteredAndSortedTasks.length} />
                 <TableDisplay filteredAndSortedTasks={filteredAndSortedTasks} setTaskRowData={setTaskRowData} openTaskDetailDealerModal={openTaskDetailDealerModal} openTaskDetailProductionModal={openTaskDetailProductionModal} />
             </div>
         </>

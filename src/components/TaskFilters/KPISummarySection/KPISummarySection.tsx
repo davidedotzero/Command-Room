@@ -11,7 +11,7 @@ const statDescriptions = {
     helpMe: "งานที่ทีมกำลังร้องขอความช่วยเหลือ",
 };
 
-function KPISummarySection({ activeStatFilterState, tasks, avgHelpLeadDays }: { activeStatFilterState: [string | null, React.Dispatch<React.SetStateAction<string | null>>], tasks: FilteringTask[], avgHelpLeadDays?: number }) {
+function KPISummarySection({ activeStatFilterState, tasks, avgHelpLeadDays, title }: { activeStatFilterState: [string | null, React.Dispatch<React.SetStateAction<string | null>>], tasks: FilteringTask[], avgHelpLeadDays?: number, title: string }) {
     const [activeStatFilter, setActiveStatFilter] = activeStatFilterState;
 
     const toggleActiveStatFilter = (stat: string) => {
@@ -45,7 +45,7 @@ function KPISummarySection({ activeStatFilterState, tasks, avgHelpLeadDays }: { 
             <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="flex justify-between items-center mb-3">
                     <h3 className="text-md font-bold text-gray-700">
-                        สรุปสถานะ Task ของโปรเจกต์นี้
+                        {title}
                     </h3>
                     <button
                         // onClick={refreshAllData} TODO: make refresh data work
@@ -100,7 +100,7 @@ function KPISummarySection({ activeStatFilterState, tasks, avgHelpLeadDays }: { 
                 {
                     avgHelpLeadDays && (
                         <div className="mt-4 pt-4 border-t">
-                            <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center p-3 bg-gray-100 rounded-lg">
                                 <span className="text-sm font-medium text-gray-700">
                                     ระยะเวลาเฉลี่ยที่ขอความช่วยเหลือก่อน Deadline:
                                 </span>

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { API } from "../utils/api";
-import type { PoStatus, Role, TaskName, TaskStatus, Team } from "../utils/types";
+import type { DefaultTaskName, PoStatus, Role, TaskStatus, Team } from "../utils/types";
 
 // =============================== IMPORTANT!!! ===============================
 // this is only for fetching data that are considered "constants" from database
@@ -8,7 +8,7 @@ import type { PoStatus, Role, TaskName, TaskStatus, Team } from "../utils/types"
 // such as Task Statuses, PO Statuses etc.
 
 interface DbConstContextType {
-    TASK_NAMES: TaskName[];
+    DEFAULT_TASK_NAMES: DefaultTaskName[];
     TEAMS: Team[];
     ROLES: Role[];
     TASK_STATUSES: TaskStatus[];
@@ -18,20 +18,20 @@ interface DbConstContextType {
 const DbConstContext = createContext<DbConstContextType | null>(null);
 
 export function DbConstProvider({ children }: { children: ReactNode }) {
-    const [taskName, setTaskName] = useState<TaskName[]>([]);
+    const [defaultTaskName, setDefaultTaskName] = useState<DefaultTaskName[]>([]);
     const [team, setTeam] = useState<Team[]>([]);
     const [role, setRole] = useState<Role[]>([]);
     const [taskStatus, setTaskStatus] = useState<TaskStatus[]>([]);
     const [poStatus, setPoStatus] = useState<PoStatus[]>([]);
 
     const fetchData = async () => {
-        const taskNameResponse = await API.getAllTaskNames();
+        const defaultTaskNameResponse = await API.getAllDefaultTaskNames();
         const teamResponse = await API.getAllTeams();
         const roleResponse = await API.getAllRoles();
         const taskStatusResponse = await API.getAllTaskStatuses();
         const poStatusResponse = await API.getAllPoStatuses();
 
-        setTaskName(taskNameResponse);
+        setDefaultTaskName(defaultTaskNameResponse);
         setTeam(teamResponse);
         setRole(roleResponse);
         setTaskStatus(taskStatusResponse);
@@ -42,7 +42,7 @@ export function DbConstProvider({ children }: { children: ReactNode }) {
         fetchData();
     }, [])
 
-    const value: DbConstContextType = { TASK_NAMES: taskName, TEAMS: team, ROLES: role, TASK_STATUSES: taskStatus, PO_STATUSES: poStatus };
+    const value: DbConstContextType = { DEFAULT_TASK_NAMES: defaultTaskName, TEAMS: team, ROLES: role, TASK_STATUSES: taskStatus, PO_STATUSES: poStatus };
 
     return <DbConstContext.Provider value={value}>{children}</DbConstContext.Provider>
 }

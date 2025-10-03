@@ -24,27 +24,30 @@ function ProjectDetail() {
     }
 
     const currentProjectID: string = param.projectID; // TODO: should i pass this as props or urlParams?
-    let isCurrentProjectIDValid: boolean = false;
+    const [isCurrentProjectIDValid, setIsCurrentProjectIDValid] = useState<boolean>(false);
     const [currentProjectName, setCurrentProjectName] = useState<string>("");
 
     const [tasksByProjectIDDetailed, setTasksByProjectIDDetailed] = useState<FilteringTask[]>([]); // TODO: rename this
     const [lnw_team, setLnw_team] = useState<Team[]>([]); // TODO: rename this
-    const [taskRowData, setTaskRowData] = useState<DOMStringMap>(); // for sending task detail of selected row to task modals
+    const [taskRowData, setTaskRowData] = useState<FilteringTask | null>(null); // for sending task detail of selected row to task modals
 
     const [isLoading, setIsLoading] = useState(true);
 
     const [activeStatFilter, setActiveStatFilter] = useState<string | null>(null);
     const [teamIDFilter, setTeamIDFilter] = useState<number | null>(null);
     const [searchFilter, setSearchFilter] = useState<string>("");
+    const [startDateFilter, setStartDateFilter] = useState<Date | null>(null);
+    const [endDateFilter, setEndDateFilter] = useState<Date | null>(null);
 
     const fetchData = async () => {
         setIsLoading(true);
         const data = await API.getTasksByProjectIdDetailed(currentProjectID);
         const projectName = await API.getProjectNameById(currentProjectID);
         const teams = await API.getAllTeams();
-        isCurrentProjectIDValid = await API.isProjectIDExists(currentProjectID);
+        const idvalid = await API.isProjectIDExists(currentProjectID);
 
         setTasksByProjectIDDetailed(data);
+        setIsCurrentProjectIDValid(idvalid);
         setCurrentProjectName(projectName);
         setLnw_team(teams);
 
@@ -64,7 +67,7 @@ function ProjectDetail() {
     //
     // }, [tasksByProjectIDDetailed, activeStatFilter]);
 
-    const filteredAndSortedTasks: FilteringTask[] = useFilteredTasks(tasksByProjectIDDetailed, activeStatFilter, teamIDFilter, searchFilter);
+    const filteredAndSortedTasks: FilteringTask[] = useFilteredTasks(tasksByProjectIDDetailed, activeStatFilter, teamIDFilter, searchFilter, startDateFilter, endDateFilter);
 
     const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
     function openCreateTaskModal() { setIsCreateTaskModalOpen(true); };
@@ -95,8 +98,13 @@ function ProjectDetail() {
             <h1 className="text-2sm text-gray-800 mb-6"> {currentProjectID}</h1> {/* // TODO: remove this */}
             <div className="space-y-6">
                 {/*  TODO: split to separate components */}
-                <KPISummarySection activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={tasksByProjectIDDetailed} />
-                <FieldFiltersAndAdd teamIDFilterState={[teamIDFilter, setTeamIDFilter]} searchFilterState={[searchFilter, setSearchFilter]} teamNameList={lnw_team} tasksLength={filteredAndSortedTasks.length}
+                <KPISummarySection title={"สรุปสถานะ Task ของโปรเจกต์นี้"} activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={tasksByProjectIDDetailed} />
+                <FieldFiltersAndAdd
+                    teamIDFilterState={[teamIDFilter, setTeamIDFilter]}
+                    searchFilterState={[searchFilter, setSearchFilter]}
+                    startDateFilterState={[startDateFilter, setStartDateFilter]}
+                    endDateFilterState={[endDateFilter, setEndDateFilter]}
+                    tasksLength={filteredAndSortedTasks.length}
                     createNewTaskButton={
                         isCurrentProjectIDValid ? (
                             <button

@@ -1,12 +1,17 @@
-import type { ReactElement } from "react";
-import type { Team } from "../../../utils/types";
+import { useEffect, useState, type ReactElement } from "react";
+import type { Project, Team } from "../../../utils/types";
+import { useDbConst } from "../../../contexts/DbConstDataContext";
+import { API } from "../../../utils/api";
+import DatePicker from "react-datepicker";
 
 function FieldFiltersAndAdd(
-    { teamIDFilterState, searchFilterState, teamNameList, createNewTaskButton, resetFiltersCallback, tasksLength }:
+    { teamIDFilterState, searchFilterState, projectIDFilterState, startDateFilterState, endDateFilterState, createNewTaskButton, resetFiltersCallback, tasksLength }:
         {
             teamIDFilterState: [number | null, React.Dispatch<React.SetStateAction<number | null>>],
             searchFilterState: [string, React.Dispatch<React.SetStateAction<string>>],
-            teamNameList: Team[],
+            projectIDFilterState?: [string | null, React.Dispatch<React.SetStateAction<string | null>>],
+            startDateFilterState: [Date | null, React.Dispatch<React.SetStateAction<Date | null>>],
+            endDateFilterState: [Date | null, React.Dispatch<React.SetStateAction<Date | null>>],
             createNewTaskButton?: ReactElement,
             resetFilterCallback?: () => void,
             tasksLength: number
@@ -14,6 +19,22 @@ function FieldFiltersAndAdd(
 
     const [teamIDFilter, setTeamIDFilter] = teamIDFilterState;
     const [searchFilter, setSearchFilter] = searchFilterState;
+    const [projectIDFilter, setProjectIDFilter] = projectIDFilterState === undefined ? [null, null] : projectIDFilterState;
+    const [startDateFilter, setStartDateFilter] = startDateFilterState;
+    const [endDateFilter, setEndDateFilter] = endDateFilterState;
+
+    const { TEAMS } = useDbConst();
+    const [projectList, setProjectList] = useState<Project[]>([]);
+
+    // TODO: SOOMtm bug when add project this not update?
+    const fetchData = async () => {
+        const res = await API.getAllProjects();
+        setProjectList(res);
+    }
+
+    useEffect(() => {
+        fetchData();
+    }, [])
 
     return (
         <>
@@ -25,7 +46,7 @@ function FieldFiltersAndAdd(
                     {createNewTaskButton}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* // TODO: abstract this to comboBox component */}
+                    {/* // TODO: abstract this to comboBox component or add this via prop children */}
                     <div>
                         <label className="text-sm font-medium text-gray-700 mb-1 block">
                             Team / Assignee
@@ -35,14 +56,60 @@ function FieldFiltersAndAdd(
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                         >
                             <option value={""}>-- ทีมทั้งหมด --</option>
-                            {teamNameList.map((opt) => (
+                            {TEAMS.map((opt) => (
                                 <option key={opt.teamID} value={opt.teamID}>
                                     {opt.teamName}
                                 </option>
                             ))}
                         </select>
                     </div>
+                    {
+                        projectIDFilterState && (
+                            <div>
+                                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                                    Project
+                                </label>
+                                <select
+                                    onChange={(e) => setProjectIDFilter(e.target.value)}
+                                    className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                                >
+                                    <option value={""}>-- โปรเจกต์ทั้งหมด --</option>
+                                    {projectList.map((opt: Project) => (
+                                        <option key={opt.projectID} value={opt.projectID}>
+                                            {opt.projectName}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )
+                    }
+                    <div className="col-span-1">
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">
+                            Start Date
+                        </label>
+                        <DatePicker
+                            selected={startDateFilter}
+                            onChange={(date) => setStartDateFilter(date)}
+                            filterDate={(date) => { return date.getDay() !== 0 }}
+                            isClearable={true}
+                            placeholderText={"start date eraraera"}
+                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                        />
+                    </div>
                     <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">
+                            End Date
+                        </label>
+                        <DatePicker
+                            selected={endDateFilter}
+                            onChange={(date) => setEndDateFilter(date)}
+                            filterDate={(date) => { return date.getDay() !== 0 }}
+                            isClearable={true}
+                            placeholderText={"end date placeholderrrrr"}
+                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                        />
+                    </div>
+                    <div className="col-span-2">
                         <label className="text-sm font-medium text-gray-700 mb-1 block">
                             ค้นหา Task / Note
                         </label>
@@ -63,6 +130,7 @@ function FieldFiltersAndAdd(
                         รายการ
                     </p>
                     <button
+                        // TODO: resetFilters
                         onClick={() => {
                             // resetFilters();
                         }}
