@@ -5,6 +5,8 @@ import { PROJECTS } from "../utils/mockdata";
 import type { Project } from "../utils/types";
 import { API } from "../utils/api";
 import CreateProjectModal from "../components/modals/projects/CreateProjectModal";
+import EditProjectModal from "../components/modals/EditProjectModal";
+import DeleteProjectModal from "../components/modals/DeleteProjectModal";
 
 function Projects() {
     const navigate = useNavigate();
@@ -12,7 +14,10 @@ function Projects() {
     const [projectsList, setProjectsList] = useState<Project[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    const fetchProjects = async () => {
+    const [selectedProjectID, setSelectedProjectID] = useState<string | null>(null);
+    const [selectedProjectName, setSelectedProjectName] = useState<string | null>(null);
+
+    const fetchData = async () => {
         setIsLoading(true);
         const data = await API.getAllProjects();
         setProjectsList(data);
@@ -20,7 +25,7 @@ function Projects() {
     }
 
     useEffect(() => {
-        fetchProjects();
+        fetchData();
     }, [])
 
     const filteredProjects = useMemo(() => {
@@ -37,6 +42,14 @@ function Projects() {
     function openCreateProjectModal() { setIsCreateProjectModalOpen(true) }
     function closeCreateProjectModal() { setIsCreateProjectModalOpen(false) }
 
+    const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState<boolean>(false);
+    function openEditProjectModal() { setIsEditProjectModalOpen(true) }
+    function closeEditProjectModal() { setIsEditProjectModalOpen(false) }
+
+    const [isDeleteProjectModalOpen, setIsDeleteProjectModalOpen] = useState<boolean>(false);
+    function openDeleteProjectModal() { setIsDeleteProjectModalOpen(true) }
+    function closeDeleteProjectModal() { setIsDeleteProjectModalOpen(false) }
+
     // TODO: show only not done project (toggled by a checkbox or smth)
 
     if (isLoading) {
@@ -48,6 +61,8 @@ function Projects() {
     return (
         <>
             <CreateProjectModal isOpen={isCreateProjectModalOpen} onClose={closeCreateProjectModal} />
+            <EditProjectModal isOpen={isEditProjectModalOpen} onClose={closeEditProjectModal} selectedProjectID={selectedProjectID} selectedProjectName={selectedProjectName} parentUpdateCallback={fetchData} />
+            <DeleteProjectModal />
             {/* // TODO: separate these to each components */}
 
             <div className="space-y-8">
@@ -99,10 +114,12 @@ function Projects() {
                                 {(
                                     <div className="flex items-center space-x-1">
                                         <button
-                                            // onClick={(e) => {
-                                            //     e.stopPropagation();
-                                            //     openEditProjectModal(p);
-                                            // }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                openEditProjectModal();
+                                                setSelectedProjectID(p.projectID);
+                                                setSelectedProjectName(p.projectName);
+                                            }}
                                             className="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-blue-100"
                                             aria-label="Edit Project"
                                             title="Edit Project"
@@ -110,10 +127,10 @@ function Projects() {
                                             <EditIcon />
                                         </button>
                                         <button
-                                            // onClick={(e) => {
-                                            // e.stopPropagation();
-                                            // onDeleteProject(p);
-                                            // }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                // onDeleteProject(p);
+                                            }}
                                             className="text-gray-500 hover:text-red-600 p-2 rounded-full hover:bg-red-100"
                                             aria-label="Delete Project"
                                             title="Delete Project"

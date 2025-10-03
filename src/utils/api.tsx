@@ -180,6 +180,15 @@ export const API = {
             }
         }
     },
+    updateProjectNameAtId: async (projectID: string, newProjectName: string) => {
+        for (let project of PROJECTS) {
+            if (projectID === project.projectID) {
+                project.projectName = newProjectName;
+                break;
+            }
+        }
+        return true;
+    },
 
 
     isProjectIDExists: async (projectID: string) => {
