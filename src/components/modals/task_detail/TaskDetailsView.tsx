@@ -5,6 +5,7 @@ import { DetailItem } from "../forms/FormItems";
 import type { FilteringTask } from "../../../utils/types";
 import { API } from "../../../utils/api";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
+import AssigneeLabels from "../../utils/AssigneeLabels";
 
 // TODO: types for selectedTask
 function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, currentProjectName: string }) {
@@ -71,11 +72,11 @@ function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, cu
                             </p>
                         </DetailItem>
 
-                        <DetailItem label="Poo patibud">
-                            <p className="text-base">
-                                {/* // TODO: fetch this properly later */}
-                                {"-"}
-                            </p>
+                        <DetailItem label="Workers">
+                            {/* // TODO: fetch this properly later */}
+                            {
+                                task.workers === null ? "-" : task.workers.map(x => { return <AssigneeLabels key={x.userID} text={x.name} /> })
+                            }
                         </DetailItem>
                     </div>
                 </div>

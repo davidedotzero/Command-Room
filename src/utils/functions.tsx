@@ -50,6 +50,7 @@ export function msToDay(ms: number): number {
     return ms / (1000 * 60 * 60 * 24);
 }
 
+// TODO: validateTaskID and validateUserID cuz they are not the same
 export function validateID(id: string): boolean {
     const idRegex: RegExp = /^[^-]+-\d{8}-\d{6}$/;
     if (!idRegex.test(id)) {

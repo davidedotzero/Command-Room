@@ -1,6 +1,6 @@
 import { getOnlyDate, msToDay } from "./functions";
-import { TASKS, PROJECTS, TEAMS, TASK_STATUSES, EDIT_LOGS, ROLES, PO_STATUSES, leftJoinOne2One, DEFAULT_TASK_NAMES } from "./mockdata";
-import type { EditLog, FilteringTask, Project, Task } from "./types";
+import { TASKS, PROJECTS, TEAMS, TASK_STATUSES, EDIT_LOGS, ROLES, PO_STATUSES, leftJoinOne2One, DEFAULT_TASK_NAMES, TASK_USER, USERS } from "./mockdata";
+import type { EditLog, FilteringTask, Project, Task, User } from "./types";
 
 const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 //TODO: IMPORTANT!!!!! this file
@@ -69,7 +69,18 @@ export const API = {
         const tasksJoinTeam = leftJoinOne2One(eiei, TEAMS, "teamID", "teamID", "team");
         const tasksJoinStatus = leftJoinOne2One(tasksJoinTeam, TASK_STATUSES, "statusID", "statusID", "status");
         const tasksJoinTeam_TeamHelp = leftJoinOne2One(tasksJoinStatus, TEAMS, "teamHelpID", "teamID", "teamHelp");
-        return tasksJoinTeam_TeamHelp;
+
+        // getWorkersByTaskID
+        let tasksJoinUsers: FilteringTask[] = [];
+        for (let juan of tasksJoinTeam_TeamHelp) {
+            const userIDsOfTask = TASK_USER.filter(x => x.taskID === juan.taskID);
+            const users = leftJoinOne2One(userIDsOfTask, USERS, "userID", "userID", "workers");
+            const result: User[] = users.map((x: any) => x.workers);
+
+            tasksJoinUsers.push({ ...juan, workers: result.length === 0 ? null : result })
+        }
+
+        return tasksJoinUsers;
     },
     getAllTeams: async () => {
         return [...TEAMS];
@@ -88,6 +99,11 @@ export const API = {
     },
     getAllDefaultTaskNames: async () => {
         return [...DEFAULT_TASK_NAMES];
+    },
+    getAllUsersAsc: async () => {
+        let eiei = [...USERS];
+        eiei.sort((a, b) => a.name.localeCompare(b.name));
+        return eiei;
     },
 
 
@@ -109,7 +125,24 @@ export const API = {
         const tasksJoinTeam = leftJoinOne2One(tasksByProjectID, TEAMS, "teamID", "teamID", "team");
         const tasksJoinStatus = leftJoinOne2One(tasksJoinTeam, TASK_STATUSES, "statusID", "statusID", "status");
         const tasksJoinTeam_TeamHelp = leftJoinOne2One(tasksJoinStatus, TEAMS, "teamHelpID", "teamID", "teamHelp");
-        return tasksJoinTeam_TeamHelp;
+
+        // getWorkersByTaskID
+        let tasksJoinUsers: FilteringTask[] = [];
+        for (let juan of tasksJoinTeam_TeamHelp) {
+            const userIDsOfTask = TASK_USER.filter(x => x.taskID === juan.taskID);
+            const users = leftJoinOne2One(userIDsOfTask, USERS, "userID", "userID", "workers");
+            const result: User[] = users.map((x: any) => x.workers);
+
+            tasksJoinUsers.push({ ...juan, workers: result.length === 0 ? null : result })
+        }
+
+        return tasksJoinUsers;
+    },
+    getWorkersByTaskId: async (taskID: string) => {
+        const userIDsOfTask = TASK_USER.filter(x => x.taskID === taskID);
+        const users = leftJoinOne2One(userIDsOfTask, USERS, "userID", "userID", "workers");
+        const result: User[] = users.map((x: any) => x.workers)
+        return result;
     },
 
     getLatestTaskID: async () => {

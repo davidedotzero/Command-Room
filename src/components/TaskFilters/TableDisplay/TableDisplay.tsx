@@ -1,6 +1,7 @@
 import { StatusColor } from "../../../utils/constants";
 import { formatDateYYYY_MM_DD } from "../../../utils/functions";
 import type { FilteringTask } from "../../../utils/types";
+import AssigneeLabels from "../../utils/AssigneeLabels";
 
 function TableDisplay(
     { filteredAndSortedTasks, setTaskRowData, openTaskDetailDealerModal, openTaskDetailProductionModal }:
@@ -140,8 +141,10 @@ function TableDisplay(
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 max-w-xs">
-                                        {"PLACEHOLDER - DO / " + task.taskID}
-                                        {/* <AssigneeLabels text={task.userID || "-"} /> */}
+                                        {/* {task.taskID} */}
+                                        {
+                                            task.workers === null ? "-" : task.workers.map(x => { return <AssigneeLabels key={x.userID} text={x.name} /> })
+                                        }
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-700 font-medium">
                                         {/* {task.HelpAssignee || "-"} */}

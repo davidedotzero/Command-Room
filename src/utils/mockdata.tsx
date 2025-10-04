@@ -44,12 +44,27 @@ export let PO_STATUSES: PoStatus[] = [
     { poStatusID: 5, poStatusName: "backlog" },
 ];
 
+// WARNING: this is only used for mocking 1TaskManyUsers functionality
 export let USERS: User[] = [
-
+    { userID: "USR-00001", name: "lnwjuanza", email: "lnwjuanza007.2535@gmail.com", roleID: 1, isAdmin: true },
+    { userID: "USR-00002", name: "pchampkaaa", email: "pchamplovelove@gmail.com", roleID: 2, isAdmin: true },
+    { userID: "USR-00003", name: "OWO", email: "musicarmscreative@gmail.com", roleID: 1, isAdmin: true },
+    { userID: "USR-00004", name: "UWU", email: "larron959@gmail.com", roleID: 1, isAdmin: true },
 ];
 
 export let TASK_USER: TaskUser[] = [
     { taskID: "TASK-20250912-000012", userID: "USR-00002" },
+    { taskID: "TASK-20250913-000013", userID: "USR-00002" },
+    { taskID: "TASK-20250914-000014", userID: "USR-00002" },
+    { taskID: "TASK-20250915-000015", userID: "USR-00002" },
+    { taskID: "TASK-20250916-000016", userID: "USR-00002" },
+    { taskID: "TASK-20250917-000017", userID: "USR-00002" },
+    { taskID: "TASK-20250918-000018", userID: "USR-00002" },
+    { taskID: "TASK-20250919-000019", userID: "USR-00002" },
+    { taskID: "TASK-20250916-000016", userID: "USR-00003" },
+    { taskID: "TASK-20250917-000017", userID: "USR-00003" },
+    { taskID: "TASK-20250918-000018", userID: "USR-00003" },
+    { taskID: "TASK-20250919-000019", userID: "USR-00003" },
     { taskID: "TASK-20250912-000012", userID: "USR-00003" },
 ];
 

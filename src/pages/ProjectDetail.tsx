@@ -9,7 +9,6 @@ import TaskDetailProductionModal from "../components/modals/TaskDetailProduction
 import TaskDetailDealerModal from "../components/modals/TaskDetailDealerModal";
 import CreateTaskModal from "../components/modals/CreateTaskModal";
 import { API } from "../utils/api";
-import { AssigneeLabels } from "../components/utils/AssigneeLabels";
 import KPISummarySection from "../components/TaskFilters/KPISummarySection/KPISummarySection";
 import FieldFiltersAndAdd from "../components/TaskFilters/FieldFiltersAndAdd/FieldFiltersAndAdd";
 import TableDisplay from "../components/TaskFilters/TableDisplay/TableDisplay";

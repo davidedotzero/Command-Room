@@ -71,6 +71,7 @@ export interface FilteringTask extends Task {
     team: Team;
     status: TaskStatus;
     teamHelp: Team;
+    workers: User[];
 }
 
 export interface DefaultTaskName {
