@@ -158,9 +158,9 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
                                 {/* === Section: รายละเอียดหลัก === */}
                                 <div className="pb-6 border-b">
                                     <div className="overflow-y-auto flex-1">
-                                        {/* // TODO: only admin can edit this */}
                                         <FormField label="Task">
                                             <input
+                                                disabled={!user?.isAdmin}
                                                 name="FormTaskName"
                                                 type="text"
                                                 required
@@ -172,6 +172,7 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
                                         {/* // TODO: only admin can edit this */}
                                         <FormField label="Team">
                                             <Select
+                                                isDisabled={!user?.isAdmin}
                                                 name="FormTeam"
                                                 className={"shadow-sm"}
                                                 required

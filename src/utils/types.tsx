@@ -78,6 +78,11 @@ export interface DefaultTaskName {
     teamID: number;
 }
 
+export interface TaskUser {
+    taskID: string;
+    userID: string;
+}
+
 // format PREFIX-YYYYMMDD-XXXXXX
 // PROJ-20251001-000001
 // TASK-20251001-000001

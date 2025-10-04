@@ -6,6 +6,7 @@ import { API } from "../utils/api";
 import CreateProjectModal from "../components/modals/projects/CreateProjectModal";
 import EditProjectModal from "../components/modals/EditProjectModal";
 import ConfirmModal from "../components/modals/ConfirmModal";
+import { useAuth } from "../contexts/AuthContext";
 
 function Projects() {
     const navigate = useNavigate();
@@ -15,6 +16,8 @@ function Projects() {
 
     const [selectedProjectID, setSelectedProjectID] = useState<string | null>(null);
     const [selectedProjectName, setSelectedProjectName] = useState<string | null>(null);
+
+    const { user } = useAuth();
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -71,11 +74,19 @@ function Projects() {
         </div>
     }
 
+
+    const deleteModalTexts = {
+        dialogTitle: "wow",
+        dialogDescription: "eiei",
+        btnCancelText: "ยกเลิก",
+        btnConfirmText: "ยืนยันการลบ",
+    };
+
     return (
         <>
             <CreateProjectModal isOpen={isCreateProjectModalOpen} onClose={closeCreateProjectModal} />
             <EditProjectModal isOpen={isEditProjectModalOpen} onClose={closeEditProjectModal} selectedProjectID={selectedProjectID} selectedProjectName={selectedProjectName} parentUpdateCallback={fetchData} />
-            <ConfirmModal isOpen={isDeleteProjectModalOpen} onClose={closeDeleteProjectModal} callback={deleteSelectedProject} />
+            <ConfirmModal isOpen={isDeleteProjectModalOpen} onClose={closeDeleteProjectModal} callback={deleteSelectedProject} texts={deleteModalTexts} />
             {/* // TODO: separate these to each components */}
 
             <div className="space-y-8">
@@ -123,8 +134,7 @@ function Projects() {
                             </div>
                             <div className="flex items-center justify-between mt-4">
                                 <p className="text-sm text-gray-500 font-mono">{p.projectID}</p>
-                                {/* // TODO: only show edit and delete button for admin role */}
-                                {(
+                                {user?.isAdmin && (
                                     <div className="flex items-center space-x-1">
                                         <button
                                             onClick={(e) => {

@@ -1,6 +1,6 @@
 // TODO: DELETE MOCKUP DATA
 
-import type { DefaultTaskName, EditLog, PoStatus, Project, Role, Task, TaskStatus, Team } from "./types";
+import type { DefaultTaskName, EditLog, PoStatus, Project, Role, Task, TaskStatus, TaskUser, Team, User } from "./types";
 
 export let DEFAULT_TASK_NAMES: DefaultTaskName[] = [
     { taskName: "default-task-1", teamID: 1 },
@@ -42,6 +42,15 @@ export let PO_STATUSES: PoStatus[] = [
     { poStatusID: 3, poStatusName: "closed" },
     { poStatusID: 4, poStatusName: "failed" },
     { poStatusID: 5, poStatusName: "backlog" },
+];
+
+export let USERS: User[] = [
+
+];
+
+export let TASK_USER: TaskUser[] = [
+    { taskID: "TASK-20250912-000012", userID: "USR-00002" },
+    { taskID: "TASK-20250912-000012", userID: "USR-00003" },
 ];
 
 

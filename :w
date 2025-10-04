@@ -23,16 +23,8 @@ function Navbar() {
                     <button className="border border-transparent rounded-md p-3 bg-red-500 text-white shadow-sm transition-colors hover:bg-red-600 focus:outline-none " onClick={() => { logout() }}>Logout</button>
                 </div>
 
-                <div className="flex flex-row">
-                    <button className="p-3 text-white border border-transparent rounded-md bg-green-500 hover:bg-green-600 active:bg-black"
-                        onClick={() => {
-                            console.log("admin toggle");
-                            localStorage.setItem("project-crm-user", JSON.stringify({ "userID": "USR-00002", "name": "pchampkaaa", "email": "pchamplovelove@gmail.com", "roleID": 2, "isAdmin": !user?.isAdmin }))
-                            window.location.reload();
-                        }}
-                    >
-                        DEV TEST TOGGLE admin
-                    </button>
+                <div>
+                    <button className="border border-transparent rounded-md bg-green-600">toggle admin</button>
                 </div>
             </nav >
             {
