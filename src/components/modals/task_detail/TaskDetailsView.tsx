@@ -23,7 +23,7 @@ function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, cu
     const fetchData = async (taskID: string) => {
         const response = await API.getLogsByTaskIdDesc(currentTask.taskID);
         let displayLog = "";
-        if (!response || response.length < 0) {
+        if (!response || response.length <= 0) {
             displayLog = "-";
             setTaskLogs(displayLog);
             return;
@@ -117,7 +117,7 @@ function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, cu
 
                 <div className="grid grid-cols-1 gap-y-6">
                     <DetailItem label="Notes / Result (Log)">
-                        <p className="p-3 bg-gray-50 rounded-md border min-h-[100px] whitespace-pre-wrap disabled overflow-auto">
+                        <p className="p-3 bg-gray-50 rounded-md border min-h-[100px] max-h-[300px] whitespace-pre-wrap disabled overflow-y-scroll">
                             {/* // TODO: fetch this properly later */}
                             {taskLogs}
                         </p>

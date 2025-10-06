@@ -138,6 +138,25 @@ export const API = {
 
         return tasksJoinUsers;
     },
+    getTasksByUserIdDetailed: async (userID: string): Promise<FilteringTask[]> => {
+        const taskUsers = TASK_USER.filter(x => x.userID === userID);
+        const tasksFilter = TASKS.filter(x => taskUsers.find(tu => tu.taskID === x.taskID) !== undefined);
+        const tasksJoinTeam = leftJoinOne2One(tasksFilter, TEAMS, "teamID", "teamID", "team");
+        const tasksJoinStatus = leftJoinOne2One(tasksJoinTeam, TASK_STATUSES, "statusID", "statusID", "status");
+        const tasksJoinTeam_TeamHelp = leftJoinOne2One(tasksJoinStatus, TEAMS, "teamHelpID", "teamID", "teamHelp");
+
+        // getWorkersByTaskID
+        let tasksJoinUsers: FilteringTask[] = [];
+        for (let juan of tasksJoinTeam_TeamHelp) {
+            const userIDsOfTask = TASK_USER.filter(x => x.taskID === juan.taskID);
+            const users = leftJoinOne2One(userIDsOfTask, USERS, "userID", "userID", "workers");
+            const result: User[] = users.map((x: any) => x.workers);
+
+            tasksJoinUsers.push({ ...juan, workers: result.length === 0 ? null : result })
+        }
+
+        return tasksJoinUsers;
+    },
     getWorkersByTaskId: async (taskID: string) => {
         const userIDsOfTask = TASK_USER.filter(x => x.taskID === taskID);
         const users = leftJoinOne2One(userIDsOfTask, USERS, "userID", "userID", "workers");
@@ -186,7 +205,12 @@ export const API = {
         PROJECTS.push(newProject);
         return true;
     },
-
+    addTaskUsers: async (taskID: string, users: User[]) => {
+        for (let user of users) {
+            TASK_USER.push({ taskID: taskID, userID: user.userID })
+        }
+        return true;
+    },
 
     updateTask: async (
         taskID: string,
@@ -199,9 +223,6 @@ export const API = {
         logPreview: string,
         helpReqReason: string | null) => {
 
-        console.log("in updatetask");
-        console.log(teamHelpID);
-        console.log(teamHelpID ?? "kuy");
         for (let task of TASKS) {
             if (taskID === task.taskID) {
                 task.taskName = taskName;
@@ -234,6 +255,25 @@ export const API = {
             if (projectID === project.projectID) {
                 project.isArchived = true;
                 break;
+            }
+        }
+        return true;
+    },
+    deleteTaskUsers: async (taskID: string, usersToDelete: User[]) => {
+        let taskUserByTaskID = TASK_USER.filter(x => x.taskID === taskID);
+        for (let taskUser of taskUserByTaskID) {
+            for (let user of usersToDelete) {
+                if (taskUser.userID === user.userID) {
+                    const filtered = TASK_USER.filter(x => !(x.taskID === taskUser.taskID && x.userID === user.userID));
+
+                    // WARNING: bodge asf cuz js imports are fucking immutable and we cant change it cuz js devs wanna shove functional paradigm and "purity" bullshit up our ass cuz this language did not have enough shit in it like our beloved c++ amirite?
+                    // fuck it its mock api anyway
+                    TASK_USER.splice(0, TASK_USER.length); // remove everything in place
+                    TASK_USER.push(...filtered);
+
+                    // WARNING: see? and we can still mutate it anyway so whats the fucking point?
+                    // and also why this lang does not have inplace filter function? its so confusing having to remind ourselves that this function mutates, but this does not ITS MAD!!!!!!
+                }
             }
         }
         return true;

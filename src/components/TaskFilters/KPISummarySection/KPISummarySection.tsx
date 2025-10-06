@@ -26,7 +26,10 @@ function KPISummarySection({ activeStatFilterState, tasks, avgHelpLeadDays, titl
         let overdue = 0, warning = 0, incomplete = 0, done = 0, helpme = 0;
         tasks.forEach(task => {
             // TODO: rewrite this counting logic
-            if (task.deadline && task.deadline < TODAY) overdue += 1;
+            if (task.deadline && task.deadline < TODAY && task.statusID !== 3) {
+                console.log(task.taskID);
+                overdue += 1;
+            }
 
             if (task.deadline >= TODAY && task.deadline <= WARNING_DATE && task.status.statusName !== "Done") {
                 warning += 1;

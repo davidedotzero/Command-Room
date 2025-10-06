@@ -7,6 +7,7 @@ import { API } from "../utils/api";
 import KPISummarySection from "../components/TaskFilters/KPISummarySection/KPISummarySection";
 import FieldFiltersAndAdd from "../components/TaskFilters/FieldFiltersAndAdd/FieldFiltersAndAdd";
 import TableDisplay from "../components/TaskFilters/TableDisplay/TableDisplay";
+import { useAuth } from "../contexts/AuthContext";
 
 function Tasks() {
     const [allTasks, setAllTasks] = useState<FilteringTask[]>([]); // TODO: rename this
@@ -22,9 +23,17 @@ function Tasks() {
     const [startDateFilter, setStartDateFilter] = useState<Date | null>(null);
     const [endDateFilter, setEndDateFilter] = useState<Date | null>(null);
 
+    const { user } = useAuth();
+
     const fetchData = async () => {
         setIsLoading(true);
-        const data = await API.getAllTasksDetailed();
+        let data = null;
+        if (user?.isAdmin) {
+            data = await API.getAllTasksDetailed();
+        } else {
+            // TODO: handler user undefined
+            data = await API.getTasksByUserIdDetailed(user!.userID);
+        }
         const teams = await API.getAllTeams();
         const avgHelp = await API.getAvgHelpLeadDaysBeforeDeadline();
 

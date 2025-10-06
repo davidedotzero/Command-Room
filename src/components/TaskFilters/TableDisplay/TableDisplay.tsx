@@ -81,6 +81,7 @@ function TableDisplay(
                             return (
                                 <tr key={task.taskID} className={`hover:bg-orange-50 cursor-pointer ${task.statusID === 3 ? "bg-purple-200" : "bg-white"}`} // highlight help me row
                                     data-selected-task={JSON.stringify(task)} // TODO: SUPER LOW IQ SOLUTION: JUST TAKE ALL ROW DATA, TURN IT TO JSON STRING, THROW TO MODAL AND PARSE THE SHEESH THERE LOLLLLLLLLLLLLLLL
+                                    title={task.taskID}
                                     onClick={(e) => {
                                         // const rowData = e.currentTarget.dataset;
                                         setTaskRowData(task);

@@ -10,6 +10,7 @@ import Select from "react-select";
 import { useDbConst } from "../../contexts/DbConstDataContext";
 import DatePicker from "react-datepicker";
 import AssigneeLabels from "../utils/AssigneeLabels";
+import equal from "fast-deep-equal";
 
 function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: FilteringTask, parentUpdateCallback: () => {} }) {
     if (!isOpen) return null;
@@ -46,7 +47,7 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
     const [listWorkers, setListWorkers] = useState<User[] | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const prevSelectedWorkers = selectedWorkers;
+    const prevSelectedWorkers = currentTask.workers === null ? [] : currentTask.workers;
 
     // const handleDeadlineChange = (e: Date | null) => {
     //     console.log("kuy");
@@ -62,12 +63,17 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
 
     const fetchData = async () => {
         const _listWorkers = await API.getAllUsersAsc();
-        let lnws: User[] = [];
-        for (let worker of _listWorkers) {
-            if (selectedWorkers.some(x => x.userID === worker.userID)) continue;
-            lnws.push(worker);
+        // TODO: FilteringTask:workers | null add this sheesh 
+        if (currentTask.workers === null) {
+            setListWorkers(_listWorkers);
+        } else {
+            let lnws: User[] = [];
+            for (let worker of _listWorkers) {
+                if (selectedWorkers.some(x => x.userID === worker.userID)) continue;
+                lnws.push(worker);
+            }
+            setListWorkers(lnws);
         }
-        setListWorkers(lnws);
     }
 
     useEffect(() => {
@@ -84,11 +90,12 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
 
     // TODO: not using formData anymore it sucks
     const handleSubmit = async (formData: FormData) => {
-        console.log("EDIT TASK LAEW JAAAAAA");
-        console.log(formData);
-        console.log("currentTask ======");
-        console.log(currentTask);
-        console.log(currentTask.deadline);
+        // console.log("EDIT TASK LAEW JAAAAAA");
+        // console.log(formData);
+        // console.log("currentTask ======");
+        // console.log(currentTask);
+        // console.log(currentTask.deadline);
+
 
         // TODO: check null all of this
         const reason: string = formData.get("FormLogReason")!.toString();
@@ -112,13 +119,47 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
         // handle when changing from Help Me --> something else
         // we clear help related fields from Task record
         if (currentTask.statusID === 3 && toStatusID !== 3) {
-            console.log("clearing");
+            // console.log("clearing");
             teamHelpID = null;
             helpReqAt = null;
             helpReqReason = null;
         }
         // we do this because if status is Help Me --> Help Me
         // no need to update teamHelpID, helpReqAt and helpReqReason
+
+        handleWorkersChange: {
+            if (!user?.isAdmin) {
+                break handleWorkersChange;
+            }
+
+            // WARNING: doesn't work if both arrays are the "same" but different order but that's fine cuz we in the end both toDelete and toAdd is gonna be empty anyway 
+            if (equal(selectedWorkers, prevSelectedWorkers)) { // deep comparison
+                console.log("its the same bro");
+                break handleWorkersChange;
+            }
+
+            let toDelete: User[] = [];
+            for (let oldWorker of prevSelectedWorkers) {
+                if (!selectedWorkers.find(x => x.userID === oldWorker.userID)) {
+                    toDelete.push(oldWorker);
+                }
+            }
+
+            let toAdd: User[] = [];
+            for (let newWorker of selectedWorkers) {
+                if (!prevSelectedWorkers.find(x => x.userID === newWorker.userID)) {
+                    toAdd.push(newWorker);
+                }
+            }
+
+            console.log(toDelete);
+            console.log(toAdd);
+
+            // TODO: handle api correctly
+            // TODO: make all of this and below using only 1 api call and a big query
+            if (toDelete.length > 0) await API.deleteTaskUsers(currentTask.taskID, toDelete);
+            if (toAdd.length > 0) await API.addTaskUsers(currentTask.taskID, toAdd);
+        }
 
         // TODO: generate new elogid 
         const newLog: EditLog = {
@@ -222,14 +263,18 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
                                                                 return;
                                                             }
 
-                                                            const newSelectedWorkers = selectedWorkers.concat(
-                                                                // TODO: handle if e is undefined properly
-                                                                e.value
-                                                            );
+                                                            let newSelectedWorkers: User[] = [];
+                                                            if (selectedWorkers === null) {
+                                                                newSelectedWorkers = newSelectedWorkers.concat(e.value);
+                                                            } else {
+                                                                newSelectedWorkers = selectedWorkers.concat(
+                                                                    e.value
+                                                                );
+                                                            }
+
                                                             setSelectedWorkers(newSelectedWorkers);
 
                                                             const newListWorker = listWorkers!.filter(x => x.userID !== e.value.userID);
-                                                            console.log(newListWorker);
                                                             setListWorkers(newListWorker);
                                                         }}
                                                     />
@@ -242,7 +287,7 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
                                             {/* // TODO: overflow scrollbar when add so many worker */}
                                             <div className={`border border-gray-300 rounded-md col-span-5 mt-6 shadow-sm p-1 ${!user?.isAdmin && "bg-gray-100"}`}>
                                                 {
-                                                    selectedWorkers === null ? "-" :
+                                                    selectedWorkers === null ? "" :
                                                         selectedWorkers.map(x => {
                                                             return <AssigneeLabels
                                                                 key={x.userID} text={x.name} closeButton={user?.isAdmin}
@@ -253,7 +298,6 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
 
                                                                         let newListWorker = listWorkers!.concat(x);
                                                                         newListWorker.sort((a, b) => a.name.localeCompare(b.name));
-                                                                        console.log(newListWorker);
                                                                         setListWorkers(newListWorker);
                                                                     }
                                                                 }
