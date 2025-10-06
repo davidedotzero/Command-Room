@@ -1,6 +1,6 @@
 import { createPortal } from "react-dom";
 import { DetailItem, FormButton, FormField, FormFieldSetWrapper } from "./forms/FormItems";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import type { EditLog, FilteringTask, TaskStatus, User } from "../../utils/types";
 import { API } from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
@@ -12,7 +12,9 @@ import DatePicker from "react-datepicker";
 import AssigneeLabels from "../utils/AssigneeLabels";
 import equal from "fast-deep-equal";
 
-function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: FilteringTask, parentUpdateCallback: () => {} }) {
+function EditTaskModal(
+    { isOpen, onClose, taskData, parentUpdateCallback, customerAndPoData }:
+        { isOpen: boolean, onClose: () => void, taskData: FilteringTask, parentUpdateCallback: () => {}, customerAndPoData?: any }) { // TODO: assign type to customerData
     if (!isOpen) return null;
     // Close Modal on ESC key
     useEffect(() => {
@@ -45,21 +47,10 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
     const [selectedDeadline, setSelectedDeadline] = useState<Date>(currentTask.deadline);
     const [selectedWorkers, setSelectedWorkers] = useState<User[]>(currentTask.workers);
     const [listWorkers, setListWorkers] = useState<User[] | null>(null);
+    const [selectedFile, setSelectedFile] = useState(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const prevSelectedWorkers = currentTask.workers === null ? [] : currentTask.workers;
-
-    // const handleDeadlineChange = (e: Date | null) => {
-    //     console.log("kuy");
-    //
-    //     setSelectedDeadline(e!);
-    //
-    //     const _helpleaddays = calculateLeadTime(
-    //         new Date(selectedDeadline),
-    //         currentTask.helpReqAt === null ? new Date() : new Date(currentTask.helpReqAt)
-    //     );
-    //     setHelpLeadDays(_helpleaddays);
-    // }
 
     const fetchData = async () => {
         const _listWorkers = await API.getAllUsersAsc();
@@ -88,15 +79,17 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
         fetchData();
     }, [selectedDeadline]);
 
+    // TODO: loading indicator when file uploading 
+    function handleFileChange(event: ChangeEvent<HTMLInputElement>): void {
+        console.log("file changed");
+        const file = event.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+        }
+    };
+
     // TODO: not using formData anymore it sucks
     const handleSubmit = async (formData: FormData) => {
-        // console.log("EDIT TASK LAEW JAAAAAA");
-        // console.log(formData);
-        // console.log("currentTask ======");
-        // console.log(currentTask);
-        // console.log(currentTask.deadline);
-
-
         // TODO: check null all of this
         const reason: string = formData.get("FormLogReason")!.toString();
         const logPreview: string = truncateText(reason);
@@ -161,6 +154,15 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
             if (toAdd.length > 0) await API.addTaskUsers(currentTask.taskID, toAdd);
         }
 
+        handleFileUpload: {
+            if (!selectedFile) {
+                break handleFileUpload;
+            }
+
+            // TODO: do this properly 
+            // await API.uploadNewPOToTask(currentTask.taskID, )
+        }
+
         // TODO: generate new elogid 
         const newLog: EditLog = {
             eLogID: "TEMPTEMPTEMPTEMTPEMTPE",
@@ -195,6 +197,7 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
     // TODO: move this to a better place
     const baseInputClass =
         "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm disabled:bg-gray-100 disabled:text-gray-500";
+
 
     // TODO: highlight field if its not been edited or its default value
     return createPortal(
@@ -374,15 +377,17 @@ function EditTaskModal({ isOpen, onClose, taskData, parentUpdateCallback }: { is
                                         )}
 
                                         {/* // TODO: fix this bodge */}
+                                        {/* // TODO: make this have a checkbox to turn on or smth */}
+                                        {/* // TODO: make loading indicator when uploading file */}
                                         {
                                             // only dealer
-                                            //                                         currentTask.teamID === 2 && (
-                                            //                                             <div className="md:col-span-2 mt-4">
-                                            //                                                 <FormField label={"อับโหลดไฟล์"}>
-                                            //                                                     <input type="file" />
-                                            //                                                 </FormField>
-                                            //                                             </div>
-                                            //                                         )
+                                            currentTask.teamID === 2 && (
+                                                <div className="md:col-span-2 mt-4">
+                                                    <FormField label={"แนบไฟล์ PO"}>
+                                                        <input type="file" onChange={handleFileChange} className={baseInputClass} />
+                                                    </FormField>
+                                                </div>
+                                            )
                                         }
 
                                         <div className="md:col-span-2 mt-4">

@@ -6,11 +6,28 @@ import EditTaskModal from "./EditTaskModal";
 import { DetailItem } from "./forms/FormItems";
 import TaskDetailsView from "./task_detail/TaskDetailsView";
 import type { FilteringTask } from "../../utils/types";
+import { API } from "../../utils/api";
 
 
 function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: FilteringTask | null, currentProjectName: string, parentUpdateCallback: () => {} }) {
     if (!isOpen) return null;
     if (!taskData) return null;
+
+    // TODO: separate this to customerdetailview component
+    const [customerData, setCustomerData] = useState({});
+
+    // TODO: separate this to customerdetailview component
+    const fetchCustomerData = async () => {
+        const res = await API.getPOandCustomerDetailByTaskID(currentTask.taskID);
+        console.log(res);
+        if (!res) setCustomerData(null);
+        else setCustomerData(res);
+    }
+
+    // TODO: separate this to customerdetailview component
+    useEffect(() => {
+        fetchCustomerData();
+    }, []);
 
     // Close Modal on ESC key
     useEffect(() => {
@@ -54,7 +71,7 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, 
 
     return createPortal(
         <>
-            <EditTaskModal isOpen={isEditTaskModalOpen} onClose={() => { closeEditTaskModal() }} taskData={currentTask} parentUpdateCallback={parentUpdateCallback_eiei} />
+            <EditTaskModal isOpen={isEditTaskModalOpen} onClose={() => { closeEditTaskModal() }} taskData={currentTask} parentUpdateCallback={parentUpdateCallback_eiei} customerAndPoData={customerData} />
 
             <div className="fixed inset-0 z-50 bg-white/70 bg-opacity-50 flex items-center justify-center">
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-y-auto max-h-[90vh]">
@@ -75,10 +92,15 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, 
                     {/* // TODO: change from form to normal div???? */}
                     <form action={handleSubmit} className="flex flex-col overflow-hidden flex-1 min-h-0">
                         <div className="overflow-y-auto flex-1">
+                            {/* // TODO: extract log ui from TaskDetailsView */}
                             <TaskDetailsView task={currentTask} currentProjectName={currentProjectName} />
+
                             {/* // TODO: customer section */}
-                            <div className="pb-6 border-b">
-                                ================== ข้อมูล customer ตรงนี้ =========================
+                            <div className="p-6 border-b flex justify-center flex-col">
+                                <p>kor moon luk ka & po</p>
+                                <p>POID: {customerData ? customerData.poID : "-"}</p>
+                                <p>CustomerID: {customerData ? customerData.customerID : "-"}</p>
+                                <p>CustomerName: {customerData && customerData.customer ? customerData.customer.customerName : "-"}</p>
                             </div>
                         </div>
 

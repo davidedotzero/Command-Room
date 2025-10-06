@@ -71,6 +71,8 @@ export interface FilteringTask extends Task {
     status: TaskStatus;
     teamHelp: Team;
     workers: User[];
+    po: PO | null;
+    customer: Customer | null;
 }
 
 export interface DetailedCustomer extends Customer {

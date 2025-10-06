@@ -184,6 +184,15 @@ export const API = {
         const result: User[] = users.map((x: any) => x.workers)
         return result;
     },
+    getPOandCustomerDetailByTaskID: async (taskID: string) => { // TODO: type this shit
+        const po = POs.filter(x => x.taskID === taskID);
+
+        const poJoinCustomer = leftJoinOne2One(po, CUSTOMERS, "customerID", "customerID", "customer");
+        // WARNING: assume that this will have 1 only object cuz im bodging this sheeshhhhhhhhhhhhh
+        console.log("kuy");
+        console.log(poJoinCustomer);
+        return poJoinCustomer[0];
+    },
 
     getLatestTaskID: async () => {
         const tasksSorted = TASKS.sort((a, b) => +b.createdAt - +a.createdAt);
