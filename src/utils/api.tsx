@@ -1,6 +1,6 @@
 import { getOnlyDate, msToDay } from "./functions";
-import { TASKS, PROJECTS, TEAMS, TASK_STATUSES, EDIT_LOGS, ROLES, PO_STATUSES, leftJoinOne2One, DEFAULT_TASK_NAMES, TASK_USER, USERS } from "./mockdata";
-import type { EditLog, FilteringTask, Project, Task, User } from "./types";
+import { TASKS, PROJECTS, TEAMS, TASK_STATUSES, EDIT_LOGS, ROLES, PO_STATUSES, leftJoinOne2One, DEFAULT_TASK_NAMES, TASK_USER, USERS, CUSTOMERS, CUSTOMER_TYPES, POs } from "./mockdata";
+import type { DetailedCustomer, DetailedPO, EditLog, FilteringTask, Project, Task, User } from "./types";
 
 const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 //TODO: IMPORTANT!!!!! this file
@@ -104,6 +104,27 @@ export const API = {
         let eiei = [...USERS];
         eiei.sort((a, b) => a.name.localeCompare(b.name));
         return eiei;
+    },
+    getAllCustomers: async () => {
+        return [...CUSTOMERS];
+    },
+    getAllCustomersDetailed: async (): Promise<DetailedCustomer[]> => {
+        const customers = [...CUSTOMERS];
+
+        let customersJoinCustomerType = leftJoinOne2One(customers, CUSTOMER_TYPES, "customerTypeID", "customerTypeID", "customerType");
+
+        return customersJoinCustomerType;
+    },
+    getAllPOs: async () => {
+        return [...POs];
+    },
+    getAllPOsDetailed: async (): Promise<DetailedPO[]> => {
+        const pos = [...POs];
+
+        const posJoinCustomer = leftJoinOne2One(pos, CUSTOMERS, "customerID", "customerID", "customer");
+        const posJoinPoStatus = leftJoinOne2One(posJoinCustomer, PO_STATUSES, "poStatusID", "poStatusID", "poStatus");
+
+        return posJoinPoStatus;
     },
 
 
@@ -282,5 +303,31 @@ export const API = {
 
     isProjectIDExists: async (projectID: string) => {
         return PROJECTS.some(proj => proj.projectID === projectID);
-    }
+    },
+
+    countCustomersPOs: async () => {
+        const poCountGroupByCustomerID = POs.reduce(
+            (acc, po) => {
+                const key = po.customerID;
+                acc[key] = (acc[key] || 0) + 1;
+                return acc;
+            }, {}
+        );
+
+        return poCountGroupByCustomerID;
+    },
+    countInCompleteCustomersPOs: async () => {
+        throw new Error("NOT IMPLEMENTED");
+
+        const poCountGroupByCustomerID = POs.reduce(
+            (acc, po) => {
+                if (po.poStatusID)
+                    // const key = po.customerID;
+                    acc[key] = (acc[key] || 0) + 1;
+                return acc;
+            }, {}
+        );
+
+        return poCountGroupByCustomerID;
+    },
 }

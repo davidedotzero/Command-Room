@@ -1,6 +1,6 @@
 // TODO: DELETE MOCKUP DATA
 
-import type { DefaultTaskName, EditLog, PoStatus, Project, Role, Task, TaskStatus, TaskUser, Team, User } from "./types";
+import type { Customer, CustomerType, DefaultTaskName, EditLog, PO, PoStatus, Project, Role, Task, TaskStatus, TaskUser, Team, User } from "./types";
 
 export let DEFAULT_TASK_NAMES: DefaultTaskName[] = [
     { taskName: "default-task-1", teamID: 1 },
@@ -52,6 +52,32 @@ export let USERS: User[] = [
     { userID: "USR-00004", name: "UWU", email: "larron959@gmail.com", roleID: 1, isAdmin: true },
 ];
 
+export let CUSTOMER_TYPES: CustomerType[] = [
+    { customerTypeID: 1, customerTypeName: "ประเภทที่ 1" },
+    { customerTypeID: 2, customerTypeName: "ประเภทที่ 2" },
+    { customerTypeID: 3, customerTypeName: "ประเภทที่ 3" },
+]
+
+export let CUSTOMERS: Customer[] = [
+    { customerID: "CUS-2025-000001", customerName: "luk ka #1", address: "addr #1", customerTypeID: 1 },
+    { customerID: "CUS-2025-000002", customerName: "luk ka #2", address: "addr #2", customerTypeID: 2 },
+    { customerID: "CUS-2025-000003", customerName: "luk ka #3", address: "addr #3", customerTypeID: 3 },
+    { customerID: "CUS-2025-000004", customerName: "luk ka #4", address: "addr #4", customerTypeID: 1 },
+    { customerID: "CUS-2025-000005", customerName: "luk ka #5", address: "addr #5", customerTypeID: 2 },
+    { customerID: "CUS-2025-000006", customerName: "luk ka #6", address: "addr #6", customerTypeID: 3 },
+    { customerID: "CUS-2025-000007", customerName: "luk ka #7", address: "addr #7", customerTypeID: 1 },
+    { customerID: "CUS-2025-000008", customerName: "luk ka #8", address: "addr #8", customerTypeID: 2 },
+    { customerID: "CUS-2025-000009", customerName: "luk ka #9", address: "addr #9", customerTypeID: 3 },
+    { customerID: "CUS-2025-000010", customerName: "luk ka #10", address: "addr #10", customerTypeID: 1 },
+];
+
+export let POs: PO[] = [
+    { poID: "PO-20251006-000001", customerID: "CUS-2025-000001", taskID: "TASK-20250903-000003", poStatusID: 1, createAt: new Date(2025, 9, 6), poAttachmentID: null },
+    { poID: "PO-20251006-000002", customerID: "CUS-2025-000002", taskID: "TASK-20250906-000006", poStatusID: 1, createAt: new Date(2025, 9, 6), poAttachmentID: null },
+    { poID: "PO-20251006-000003", customerID: "CUS-2025-000003", taskID: "TASK-20250909-000009", poStatusID: 1, createAt: new Date(2025, 9, 6), poAttachmentID: null },
+    { poID: "PO-20251006-000004", customerID: "CUS-2025-000002", taskID: "TASK-20250912-000012", poStatusID: 1, createAt: new Date(2025, 9, 6), poAttachmentID: null },
+];
+
 export let TASK_USER: TaskUser[] = [
     { taskID: "TASK-20250912-000012", userID: "USR-00002" },
     { taskID: "TASK-20250913-000013", userID: "USR-00002" },
@@ -70,40 +96,6 @@ export let TASK_USER: TaskUser[] = [
 
 
 // TODO: move teamID to many-2-many model 
-// export let TASKS: Task[] = [
-//     { taskID: "TASK-0001", projectID: "PROJ-CRM-0007", taskName: "default-task-5", teamID: 3, deadline: new Date("2025-12-11"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "002-PLACEHOLDER" },
-//     { taskID: "TASK-0002", projectID: "PROJ-CRM-0002", taskName: "default-task-8", teamID: 1, deadline: new Date("2025-11-25"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "003-PLACEHOLDER" },
-//     { taskID: "TASK-0003", projectID: "PROJ-CRM-0009", taskName: "default-task-7", teamID: 2, deadline: new Date("2025-10-30"), statusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "004-PLACEHOLDER" },
-//     { taskID: "TASK-0004", projectID: "PROJ-CRM-0001", taskName: "default-task-6", teamID: 3, deadline: new Date("2025-12-05"), statusID: 3, teamHelpID: 2, helpReqAt: new Date("2024-12-12"), logPreview: "005-PLACEHOLDER" },
-//     { taskID: "TASK-0005", projectID: "PROJ-CRM-0005", taskName: "default-task-2", teamID: 1, deadline: new Date("2025-11-18"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "006-PLACEHOLDER" },
-//     { taskID: "TASK-0006", projectID: "PROJ-CRM-0010", taskName: "default-task-1", teamID: 2, deadline: new Date("2025-10-15"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "007-PLACEHOLDER" },
-//     { taskID: "TASK-0007", projectID: "PROJ-CRM-0003", taskName: "default-task-3", teamID: 3, deadline: new Date("2025-12-22"), statusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "008-PLACEHOLDER" },
-//     { taskID: "TASK-0008", projectID: "PROJ-CRM-0008", taskName: "default-task-4", teamID: 1, deadline: new Date("2025-11-02"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "009-PLACEHOLDER" },
-//     { taskID: "TASK-0009", projectID: "PROJ-CRM-0004", taskName: "default-task-5", teamID: 2, deadline: new Date("2025-10-21"), statusID: 3, teamHelpID: 3, helpReqAt: new Date("2024-01-01"), logPreview: "010-PLACEHOLDER" },
-//     { taskID: "TASK-0010", projectID: "PROJ-CRM-0006", taskName: "default-task-8", teamID: 3, deadline: new Date("2025-12-14"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "011-PLACEHOLDER" },
-//     { taskID: "TASK-0011", projectID: "PROJ-CRM-0001", taskName: "default-task-7", teamID: 1, deadline: new Date("2025-11-09"), statusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "012-PLACEHOLDER" },
-//     { taskID: "TASK-0012", projectID: "PROJ-CRM-0007", taskName: "default-task-6", teamID: 2, deadline: new Date("2025-10-28"), statusID: 3, teamHelpID: 3, helpReqAt: new Date("2025-10-5"), logPreview: "013-PLACEHOLDER" },
-//     { taskID: "TASK-0013", projectID: "PROJ-CRM-0002", taskName: "default-task-2", teamID: 3, deadline: new Date("2025-12-01"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "014-PLACEHOLDER" },
-//     { taskID: "TASK-0014", projectID: "PROJ-CRM-0009", taskName: "default-task-1", teamID: 1, deadline: new Date("2025-11-15"), statusID: 3, teamHelpID: 2, helpReqAt: new Date("2024-01-01"), logPreview: "015-PLACEHOLDER" },
-//     { taskID: "TASK-0015", projectID: "PROJ-CRM-0005", taskName: "default-task-3", teamID: 2, deadline: new Date("2025-10-08"), statusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "016-PLACEHOLDER" },
-//     { taskID: "TASK-0016", projectID: "PROJ-CRM-0010", taskName: "default-task-4", teamID: 3, deadline: new Date("2025-12-28"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "017-PLACEHOLDER" },
-//     { taskID: "TASK-0017", projectID: "PROJ-CRM-0003", taskName: "default-task-5", teamID: 1, deadline: new Date("2025-11-20"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "018-PLACEHOLDER" },
-//     { taskID: "TASK-0018", projectID: "PROJ-CRM-0008", taskName: "default-task-8", teamID: 2, deadline: new Date("2025-10-12"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "019-PLACEHOLDER" },
-//     { taskID: "TASK-0019", projectID: "PROJ-CRM-0004", taskName: "default-task-7", teamID: 3, deadline: new Date("2025-12-08"), statusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "020-PLACEHOLDER" },
-//     { taskID: "TASK-0020", projectID: "PROJ-CRM-420", taskName: "default-task-6", teamID: 1, deadline: new Date("2024-01-01"), statusID: 3, teamHelpID: 3, helpReqAt: new Date("2024-01-01"), logPreview: "021-PLACEHOLDER" },
-//     { taskID: "TASK-0021", projectID: "PROJ-CRM-0001", taskName: "default-task-2", teamID: 2, deadline: new Date("2025-10-19"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "022-PLACEHOLDER" },
-//     { taskID: "TASK-0022", projectID: "PROJ-CRM-0007", taskName: "default-task-1", teamID: 3, deadline: new Date("2025-12-18"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "023-PLACEHOLDER" },
-//     { taskID: "TASK-0023", projectID: "PROJ-CRM-0002", taskName: "default-task-3", teamID: 1, deadline: new Date("2025-11-05"), statusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "024-PLACEHOLDER" },
-//     { taskID: "TASK-0024", projectID: "PROJ-CRM-0009", taskName: "default-task-4", teamID: 2, deadline: new Date("2025-10-25"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "025-PLACEHOLDER" },
-//     { taskID: "TASK-0025", projectID: "PROJ-CRM-0005", taskName: "default-task-5", teamID: 3, deadline: new Date("2025-12-03"), statusID: 3, teamHelpID: 2, helpReqAt: new Date("2024-01-01"), logPreview: "026-PLACEHOLDER" },
-//     { taskID: "TASK-0026", projectID: "PROJ-CRM-0010", taskName: "default-task-8", teamID: 1, deadline: new Date("2025-11-12"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "027-PLACEHOLDER" },
-//     { taskID: "TASK-0027", projectID: "PROJ-CRM-0003", taskName: "default-task-7", teamID: 2, deadline: new Date("2025-10-05"), statusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "028-PLACEHOLDER" },
-//     { taskID: "TASK-0028", projectID: "PROJ-CRM-0008", taskName: "default-task-6", teamID: 3, deadline: new Date("2025-12-25"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "029-PLACEHOLDER" },
-//     { taskID: "TASK-0029", projectID: "PROJ-CRM-0004", taskName: "default-task-2", teamID: 1, deadline: new Date("2025-11-22"), statusID: 3, teamHelpID: 3, helpReqAt: new Date("2024-01-01"), logPreview: "030-PLACEHOLDER" },
-//     { taskID: "TASK-0030", projectID: "PROJ-CRM-0006", taskName: "default-task-1", teamID: 2, deadline: new Date("2025-10-17"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "031-PLACEHOLDER" },
-//     { taskID: "TASK-0031", projectID: "PROJ-CRM-0007", taskName: "default-task-6", teamID: 2, deadline: new Date("2025-10-28"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "032-PLACEHOLDER" },
-// ];
-
 export let TASKS: Task[] = [
     { taskID: "TASK-20250901-000001", projectID: "PROJ-CRM-0007", taskName: "default-task-5", teamID: 3, deadline: new Date("2025-12-11"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "002-PLACEHOLDER", createdAt: new Date("2025-09-01"), helpReqReason: null },
     { taskID: "TASK-20250902-000002", projectID: "PROJ-CRM-0002", taskName: "default-task-8", teamID: 1, deadline: new Date("2025-11-25"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "003-PLACEHOLDER", createdAt: new Date("2025-09-02"), helpReqReason: null },

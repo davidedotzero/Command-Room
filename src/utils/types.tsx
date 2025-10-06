@@ -1,7 +1,6 @@
 // TODO: make all this sheesh match database schema
 
 // TODO: make this id+name ????
-type POStatus = "PLACEHOLDER" | "PLACEHOLDER2";
 
 // TODO: will change this when i know what fields are supposed to be in projectTask
 // TODO: add preview log field
@@ -74,6 +73,15 @@ export interface FilteringTask extends Task {
     workers: User[];
 }
 
+export interface DetailedCustomer extends Customer {
+    customerType: CustomerType;
+}
+
+export interface DetailedPO extends PO {
+    poStatus: POStatus;
+    customer: Customer;
+}
+
 export interface DefaultTaskName {
     taskName: string;
     teamID: number;
@@ -82,6 +90,48 @@ export interface DefaultTaskName {
 export interface TaskUser {
     taskID: string;
     userID: string;
+}
+
+export interface Customer {
+    customerID: string;
+    customerName: string;
+    address: string;
+    customerTypeID: number;
+}
+
+export interface CustomerType {
+    customerTypeID: number;
+    customerTypeName: string;
+}
+
+export interface PO {
+    poID: string;
+    customerID: string;
+    taskID: string;
+    poStatusID: number;
+    poAttachmentID: string | null;
+    createAt: Date;
+}
+
+export interface POStatus {
+    poStatusID: number;
+    poStatusName: string;
+}
+
+export interface CustomerUser {
+    customerID: string;
+    userID: string;
+}
+
+export interface Attachment {
+    attachmentID: string;
+    attachmentTypeID: number;
+    link: string;
+}
+
+export interface AttachmentType {
+    attachmentTypeID: number;
+    attachmentTypeName: number;
 }
 
 // format PREFIX-YYYYMMDD-XXXXXX
