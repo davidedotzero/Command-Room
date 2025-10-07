@@ -1,31 +1,12 @@
 // TODO: DELETE MOCKUP DATA
 
-import type { Customer, CustomerType, DefaultTaskName, EditLog, PO, PoStatus, Project, Role, Task, TaskStatus, TaskUser, Team, User } from "./types";
+import type { Customer, CustomerType, DefaultTaskName, EditLog, PO, PoStatus, Project, Task, TaskStatus, TaskUser, Team, User } from "./types";
 
-export let DEFAULT_TASK_NAMES: DefaultTaskName[] = [
-    { taskName: "default-task-1", teamID: 1 },
-    { taskName: "default-task-2", teamID: 2 },
-    { taskName: "default-task-3", teamID: 3 },
-    { taskName: "default-task-4", teamID: 1 },
-    { taskName: "default-task-5", teamID: 2 },
-    { taskName: "default-task-6", teamID: 3 },
-    { taskName: "default-task-7", teamID: 1 },
-    { taskName: "default-task-8", teamID: 2 },
-]
 
 export let TEAMS: Team[] = [
     { teamID: 1, teamName: "PRODUCTION" },
     { teamID: 2, teamName: "DEALER" },
     { teamID: 3, teamName: "OWO" },
-]
-
-export let ROLES: Role[] = [
-    { roleID: 1, teamID: 1, roleName: "PROD_TUDTOR" },
-    { roleID: 2, teamID: 1, roleName: "PROD_GRAPHIC" },
-    { roleID: 3, teamID: 2, roleName: "DEALER_1" },
-    { roleID: 4, teamID: 2, roleName: "DEALER_2" },
-    { roleID: 5, teamID: 3, roleName: "OWO_1" },
-    { roleID: 6, teamID: 3, roleName: "OWO_2" },
 ]
 
 export let TASK_STATUSES: TaskStatus[] = [
@@ -50,6 +31,7 @@ export let USERS: User[] = [
     { userID: "USR-00002", name: "pchampkaaa", email: "pchamplovelove@gmail.com", roleID: 2, isAdmin: true },
     { userID: "USR-00003", name: "OWO", email: "musicarmscreative@gmail.com", roleID: 1, isAdmin: true },
     { userID: "USR-00004", name: "UWU", email: "larron959@gmail.com", roleID: 1, isAdmin: true },
+    // USER-2025-000000
 ];
 
 export let CUSTOMER_TYPES: CustomerType[] = [
@@ -145,6 +127,7 @@ export let PROJECTS: Project[] = [
     { projectID: "PROJ-CRM-0011", projectName: "test11", isArchived: true },
     { projectID: "PROJ-CRM-0012", projectName: "test12", isArchived: false },
     { projectID: "PROJ-CRM-0013", projectName: "test13", isArchived: true },
+    // proj-2025-000000
 ];
 
 export let EDIT_LOGS: EditLog[] = [

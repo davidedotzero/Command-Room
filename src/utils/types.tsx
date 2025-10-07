@@ -29,12 +29,6 @@ export interface Team {
     teamName: string,
 }
 
-export interface Role {
-    roleID: number,
-    teamID: number,
-    roleName: string,
-}
-
 export interface TaskStatus {
     statusID: number,
     statusName: string,

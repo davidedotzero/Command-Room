@@ -2,7 +2,6 @@ import { useEffect, useState, type ReactNode } from "react";
 import Select, { type SingleValue } from "react-select";
 
 import { createPortal, useFormStatus } from "react-dom";
-import { TASKS, TEAMS } from "../../utils/mockdata";
 import { FormButton, FormField, FormFieldSetWrapper } from "./forms/FormItems";
 import CreatableSelect from "react-select/creatable";
 import { useDbConst } from "../../contexts/DbConstDataContext";

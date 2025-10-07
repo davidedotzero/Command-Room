@@ -4,7 +4,7 @@ import { useEffect, useState, type ChangeEvent } from "react";
 import type { EditLog, FilteringTask, TaskStatus, User } from "../../utils/types";
 import { API } from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
-import { EDIT_LOGS, TASKS, TEAMS } from "../../utils/mockdata";
+import { EDIT_LOGS, TASKS } from "../../utils/mockdata";
 import { calculateLeadTime, formatDateYYYY_MM_DD, getOnlyDate, isOnlyDateEqual, truncateText } from "../../utils/functions";
 import Select from "react-select";
 import { useDbConst } from "../../contexts/DbConstDataContext";

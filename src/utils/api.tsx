@@ -1,6 +1,6 @@
 import { getOnlyDate, msToDay } from "./functions";
-import { TASKS, PROJECTS, TEAMS, TASK_STATUSES, EDIT_LOGS, ROLES, PO_STATUSES, leftJoinOne2One, DEFAULT_TASK_NAMES, TASK_USER, USERS, CUSTOMERS, CUSTOMER_TYPES, POs } from "./mockdata";
-import type { DetailedCustomer, DetailedPO, EditLog, FilteringTask, Project, Task, User } from "./types";
+import { TASKS, PROJECTS, TEAMS, TASK_STATUSES, EDIT_LOGS, PO_STATUSES, leftJoinOne2One, TASK_USER, USERS, CUSTOMERS, CUSTOMER_TYPES, POs } from "./mockdata";
+import type { DetailedCustomer, DetailedPO, EditLog, FilteringTask, Project, Task, TaskStatus, Team, User } from "./types";
 
 const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 //TODO: IMPORTANT!!!!! this file
@@ -59,11 +59,17 @@ export async function callAPI<T>(op: string, payload: object): Promise<T> {
     }
 }
 
+const apiURL = "https://command-room-backend.vercel.app/api/"
+// const apiURL = "http://localhost:8080/api/";
+
+async function getAPI(endpoint: string): Promise<any> {
+    // TODO: handle error responses
+    const res = await fetch(apiURL + endpoint);
+    const data = await res.json();
+    return data;
+}
+
 export const API = {
-    getAllTasks: async () => {
-        // await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
-        return [...TASKS];
-    },
     getAllTasksDetailed: async (): Promise<FilteringTask[]> => {
         const eiei = [...TASKS]
         const tasksJoinTeam = leftJoinOne2One(eiei, TEAMS, "teamID", "teamID", "team");
@@ -82,23 +88,24 @@ export const API = {
 
         return tasksJoinUsers;
     },
-    getAllTeams: async () => {
-        return [...TEAMS];
+    getAllTeams: async (): Promise<Team[]> => {
+        const data = await getAPI("getAllTeams");
+        return data;
     },
-    getAllRoles: async () => {
-        return [...ROLES];
-    },
-    getAllTaskStatuses: async () => {
-        return [...TASK_STATUSES]
+    getAllTaskStatuses: async (): Promise<TaskStatus[]> => {
+        const data = await getAPI("getAllTaskStatuses");
+        return data;
     },
     getAllPoStatuses: async () => {
         return [...PO_STATUSES]
     },
     getAllProjects: async () => {
-        return [...PROJECTS];
+        const data = await getAPI("getAllProjects")
+        return data;
     },
     getAllDefaultTaskNames: async () => {
-        return [...DEFAULT_TASK_NAMES];
+        const data = await getAPI("getAllDefaultTaskNames");
+        return data;
     },
     getAllUsersAsc: async () => {
         let eiei = [...USERS];
@@ -129,7 +136,8 @@ export const API = {
 
 
     getAllActiveProjects: async () => {
-        return PROJECTS.filter(p => p.isArchived === false);
+        const data = getAPI("getAllActiveProjects");
+        return data;
     },
     getProjectNameById: async (projectID: string) => {
         // TODO: handle when name not found

@@ -24,31 +24,31 @@ function Navbar() {
                 </div>
 
                 {/* // WARNING: dev button */}
-                {/* <div className="hidden"> */}
-                <div className="flex flex-row">
-                    <button className="p-3 text-white border border-transparent rounded-md bg-green-500 hover:bg-green-600 active:bg-black"
-                        onClick={() => {
-                            console.log("admin toggle");
-                            localStorage.setItem("project-crm-user", JSON.stringify({ "userID": "USR-00002", "name": "pchampkaaa", "email": "pchamplovelove@gmail.com", "roleID": 2, "isAdmin": !user?.isAdmin }))
-                            window.location.reload();
-                        }}
-                    >
-                        DEV TEST TOGGLE admin
-                    </button>
+                <div className="hidden">
+                    <div className="flex flex-row">
+                        <button className="p-3 text-white border border-transparent rounded-md bg-green-500 hover:bg-green-600 active:bg-black"
+                            onClick={() => {
+                                console.log("admin toggle");
+                                localStorage.setItem("project-crm-user", JSON.stringify({ "userID": "USR-00002", "name": "pchampkaaa", "email": "pchamplovelove@gmail.com", "roleID": 2, "isAdmin": !user?.isAdmin }))
+                                window.location.reload();
+                            }}
+                        >
+                            DEV TEST TOGGLE admin
+                        </button>
+                    </div>
                 </div>
-                {/* </div> */}
             </nav >
             {/* // WARNING: dev button */}
-            {/* <div className="hidden"> */}
-            {
-                user?.isAdmin && (
-                    <div className="bg-red-500 font-bold text-3xl flex items-center justify-center text-white p-5 flex-col">
-                        <div>YOU ARE NOT SUPPOSED TO SEE THIS. PLEASE CONTACT DEVELOPER IMMEDIATELY.</div>
-                        <div>DEV INFO: if you are seeing this, you're an admin.</div>
-                    </div>
-                )
-            }
-            {/* </div> */}
+            <div className="hidden">
+                {
+                    user?.isAdmin && (
+                        <div className="bg-red-500 font-bold text-3xl flex items-center justify-center text-white p-5 flex-col">
+                            <div>YOU ARE NOT SUPPOSED TO SEE THIS. PLEASE CONTACT DEVELOPER IMMEDIATELY.</div>
+                            <div>DEV INFO: if you are seeing this, you're an admin.</div>
+                        </div>
+                    )
+                }
+            </div>
         </>
     );
 }
