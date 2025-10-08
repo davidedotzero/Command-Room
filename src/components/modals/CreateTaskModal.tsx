@@ -57,10 +57,10 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
             return;
         }
 
+        // TODO: generate ids on backend;
         let a = await API.getLatestTaskID();
         let newTaskID = genSingleNewID(a);
 
-        // TODO: generate new task id
         const newTask =
         {
             taskID: newTaskID,
@@ -68,11 +68,15 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
             taskName: selectedTask.value,
             teamID: selectedTeamID.value,
             deadline: getOnlyDate(selectedDeadline),
-            statusID: inProgressStatusID,
+            taskStatusID: inProgressStatusID,
+
+            // TODO: These 6 below properties are useless and should be deleted cuz we hardcoded these in backend anyway but i dont wanna messes with the types for now
             teamHelpID: null,
             helpReqAt: null,
             logPreview: "",
-            createdAt: new Date()
+            createdAt: new Date(),
+            helpReqReason: null,
+            updatedAt: null
         };
 
         const res = await API.addTask(newTask);

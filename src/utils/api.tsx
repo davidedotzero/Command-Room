@@ -5,88 +5,118 @@ import type { DetailedCustomer, DetailedPO, EditLog, FilteringTask, Project, Tas
 const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 //TODO: IMPORTANT!!!!! this file
 
-export async function callAPI<T>(op: string, payload: object): Promise<T> {
-    if (!SCRIPT_URL) throw new Error("VITE_APP_SCRIPT_URL is not defined in env.");
+// export async function callAPI<T>(op: string, payload: object): Promise<T> {
+//     if (!SCRIPT_URL) throw new Error("VITE_APP_SCRIPT_URL is not defined in env.");
+//
+//     try {
+//         const response = await fetch(SCRIPT_URL, {
+//             method: "POST",
+//             headers: { "Content-Type": "text/plain;charset=utf-8" },
+//             body: JSON.stringify({ op, payload }),
+//         });
+//
+//         // TODO: potentially error if api return 302??????????
+//         if (!response.ok) {
+//             const errorText = await response.text().catch(() => "N/A");
+//             console.error("HTTP Error Response:", errorText);
+//             throw new Error(
+//                 `HTTP error ${response.status}. โปรดตรวจสอบการเชื่อมต่อหรือสถานะเซิร์ฟเวอร์.`
+//             );
+//         }
+//
+//         // 2. อ่านข้อมูลเป็น Text ก่อน (สำคัญมากสำหรับการ Debug และป้องกัน JSON Error)
+//         const textData = await response.text();
+//
+//         // 3. พยายามแปลงเป็น JSON
+//         try {
+//             const result = JSON.parse(textData);
+//             // ตรวจสอบสถานะจาก Backend (ตามโครงสร้างที่คาดหวังจาก GAS)
+//             if (result.status !== "success") {
+//                 throw new Error(
+//                     result.message || "การดำเนินการล้มเหลว (Backend Error)."
+//                 );
+//             }
+//             // ตรวจสอบว่ามี data หรือไม่ ถ้าไม่มีให้ return เป็น object ว่าง
+//             return (result.data !== undefined ? result.data : {}) as T;
+//         } catch (parseError) {
+//             // ดักจับ "SyntaxError: JSON.parse: unexpected character"
+//             if (parseError instanceof SyntaxError) {
+//                 console.error("Failed to parse JSON. Raw data received:", textData);
+//                 throw new Error(
+//                     "ได้รับข้อมูลที่ไม่ใช่รูปแบบ JSON. โปรดตรวจสอบ Logs หรือสิทธิ์ของ Google Apps Script."
+//                 );
+//             }
+//             throw parseError;
+//         }
+//     } catch (error) {
+//         // จัดการ Network errors
+//         if (error instanceof TypeError && error.message === "Failed to fetch") {
+//             throw new Error(
+//                 "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ (Network Error/CORS)."
+//             );
+//         }
+//         throw error;
+//     }
+// }
 
-    try {
-        const response = await fetch(SCRIPT_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ op, payload }),
-        });
+// const apiURL = "https://command-room-backend.vercel.app/api/"
+const apiURL = "http://localhost:8080/api/";
 
-        // TODO: potentially error if api return 302??????????
-        if (!response.ok) {
-            const errorText = await response.text().catch(() => "N/A");
-            console.error("HTTP Error Response:", errorText);
-            throw new Error(
-                `HTTP error ${response.status}. โปรดตรวจสอบการเชื่อมต่อหรือสถานะเซิร์ฟเวอร์.`
-            );
-        }
-
-        // 2. อ่านข้อมูลเป็น Text ก่อน (สำคัญมากสำหรับการ Debug และป้องกัน JSON Error)
-        const textData = await response.text();
-
-        // 3. พยายามแปลงเป็น JSON
-        try {
-            const result = JSON.parse(textData);
-            // ตรวจสอบสถานะจาก Backend (ตามโครงสร้างที่คาดหวังจาก GAS)
-            if (result.status !== "success") {
-                throw new Error(
-                    result.message || "การดำเนินการล้มเหลว (Backend Error)."
-                );
-            }
-            // ตรวจสอบว่ามี data หรือไม่ ถ้าไม่มีให้ return เป็น object ว่าง
-            return (result.data !== undefined ? result.data : {}) as T;
-        } catch (parseError) {
-            // ดักจับ "SyntaxError: JSON.parse: unexpected character"
-            if (parseError instanceof SyntaxError) {
-                console.error("Failed to parse JSON. Raw data received:", textData);
-                throw new Error(
-                    "ได้รับข้อมูลที่ไม่ใช่รูปแบบ JSON. โปรดตรวจสอบ Logs หรือสิทธิ์ของ Google Apps Script."
-                );
-            }
-            throw parseError;
-        }
-    } catch (error) {
-        // จัดการ Network errors
-        if (error instanceof TypeError && error.message === "Failed to fetch") {
-            throw new Error(
-                "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ (Network Error/CORS)."
-            );
-        }
-        throw error;
-    }
-}
-
-const apiURL = "https://command-room-backend.vercel.app/api/"
-// const apiURL = "http://localhost:8080/api/";
-
-async function getAPI(endpoint: string): Promise<any> {
+async function getAPI(endpoint: string, param: string = ""): Promise<any> {
     // TODO: handle error responses
-    const res = await fetch(apiURL + endpoint);
+    const res = await fetch(apiURL + endpoint + "/" + param);
     const data = await res.json();
     return data;
 }
 
+async function postAPI(endpoint: string, body: any): Promise<any> {
+    try {
+        const response = await fetch(apiURL + endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const result = await response.json();
+        console.log('Success:', result);
+        alert('POST api done successfully!');
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to run POST api.');
+    }
+}
+
+
 export const API = {
-    getAllTasksDetailed: async (): Promise<FilteringTask[]> => {
-        const eiei = [...TASKS]
-        const tasksJoinTeam = leftJoinOne2One(eiei, TEAMS, "teamID", "teamID", "team");
-        const tasksJoinStatus = leftJoinOne2One(tasksJoinTeam, TASK_STATUSES, "statusID", "statusID", "status");
-        const tasksJoinTeam_TeamHelp = leftJoinOne2One(tasksJoinStatus, TEAMS, "teamHelpID", "teamID", "teamHelp");
-
-        // getWorkersByTaskID
-        let tasksJoinUsers: FilteringTask[] = [];
-        for (let juan of tasksJoinTeam_TeamHelp) {
-            const userIDsOfTask = TASK_USER.filter(x => x.taskID === juan.taskID);
-            const users = leftJoinOne2One(userIDsOfTask, USERS, "userID", "userID", "workers");
-            const result: User[] = users.map((x: any) => x.workers);
-
-            tasksJoinUsers.push({ ...juan, workers: result.length === 0 ? null : result })
+    // TODO: THIS AUTH METHOD IS SHIT, MUST USE BETTER AUTH LATER KUYKUYUKYUKYUKYKUYKUYKUYKUYKUYKUKYUKYUYKUYKU
+    verifyEmail: async (email: string) => {
+        let response = await getAPI("verifyEmail", email);
+        if (!response || response.length <= 0) {
+            console.log("meung krai ni");
+            return null;
         }
 
-        return tasksJoinUsers;
+        return response[0];
+    },
+    getAllTasksDetailed: async (): Promise<FilteringTask[]> => {
+        let data: FilteringTask[] = await getAPI("getAllTasksDetailed");
+
+        // need to parse date here cuz backend cant send Date obj to us sadge
+        data = data.map(row => {
+            return {
+                ...row,
+                deadline: new Date(row.deadline),
+                createdAt: new Date(row.createdAt),
+                updatedAt: row.updatedAt !== null ? new Date(row.updatedAt) : null
+            };
+        })
+
+        return data;
     },
     getAllTeams: async (): Promise<Team[]> => {
         const data = await getAPI("getAllTeams");
@@ -108,83 +138,63 @@ export const API = {
         return data;
     },
     getAllUsersAsc: async () => {
-        let eiei = [...USERS];
-        eiei.sort((a, b) => a.name.localeCompare(b.name));
-        return eiei;
-    },
-    getAllCustomers: async () => {
-        return [...CUSTOMERS];
-    },
-    getAllCustomersDetailed: async (): Promise<DetailedCustomer[]> => {
-        const customers = [...CUSTOMERS];
-
-        let customersJoinCustomerType = leftJoinOne2One(customers, CUSTOMER_TYPES, "customerTypeID", "customerTypeID", "customerType");
-
-        return customersJoinCustomerType;
-    },
-    getAllPOs: async () => {
-        return [...POs];
-    },
-    getAllPOsDetailed: async (): Promise<DetailedPO[]> => {
-        const pos = [...POs];
-
-        const posJoinCustomer = leftJoinOne2One(pos, CUSTOMERS, "customerID", "customerID", "customer");
-        const posJoinPoStatus = leftJoinOne2One(posJoinCustomer, PO_STATUSES, "poStatusID", "poStatusID", "poStatus");
-
-        return posJoinPoStatus;
+        const data = await getAPI("getAllUsersAsc");
+        return data;
     },
 
 
     getAllActiveProjects: async () => {
-        const data = getAPI("getAllActiveProjects");
+        const data = await getAPI("getAllActiveProjects");
         return data;
     },
     getProjectNameById: async (projectID: string) => {
-        // TODO: handle when name not found
-        return PROJECTS.find(proj => proj.projectID === projectID)?.projectName!;
+        // // TODO: handle when name not found maybe in backend?
+        const data = await getAPI("getProjectNameById", projectID);
+        return data.projectName;
     },
     getLogsByTaskIdDesc: async (taskID: string) => {
-        return EDIT_LOGS.filter(log => log.taskID === taskID).sort((a: EditLog, b: EditLog) => +b.date - +a.date);
-    },
-    getTasksByProjectId: async (projectID: string) => {
-        return TASKS.filter((t) => t.projectID === projectID);
+        let data: EditLog[] = await getAPI("getLogsByTaskIdDesc", taskID);
+        data = data.map(row => {
+            return {
+                ...row,
+                date: new Date(row.date),
+                fromDeadline: row.fromDeadline !== null ? new Date(row.fromDeadline) : null,
+                toDeadline: row.toDeadline !== null ? new Date(row.toDeadline) : null
+            };
+        })
+        return data;
     },
     getTasksByProjectIdDetailed: async (projectID: string): Promise<FilteringTask[]> => {
-        const tasksByProjectID = TASKS.filter((t) => t.projectID === projectID);
-        const tasksJoinTeam = leftJoinOne2One(tasksByProjectID, TEAMS, "teamID", "teamID", "team");
-        const tasksJoinStatus = leftJoinOne2One(tasksJoinTeam, TASK_STATUSES, "statusID", "statusID", "status");
-        const tasksJoinTeam_TeamHelp = leftJoinOne2One(tasksJoinStatus, TEAMS, "teamHelpID", "teamID", "teamHelp");
+        let res: FilteringTask[] = await getAPI("getTasksByProjectIdDetailed", projectID);
 
-        // getWorkersByTaskID
-        let tasksJoinUsers: FilteringTask[] = [];
-        for (let juan of tasksJoinTeam_TeamHelp) {
-            const userIDsOfTask = TASK_USER.filter(x => x.taskID === juan.taskID);
-            const users = leftJoinOne2One(userIDsOfTask, USERS, "userID", "userID", "workers");
-            const result: User[] = users.map((x: any) => x.workers);
+        // need to parse date here cuz backend cant send Date obj to us sadge
+        res = res.map(row => {
+            return {
+                ...row,
+                deadline: new Date(row.deadline),
+                createdAt: new Date(row.createdAt),
+                updatedAt: row.updatedAt !== null ? new Date(row.updatedAt) : null
+            };
+        })
 
-            tasksJoinUsers.push({ ...juan, workers: result.length === 0 ? null : result })
-        }
-
-        return tasksJoinUsers;
+        return res;
     },
     getTasksByUserIdDetailed: async (userID: string): Promise<FilteringTask[]> => {
-        const taskUsers = TASK_USER.filter(x => x.userID === userID);
-        const tasksFilter = TASKS.filter(x => taskUsers.find(tu => tu.taskID === x.taskID) !== undefined);
-        const tasksJoinTeam = leftJoinOne2One(tasksFilter, TEAMS, "teamID", "teamID", "team");
-        const tasksJoinStatus = leftJoinOne2One(tasksJoinTeam, TASK_STATUSES, "statusID", "statusID", "status");
-        const tasksJoinTeam_TeamHelp = leftJoinOne2One(tasksJoinStatus, TEAMS, "teamHelpID", "teamID", "teamHelp");
+        console.log(userID);
+        let res: FilteringTask[] = await getAPI("getTasksByUserIdDetailed", userID);
+        console.log(res);
 
-        // getWorkersByTaskID
-        let tasksJoinUsers: FilteringTask[] = [];
-        for (let juan of tasksJoinTeam_TeamHelp) {
-            const userIDsOfTask = TASK_USER.filter(x => x.taskID === juan.taskID);
-            const users = leftJoinOne2One(userIDsOfTask, USERS, "userID", "userID", "workers");
-            const result: User[] = users.map((x: any) => x.workers);
+        // need to parse date here cuz backend cant send Date obj to us sadge
+        res = res.map(row => {
+            return {
+                ...row,
+                deadline: new Date(row.deadline),
+                createdAt: new Date(row.createdAt),
+                updatedAt: row.updatedAt !== null ? new Date(row.updatedAt) : null
+            };
+        })
 
-            tasksJoinUsers.push({ ...juan, workers: result.length === 0 ? null : result })
-        }
-
-        return tasksJoinUsers;
+        return res;
     },
     getWorkersByTaskId: async (taskID: string) => {
         const userIDsOfTask = TASK_USER.filter(x => x.taskID === taskID);
@@ -203,6 +213,8 @@ export const API = {
     },
 
     getLatestTaskID: async () => {
+        const data = await getAPI("getLatestTaskID");
+        console.log(data);
         const tasksSorted = TASKS.sort((a, b) => +b.createdAt - +a.createdAt);
         return tasksSorted[0].taskID;
     },
@@ -226,8 +238,9 @@ export const API = {
 
 
     addTask: async (newTask: Task) => {
-        TASKS.push(newTask);
-        return true;
+        const response = await postAPI("addTask", newTask);
+        // TODO: handle response???
+        return response;
     },
     addTasks: async (tasks: Task[]) => {
         for (let task of tasks) {
@@ -269,7 +282,7 @@ export const API = {
                 task.teamHelpID = teamHelpID;
                 task.helpReqAt = helpReqAt;
                 task.helpReqReason = helpReqReason;
-                task.statusID = taskStatusID ?? task.statusID;
+                task.taskStatusID = taskStatusID ?? task.taskStatusID;
                 task.logPreview = logPreview;
                 break;
             }
@@ -319,7 +332,9 @@ export const API = {
 
 
     isProjectIDExists: async (projectID: string) => {
-        return PROJECTS.some(proj => proj.projectID === projectID);
+        const data = await getAPI("isProjectIDExists", projectID);
+        return Boolean(data.isValid);
+        // return PROJECTS.some(proj => proj.projectID === projectID);
     },
 
     countCustomersPOs: async () => {
@@ -346,5 +361,27 @@ export const API = {
         );
 
         return poCountGroupByCustomerID;
+    },
+
+    getAllCustomers: async () => {
+        return [...CUSTOMERS];
+    },
+    getAllCustomersDetailed: async (): Promise<DetailedCustomer[]> => {
+        const customers = [...CUSTOMERS];
+
+        let customersJoinCustomerType = leftJoinOne2One(customers, CUSTOMER_TYPES, "customerTypeID", "customerTypeID", "customerType");
+
+        return customersJoinCustomerType;
+    },
+    getAllPOs: async () => {
+        return [...POs];
+    },
+    getAllPOsDetailed: async (): Promise<DetailedPO[]> => {
+        const pos = [...POs];
+
+        const posJoinCustomer = leftJoinOne2One(pos, CUSTOMERS, "customerID", "customerID", "customer");
+        const posJoinPoStatus = leftJoinOne2One(posJoinCustomer, PO_STATUSES, "poStatusID", "poStatusID", "poStatus");
+
+        return posJoinPoStatus;
     },
 }

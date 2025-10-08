@@ -38,7 +38,7 @@ function EditTaskModal(
     const { user } = useAuth();
     const { TASK_STATUSES, TEAMS } = useDbConst();
 
-    const [selectedStatus, setSelectedStatus] = useState<number>(currentTask.statusID);
+    const [selectedStatus, setSelectedStatus] = useState<number>(currentTask.taskStatusID);
     const [taskName, setTaskName] = useState<string>(currentTask.taskName);
     const [selectedTeamID, setSelectedTeamID] = useState<{ value: number, label: string } | null>(
         { value: currentTask.teamID, label: TEAMS.find(x => x.teamID === currentTask.teamID)!.teamName }
@@ -99,11 +99,11 @@ function EditTaskModal(
         let helpReqAt: Date | null = null;
         let helpReqReason: string | null = null;
 
-        if (toStatusID === currentTask.statusID) toStatusID = null;
+        if (toStatusID === currentTask.taskStatusID) toStatusID = null;
         if (isOnlyDateEqual(toDeadline, new Date(currentTask.deadline))) toDeadline = null;
 
         // handle when from something else ---> Help Me
-        if (currentTask.statusID !== 3 && toStatusID === 3) { // handle help me
+        if (currentTask.taskStatusID !== 3 && toStatusID === 3) { // handle help me
             teamHelpID = Number(formData.get("FormTeamHelp"));
             helpReqAt = new Date();
             helpReqReason = reason;
@@ -111,7 +111,7 @@ function EditTaskModal(
 
         // handle when changing from Help Me --> something else
         // we clear help related fields from Task record
-        if (currentTask.statusID === 3 && toStatusID !== 3) {
+        if (currentTask.taskStatusID === 3 && toStatusID !== 3) {
             // console.log("clearing");
             teamHelpID = null;
             helpReqAt = null;
@@ -168,7 +168,7 @@ function EditTaskModal(
             eLogID: "TEMPTEMPTEMPTEMTPEMTPE",
             date: new Date(),
             reason: formData.get("FormLogReason")!.toString(),
-            fromStatusID: toStatusID === null ? null : currentTask.statusID,
+            fromStatusID: toStatusID === null ? null : currentTask.taskStatusID,
             toStatusID: toStatusID,
             fromDeadline: toDeadline === null ? null : new Date(currentTask.deadline),
             toDeadline: toDeadline,
@@ -258,7 +258,7 @@ function EditTaskModal(
                                                         className={"shadow-sm"}
                                                         isClearable={false}
                                                         isSearchable={true}
-                                                        options={listWorkers!.map(x => ({ value: x, label: x.name }))}
+                                                        options={listWorkers!.map(x => ({ value: x, label: x.userName }))}
                                                         placeholder="เพิ่มผู้ปฏิบัติ"
                                                         value={null}
                                                         onChange={e => {
@@ -293,14 +293,14 @@ function EditTaskModal(
                                                     selectedWorkers === null ? "" :
                                                         selectedWorkers.map(x => {
                                                             return <AssigneeLabels
-                                                                key={x.userID} text={x.name} closeButton={user?.isAdmin}
+                                                                key={x.userID} text={x.userName} closeButton={user?.isAdmin}
                                                                 closeButtonCallback={
                                                                     () => {
                                                                         const newSelectedWorkers = selectedWorkers.filter(sw => sw.userID !== x.userID);
                                                                         setSelectedWorkers(newSelectedWorkers);
 
                                                                         let newListWorker = listWorkers!.concat(x);
-                                                                        newListWorker.sort((a, b) => a.name.localeCompare(b.name));
+                                                                        newListWorker.sort((a, b) => a.userName.localeCompare(b.userName));
                                                                         setListWorkers(newListWorker);
                                                                     }
                                                                 }
@@ -326,11 +326,11 @@ function EditTaskModal(
                                                 value={selectedStatus}
                                                 onChange={(e) => setSelectedStatus(Number(e.target.value))}
                                                 className={baseInputClass}
-                                                defaultValue={currentTask.statusID}
+                                                defaultValue={currentTask.taskStatusID}
                                             >
                                                 {TASK_STATUSES.map((opt) => (
-                                                    <option key={opt.statusID} value={opt.statusID}>
-                                                        {opt.statusName}
+                                                    <option key={opt.taskStatusID} value={opt.taskStatusID}>
+                                                        {opt.taskStatusName}
                                                     </option>
                                                 ))}
                                             </select>
@@ -353,7 +353,7 @@ function EditTaskModal(
                                                     <div className="md:col-span-3">
                                                         <FormField label="ผู้ช่วยเหลือ (Help Assignee)">
                                                             {
-                                                                currentTask.statusID === 3 && currentTask.teamHelpID && currentTask.helpReqAt ? (
+                                                                currentTask.taskStatusID === 3 && currentTask.teamHelpID && currentTask.helpReqAt ? (
                                                                     // editing help me task. user may not change help assignee again until this helpme is done
                                                                     <p className="font-semibold">{TEAMS.find(x => x.teamID === currentTask.teamHelpID)?.teamName || "-"}</p>
                                                                 ) : (

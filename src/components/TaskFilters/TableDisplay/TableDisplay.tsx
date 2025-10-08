@@ -79,7 +79,7 @@ function TableDisplay(
 
                             {/* const userCanEdit = true; // TODO: implement bulk edit later */ }
                             return (
-                                <tr key={task.taskID} className={`hover:bg-orange-50 cursor-pointer ${task.statusID === 3 ? "bg-purple-200" : "bg-white"}`} // highlight help me row
+                                <tr key={task.taskID} className={`hover:bg-orange-50 cursor-pointer ${task.taskStatusID === 3 ? "bg-purple-200" : "bg-white"}`} // highlight help me row
                                     data-selected-task={JSON.stringify(task)} // TODO: SUPER LOW IQ SOLUTION: JUST TAKE ALL ROW DATA, TURN IT TO JSON STRING, THROW TO MODAL AND PARSE THE SHEESH THERE LOLLLLLLLLLLLLLLL
                                     title={task.taskID}
                                     onClick={(e) => {
@@ -87,7 +87,7 @@ function TableDisplay(
                                         setTaskRowData(task);
 
                                         // TODO: should compare by teamID but this works for now
-                                        if (task.team.teamName === "DEALER") {
+                                        if (task.teamName === "DEALER") {
                                             openTaskDetailDealerModal();
                                             console.log("yes");
                                         } else {
@@ -138,18 +138,18 @@ function TableDisplay(
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className="px-2.5 py-1 text-xs font-semibold text-orange-800 bg-orange-100 rounded-full">
-                                            {task.team.teamName}
+                                            {task.teamName}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 max-w-xs">
                                         {/* {task.taskID} */}
                                         {
-                                            task.workers === null ? "-" : task.workers.map(x => { return <AssigneeLabels key={x.userID} text={x.name} /> })
+                                            task.workers === null ? "-" : task.workers.map(x => { return <AssigneeLabels key={x.userID} text={x.userName} /> })
                                         }
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-700 font-medium">
                                         {/* {task.HelpAssignee || "-"} */}
-                                        {task.teamHelp ? task.teamHelp.teamName : "-"}
+                                        {task.teamHelpID ? task.teamHelpName : "-"}
                                     </td>
                                     {/* <td */}
                                     {/*     className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 truncate max-w-xs" */}
@@ -160,9 +160,9 @@ function TableDisplay(
                                     {/* </td> */}
                                     <td
                                         // TODO:  make statuscolor index by statusid?
-                                        className={`px-6 py-4 font-semibold ${StatusColor.get(task.status.statusName) || "text-gray-500"}`}
+                                        className={`px-6 py-4 font-semibold ${StatusColor.get(task.taskStatusName) || "text-gray-500"}`}
                                     >
-                                        {task.status.statusName}
+                                        {task.taskStatusName}
                                     </td>
                                 </tr>
                             );

@@ -26,18 +26,17 @@ function KPISummarySection({ activeStatFilterState, tasks, avgHelpLeadDays, titl
         let overdue = 0, warning = 0, incomplete = 0, done = 0, helpme = 0;
         tasks.forEach(task => {
             // TODO: rewrite this counting logic
-            if (task.deadline && task.deadline < TODAY && task.statusID !== 3) {
-                console.log(task.taskID);
+            if (task.deadline && task.deadline < TODAY && task.taskStatusName !== "Done") {
                 overdue += 1;
             }
 
-            if (task.deadline >= TODAY && task.deadline <= WARNING_DATE && task.status.statusName !== "Done") {
+            if (task.deadline >= TODAY && task.deadline <= WARNING_DATE && task.taskStatusName !== "Done") {
                 warning += 1;
             }
 
-            if (task.status.statusName !== "Done") incomplete += 1;
-            if (task.status.statusName === "Help Me") helpme += 1;
-            if (task.status.statusName === "Done") done += 1;
+            if (task.taskStatusName !== "Done") incomplete += 1;
+            if (task.taskStatusName === "Help Me") helpme += 1;
+            if (task.taskStatusName === "Done") done += 1;
         });
 
         return { overdue, warning, incomplete, done, helpme }

@@ -33,7 +33,7 @@ function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, cu
             displayLog += `--- อัปเดตเมื่อ ${log.date.toLocaleString("en-CA", { timeZone: "Asia/Bangkok", hour12: false })} ---\n`
             if (log.fromDeadline && log.toDeadline) displayLog += `* เปลี่ยน Deadline: ${formatDateYYYY_MM_DD(log.fromDeadline!)} -> ${formatDateYYYY_MM_DD(log.toDeadline)
                 } \"\n`
-            if (log.fromStatusID && log.toStatusID) displayLog += `* เปลี่ยน Status: ${TASK_STATUSES.find(t => t.statusID === log.fromStatusID)?.statusName} -> ${TASK_STATUSES.find(t => t.statusID === log.toStatusID)?.statusName}\n`
+            if (log.fromStatusID && log.toStatusID) displayLog += `* เปลี่ยน Status: ${TASK_STATUSES.find(t => t.taskStatusID === log.fromStatusID)?.taskStatusName} -> ${TASK_STATUSES.find(t => t.taskStatusID === log.toStatusID)?.taskStatusName}\n`
             displayLog += `รายละเอียด / เหตุผล: ${log.reason}\n`
             displayLog += '---------------------------\n\n'
         }
@@ -56,13 +56,13 @@ function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, cu
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                         <DetailItem label="Team">
                             <span className="px-2.5 py-1 text-sm font-semibold text-orange-800 bg-orange-100 rounded-full">
-                                {currentTask.team.teamName}
+                                {currentTask.teamName}
                             </span>
                         </DetailItem>
 
                         <DetailItem label="Status">
-                            <p className={`font-bold text-base ${StatusColor.get(currentTask.status.statusName) || "text-gray-500"}`}>
-                                {currentTask.status.statusName}
+                            <p className={`font-bold text-base ${StatusColor.get(currentTask.taskStatusName) || "text-gray-500"}`}>
+                                {currentTask.taskStatusName}
                             </p>
                         </DetailItem>
 
@@ -75,14 +75,14 @@ function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, cu
                         <DetailItem label="Workers">
                             {/* // TODO: fetch this properly later */}
                             {
-                                task.workers === null ? "-" : task.workers.map(x => { return <AssigneeLabels key={x.userID} text={x.name} /> })
+                                task.workers === null ? "-" : task.workers.map(x => { return <AssigneeLabels key={x.userID} text={x.userName} /> })
                             }
                         </DetailItem>
                     </div>
                 </div>
 
                 {/* // TODO: abstract this to separate component */}
-                {currentTask.status.statusName === "Help Me" && ( // TODO: compare by ID
+                {currentTask.taskStatusName === "Help Me" && ( // TODO: compare by ID
                     <div className="pb-6 border-b">
                         <div className="p-5 bg-purple-50 border-l-4 border-purple-400 rounded-r-lg">
                             <h4 className="text-md font-bold text-purple-800 mb-4">
@@ -96,7 +96,7 @@ function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, cu
                                 </DetailItem>
                                 <DetailItem label="ขอความช่วยเหลือจาก">
                                     <span className="px-2.5 py-1 text-sm font-semibold text-purple-800 bg-purple-200 rounded-full">
-                                        {currentTask.teamHelp.teamName}
+                                        {currentTask.teamHelpName}
                                     </span>
                                 </DetailItem>
                                 <DetailItem label="ขอความช่วยเหลือล่วงหน้า">

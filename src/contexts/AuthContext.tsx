@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type FC, type ReactNode } from "react";
 import type { User } from "../utils/types";
+import { API } from "../utils/api";
 
 const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 
@@ -17,7 +18,6 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    // TODO: migrate from localStorage to sessionStorage
     useEffect(() => {
         const storedUser = localStorage.getItem("project-crm-user");
         if (storedUser) {
@@ -26,33 +26,20 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         setIsLoading(false);
     }, []);
 
+    // TODO: login failed feedback
     const login = async (email: string) => {
         setIsLoading(true);
 
         try {
-            // TODO: migrate this to utils/api & api return value data documentation somewhere
-            // TODO: abstract this to api file
-            const response = await fetch(SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({ op: "verifyUserByEmail", payload: { email }, }),
-                headers: { "Content-Type": "text/plain;charset=utf-8" }
-            });
-
-            const result = await response.json();
-            console.log(result);
-            if (result.status === 'success' && result.data) {
-                // const userData: User = result.data;
-                const userData: User = {
-                    userID: result.data[0],
-                    name: result.data[1],
-                    email: result.data[2],
-                    roleID: Number(result.data[3]),
-                    isAdmin: Boolean(result.data[4])
-                }
+            const verifyResult = await API.verifyEmail(email);
+            if (verifyResult) {
+                const userData: User = verifyResult;
+                console.log("wowowowooo");
+                console.log(userData);
                 setUser(userData);
                 localStorage.setItem('project-crm-user', JSON.stringify(userData));
             } else {
-                throw new Error(result.message || 'User not authorized or not found.');
+                throw new Error('User not authorized or not found.');
             }
         } catch (error) {
             // TODO: show this information in ui

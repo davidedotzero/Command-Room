@@ -10,12 +10,13 @@ export interface Task {
     taskName: string,
     teamID: number, //Team: teamID
     deadline: Date,
-    statusID: number, //TaskStatus: statusID
+    taskStatusID: number, //TaskStatus: statusID
     logPreview: string // this should be the "description" of the latest log for the task
     teamHelpID: number | null, //Team: teamID
     helpReqAt: Date | null,
     helpReqReason: string | null,
-    createdAt: Date
+    createdAt: Date,
+    updatedAt: Date | null,
 };
 
 export interface Project {
@@ -30,8 +31,8 @@ export interface Team {
 }
 
 export interface TaskStatus {
-    statusID: number,
-    statusName: string,
+    taskStatusID: number,
+    taskStatusName: string,
 }
 
 export interface PoStatus {
@@ -41,9 +42,9 @@ export interface PoStatus {
 
 export interface User {
     userID: string;
-    name: string;
+    userName: string;
     email: string;
-    roleID: number;
+    teamID: number;
     isAdmin: boolean;
 }
 
@@ -61,9 +62,9 @@ export interface EditLog {
 
 // Task[] after joining with necessary tables
 export interface FilteringTask extends Task {
-    team: Team;
-    status: TaskStatus;
-    teamHelp: Team;
+    teamName: string; // Team: teamName
+    taskStatusName: string; // TaskStatus: taskStatusName
+    teamHelpName: string;
     workers: User[];
     po: PO | null;
     customer: Customer | null;

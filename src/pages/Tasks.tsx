@@ -31,7 +31,8 @@ function Tasks() {
         if (user?.isAdmin) {
             data = await API.getAllTasksDetailed();
         } else {
-            // TODO: handler user undefined
+            // TODO: handle user undefined
+            console.log(user.userID);
             data = await API.getTasksByUserIdDetailed(user!.userID);
         }
         const teams = await API.getAllTeams();

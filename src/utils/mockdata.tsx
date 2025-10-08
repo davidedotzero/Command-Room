@@ -10,9 +10,9 @@ export let TEAMS: Team[] = [
 ]
 
 export let TASK_STATUSES: TaskStatus[] = [
-    { statusID: 1, statusName: "In Progress" },
-    { statusID: 2, statusName: "Done" },
-    { statusID: 3, statusName: "Help Me" },
+    { taskStatusID: 1, taskStatusName: "In Progress" },
+    { taskStatusID: 2, taskStatusName: "Done" },
+    { taskStatusID: 3, taskStatusName: "Help Me" },
     // { statusID: 4, statusName: "Cancelled" },
 ];
 
@@ -27,10 +27,10 @@ export let PO_STATUSES: PoStatus[] = [
 
 // WARNING: this is only used for mocking 1TaskManyUsers functionality
 export let USERS: User[] = [
-    { userID: "USR-00001", name: "lnwjuanza", email: "lnwjuanza007.2535@gmail.com", roleID: 1, isAdmin: true },
-    { userID: "USR-00002", name: "pchampkaaa", email: "pchamplovelove@gmail.com", roleID: 2, isAdmin: true },
-    { userID: "USR-00003", name: "OWO", email: "musicarmscreative@gmail.com", roleID: 1, isAdmin: true },
-    { userID: "USR-00004", name: "UWU", email: "larron959@gmail.com", roleID: 1, isAdmin: true },
+    { userID: "USR-00001", userName: "lnwjuanza", email: "lnwjuanza007.2535@gmail.com", roleID: 1, isAdmin: true },
+    { userID: "USR-00002", userName: "pchampkaaa", email: "pchamplovelove@gmail.com", roleID: 2, isAdmin: true },
+    { userID: "USR-00003", userName: "OWO", email: "musicarmscreative@gmail.com", roleID: 1, isAdmin: true },
+    { userID: "USR-00004", userName: "UWU", email: "larron959@gmail.com", roleID: 1, isAdmin: true },
     // USER-2025-000000
 ];
 
@@ -79,37 +79,37 @@ export let TASK_USER: TaskUser[] = [
 
 // TODO: move teamID to many-2-many model 
 export let TASKS: Task[] = [
-    { taskID: "TASK-20250901-000001", projectID: "PROJ-CRM-0007", taskName: "default-task-5", teamID: 3, deadline: new Date("2025-12-11"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "002-PLACEHOLDER", createdAt: new Date("2025-09-01"), helpReqReason: null },
-    { taskID: "TASK-20250902-000002", projectID: "PROJ-CRM-0002", taskName: "default-task-8", teamID: 1, deadline: new Date("2025-11-25"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "003-PLACEHOLDER", createdAt: new Date("2025-09-02"), helpReqReason: null },
-    { taskID: "TASK-20250903-000003", projectID: "PROJ-CRM-0009", taskName: "default-task-7", teamID: 2, deadline: new Date("2025-10-30"), statusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "004-PLACEHOLDER", createdAt: new Date("2025-09-03"), helpReqReason: null },
-    { taskID: "TASK-20250904-000004", projectID: "PROJ-CRM-0001", taskName: "default-task-6", teamID: 3, deadline: new Date("2025-12-05"), statusID: 3, teamHelpID: 2, helpReqAt: new Date("2024-12-12"), logPreview: "005-PLACEHOLDER", createdAt: new Date("2025-09-04"), helpReqReason: null },
-    { taskID: "TASK-20250905-000005", projectID: "PROJ-CRM-0005", taskName: "default-task-2", teamID: 1, deadline: new Date("2025-11-18"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "006-PLACEHOLDER", createdAt: new Date("2025-09-05"), helpReqReason: null },
-    { taskID: "TASK-20250906-000006", projectID: "PROJ-CRM-0010", taskName: "default-task-1", teamID: 2, deadline: new Date("2025-10-15"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "007-PLACEHOLDER", createdAt: new Date("2025-09-06"), helpReqReason: null },
-    { taskID: "TASK-20250907-000007", projectID: "PROJ-CRM-0003", taskName: "default-task-3", teamID: 3, deadline: new Date("2025-12-22"), statusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "008-PLACEHOLDER", createdAt: new Date("2025-09-07"), helpReqReason: null },
-    { taskID: "TASK-20250908-000008", projectID: "PROJ-CRM-0008", taskName: "default-task-4", teamID: 1, deadline: new Date("2025-11-02"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "009-PLACEHOLDER", createdAt: new Date("2025-09-08"), helpReqReason: null },
-    { taskID: "TASK-20250909-000009", projectID: "PROJ-CRM-0004", taskName: "default-task-5", teamID: 2, deadline: new Date("2025-10-21"), statusID: 3, teamHelpID: 3, helpReqAt: new Date("2024-01-01"), logPreview: "010-PLACEHOLDER", createdAt: new Date("2025-09-09"), helpReqReason: null },
-    { taskID: "TASK-20250910-000010", projectID: "PROJ-CRM-0006", taskName: "default-task-8", teamID: 3, deadline: new Date("2025-12-14"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "011-PLACEHOLDER", createdAt: new Date("2025-09-10"), helpReqReason: null },
-    { taskID: "TASK-20250911-000011", projectID: "PROJ-CRM-0001", taskName: "default-task-7", teamID: 1, deadline: new Date("2025-11-09"), statusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "012-PLACEHOLDER", createdAt: new Date("2025-09-11"), helpReqReason: null },
-    { taskID: "TASK-20250912-000012", projectID: "PROJ-CRM-0007", taskName: "default-task-6", teamID: 2, deadline: new Date("2025-10-28"), statusID: 3, teamHelpID: 3, helpReqAt: new Date("2025-10-5"), logPreview: "013-PLACEHOLDER", createdAt: new Date("2025-09-12"), helpReqReason: null },
-    { taskID: "TASK-20250913-000013", projectID: "PROJ-CRM-0002", taskName: "default-task-2", teamID: 3, deadline: new Date("2025-12-01"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "014-PLACEHOLDER", createdAt: new Date("2025-09-13"), helpReqReason: null },
-    { taskID: "TASK-20250914-000014", projectID: "PROJ-CRM-0009", taskName: "default-task-1", teamID: 1, deadline: new Date("2025-11-15"), statusID: 3, teamHelpID: 2, helpReqAt: new Date("2024-01-01"), logPreview: "015-PLACEHOLDER", createdAt: new Date("2025-09-14"), helpReqReason: null },
-    { taskID: "TASK-20250915-000015", projectID: "PROJ-CRM-0005", taskName: "default-task-3", teamID: 2, deadline: new Date("2025-10-08"), statusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "016-PLACEHOLDER", createdAt: new Date("2025-09-15"), helpReqReason: null },
-    { taskID: "TASK-20250916-000016", projectID: "PROJ-CRM-0010", taskName: "default-task-4", teamID: 3, deadline: new Date("2025-12-28"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "017-PLACEHOLDER", createdAt: new Date("2025-09-16"), helpReqReason: null },
-    { taskID: "TASK-20250917-000017", projectID: "PROJ-CRM-0003", taskName: "default-task-5", teamID: 1, deadline: new Date("2025-11-20"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "018-PLACEHOLDER", createdAt: new Date("2025-09-17"), helpReqReason: null },
-    { taskID: "TASK-20250918-000018", projectID: "PROJ-CRM-0008", taskName: "default-task-8", teamID: 2, deadline: new Date("2025-10-12"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "019-PLACEHOLDER", createdAt: new Date("2025-09-18"), helpReqReason: null },
-    { taskID: "TASK-20250919-000019", projectID: "PROJ-CRM-0004", taskName: "default-task-7", teamID: 3, deadline: new Date("2025-12-08"), statusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "020-PLACEHOLDER", createdAt: new Date("2025-09-19"), helpReqReason: null },
-    { taskID: "TASK-20250920-000020", projectID: "PROJ-CRM-0420", taskName: "default-task-6", teamID: 1, deadline: new Date("2024-01-01"), statusID: 3, teamHelpID: 3, helpReqAt: new Date("2024-01-01"), logPreview: "021-PLACEHOLDER", createdAt: new Date("2025-09-20"), helpReqReason: null },
-    { taskID: "TASK-20250921-000021", projectID: "PROJ-CRM-0001", taskName: "default-task-2", teamID: 2, deadline: new Date("2025-10-19"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "022-PLACEHOLDER", createdAt: new Date("2025-09-21"), helpReqReason: null },
-    { taskID: "TASK-20250922-000022", projectID: "PROJ-CRM-0007", taskName: "default-task-1", teamID: 3, deadline: new Date("2025-12-18"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "023-PLACEHOLDER", createdAt: new Date("2025-09-22"), helpReqReason: null },
-    { taskID: "TASK-20250923-000023", projectID: "PROJ-CRM-0002", taskName: "default-task-3", teamID: 1, deadline: new Date("2025-11-05"), statusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "024-PLACEHOLDER", createdAt: new Date("2025-09-23"), helpReqReason: null },
-    { taskID: "TASK-20250924-000024", projectID: "PROJ-CRM-0009", taskName: "default-task-4", teamID: 2, deadline: new Date("2025-10-25"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "025-PLACEHOLDER", createdAt: new Date("2025-09-24"), helpReqReason: null },
-    { taskID: "TASK-20250925-000025", projectID: "PROJ-CRM-0005", taskName: "default-task-5", teamID: 3, deadline: new Date("2025-12-03"), statusID: 3, teamHelpID: 2, helpReqAt: new Date("2024-01-01"), logPreview: "026-PLACEHOLDER", createdAt: new Date("2025-09-25"), helpReqReason: null },
-    { taskID: "TASK-20250926-000026", projectID: "PROJ-CRM-0010", taskName: "default-task-8", teamID: 1, deadline: new Date("2025-11-12"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "027-PLACEHOLDER", createdAt: new Date("2025-09-26"), helpReqReason: null },
-    { taskID: "TASK-20250927-000027", projectID: "PROJ-CRM-0003", taskName: "default-task-7", teamID: 2, deadline: new Date("2025-10-05"), statusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "028-PLACEHOLDER", createdAt: new Date("2025-09-27"), helpReqReason: null },
-    { taskID: "TASK-20250928-000028", projectID: "PROJ-CRM-0008", taskName: "default-task-6", teamID: 3, deadline: new Date("2025-12-25"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "029-PLACEHOLDER", createdAt: new Date("2025-09-28"), helpReqReason: null },
-    { taskID: "TASK-20250929-000029", projectID: "PROJ-CRM-0004", taskName: "default-task-2", teamID: 1, deadline: new Date("2025-11-22"), statusID: 3, teamHelpID: 3, helpReqAt: new Date("2024-01-01"), logPreview: "030-PLACEHOLDER", createdAt: new Date("2025-09-29"), helpReqReason: null },
-    { taskID: "TASK-20250930-000030", projectID: "PROJ-CRM-0006", taskName: "default-task-1", teamID: 2, deadline: new Date("2025-10-17"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "031-PLACEHOLDER", createdAt: new Date("2025-09-30"), helpReqReason: null },
-    { taskID: "TASK-20251001-000031", projectID: "PROJ-CRM-0007", taskName: "default-task-6", teamID: 2, deadline: new Date("2025-10-28"), statusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "032-PLACEHOLDER", createdAt: new Date("2025-10-01"), helpReqReason: null },
+    { taskID: "TASK-20250901-000001", projectID: "PROJ-CRM-0007", taskName: "default-task-5", teamID: 3, deadline: new Date("2025-12-11"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "002-PLACEHOLDER", createdAt: new Date("2025-09-01"), helpReqReason: null },
+    { taskID: "TASK-20250902-000002", projectID: "PROJ-CRM-0002", taskName: "default-task-8", teamID: 1, deadline: new Date("2025-11-25"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "003-PLACEHOLDER", createdAt: new Date("2025-09-02"), helpReqReason: null },
+    { taskID: "TASK-20250903-000003", projectID: "PROJ-CRM-0009", taskName: "default-task-7", teamID: 2, deadline: new Date("2025-10-30"), taskStatusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "004-PLACEHOLDER", createdAt: new Date("2025-09-03"), helpReqReason: null },
+    { taskID: "TASK-20250904-000004", projectID: "PROJ-CRM-0001", taskName: "default-task-6", teamID: 3, deadline: new Date("2025-12-05"), taskStatusID: 3, teamHelpID: 2, helpReqAt: new Date("2024-12-12"), logPreview: "005-PLACEHOLDER", createdAt: new Date("2025-09-04"), helpReqReason: null },
+    { taskID: "TASK-20250905-000005", projectID: "PROJ-CRM-0005", taskName: "default-task-2", teamID: 1, deadline: new Date("2025-11-18"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "006-PLACEHOLDER", createdAt: new Date("2025-09-05"), helpReqReason: null },
+    { taskID: "TASK-20250906-000006", projectID: "PROJ-CRM-0010", taskName: "default-task-1", teamID: 2, deadline: new Date("2025-10-15"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "007-PLACEHOLDER", createdAt: new Date("2025-09-06"), helpReqReason: null },
+    { taskID: "TASK-20250907-000007", projectID: "PROJ-CRM-0003", taskName: "default-task-3", teamID: 3, deadline: new Date("2025-12-22"), taskStatusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "008-PLACEHOLDER", createdAt: new Date("2025-09-07"), helpReqReason: null },
+    { taskID: "TASK-20250908-000008", projectID: "PROJ-CRM-0008", taskName: "default-task-4", teamID: 1, deadline: new Date("2025-11-02"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "009-PLACEHOLDER", createdAt: new Date("2025-09-08"), helpReqReason: null },
+    { taskID: "TASK-20250909-000009", projectID: "PROJ-CRM-0004", taskName: "default-task-5", teamID: 2, deadline: new Date("2025-10-21"), taskStatusID: 3, teamHelpID: 3, helpReqAt: new Date("2024-01-01"), logPreview: "010-PLACEHOLDER", createdAt: new Date("2025-09-09"), helpReqReason: null },
+    { taskID: "TASK-20250910-000010", projectID: "PROJ-CRM-0006", taskName: "default-task-8", teamID: 3, deadline: new Date("2025-12-14"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "011-PLACEHOLDER", createdAt: new Date("2025-09-10"), helpReqReason: null },
+    { taskID: "TASK-20250911-000011", projectID: "PROJ-CRM-0001", taskName: "default-task-7", teamID: 1, deadline: new Date("2025-11-09"), taskStatusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "012-PLACEHOLDER", createdAt: new Date("2025-09-11"), helpReqReason: null },
+    { taskID: "TASK-20250912-000012", projectID: "PROJ-CRM-0007", taskName: "default-task-6", teamID: 2, deadline: new Date("2025-10-28"), taskStatusID: 3, teamHelpID: 3, helpReqAt: new Date("2025-10-5"), logPreview: "013-PLACEHOLDER", createdAt: new Date("2025-09-12"), helpReqReason: null },
+    { taskID: "TASK-20250913-000013", projectID: "PROJ-CRM-0002", taskName: "default-task-2", teamID: 3, deadline: new Date("2025-12-01"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "014-PLACEHOLDER", createdAt: new Date("2025-09-13"), helpReqReason: null },
+    { taskID: "TASK-20250914-000014", projectID: "PROJ-CRM-0009", taskName: "default-task-1", teamID: 1, deadline: new Date("2025-11-15"), taskStatusID: 3, teamHelpID: 2, helpReqAt: new Date("2024-01-01"), logPreview: "015-PLACEHOLDER", createdAt: new Date("2025-09-14"), helpReqReason: null },
+    { taskID: "TASK-20250915-000015", projectID: "PROJ-CRM-0005", taskName: "default-task-3", teamID: 2, deadline: new Date("2025-10-08"), taskStatusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "016-PLACEHOLDER", createdAt: new Date("2025-09-15"), helpReqReason: null },
+    { taskID: "TASK-20250916-000016", projectID: "PROJ-CRM-0010", taskName: "default-task-4", teamID: 3, deadline: new Date("2025-12-28"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "017-PLACEHOLDER", createdAt: new Date("2025-09-16"), helpReqReason: null },
+    { taskID: "TASK-20250917-000017", projectID: "PROJ-CRM-0003", taskName: "default-task-5", teamID: 1, deadline: new Date("2025-11-20"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "018-PLACEHOLDER", createdAt: new Date("2025-09-17"), helpReqReason: null },
+    { taskID: "TASK-20250918-000018", projectID: "PROJ-CRM-0008", taskName: "default-task-8", teamID: 2, deadline: new Date("2025-10-12"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "019-PLACEHOLDER", createdAt: new Date("2025-09-18"), helpReqReason: null },
+    { taskID: "TASK-20250919-000019", projectID: "PROJ-CRM-0004", taskName: "default-task-7", teamID: 3, deadline: new Date("2025-12-08"), taskStatusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "020-PLACEHOLDER", createdAt: new Date("2025-09-19"), helpReqReason: null },
+    { taskID: "TASK-20250920-000020", projectID: "PROJ-CRM-0420", taskName: "default-task-6", teamID: 1, deadline: new Date("2024-01-01"), taskStatusID: 3, teamHelpID: 3, helpReqAt: new Date("2024-01-01"), logPreview: "021-PLACEHOLDER", createdAt: new Date("2025-09-20"), helpReqReason: null },
+    { taskID: "TASK-20250921-000021", projectID: "PROJ-CRM-0001", taskName: "default-task-2", teamID: 2, deadline: new Date("2025-10-19"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "022-PLACEHOLDER", createdAt: new Date("2025-09-21"), helpReqReason: null },
+    { taskID: "TASK-20250922-000022", projectID: "PROJ-CRM-0007", taskName: "default-task-1", teamID: 3, deadline: new Date("2025-12-18"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "023-PLACEHOLDER", createdAt: new Date("2025-09-22"), helpReqReason: null },
+    { taskID: "TASK-20250923-000023", projectID: "PROJ-CRM-0002", taskName: "default-task-3", teamID: 1, deadline: new Date("2025-11-05"), taskStatusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "024-PLACEHOLDER", createdAt: new Date("2025-09-23"), helpReqReason: null },
+    { taskID: "TASK-20250924-000024", projectID: "PROJ-CRM-0009", taskName: "default-task-4", teamID: 2, deadline: new Date("2025-10-25"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "025-PLACEHOLDER", createdAt: new Date("2025-09-24"), helpReqReason: null },
+    { taskID: "TASK-20250925-000025", projectID: "PROJ-CRM-0005", taskName: "default-task-5", teamID: 3, deadline: new Date("2025-12-03"), taskStatusID: 3, teamHelpID: 2, helpReqAt: new Date("2024-01-01"), logPreview: "026-PLACEHOLDER", createdAt: new Date("2025-09-25"), helpReqReason: null },
+    { taskID: "TASK-20250926-000026", projectID: "PROJ-CRM-0010", taskName: "default-task-8", teamID: 1, deadline: new Date("2025-11-12"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "027-PLACEHOLDER", createdAt: new Date("2025-09-26"), helpReqReason: null },
+    { taskID: "TASK-20250927-000027", projectID: "PROJ-CRM-0003", taskName: "default-task-7", teamID: 2, deadline: new Date("2025-10-05"), taskStatusID: 2, teamHelpID: null, helpReqAt: null, logPreview: "028-PLACEHOLDER", createdAt: new Date("2025-09-27"), helpReqReason: null },
+    { taskID: "TASK-20250928-000028", projectID: "PROJ-CRM-0008", taskName: "default-task-6", teamID: 3, deadline: new Date("2025-12-25"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "029-PLACEHOLDER", createdAt: new Date("2025-09-28"), helpReqReason: null },
+    { taskID: "TASK-20250929-000029", projectID: "PROJ-CRM-0004", taskName: "default-task-2", teamID: 1, deadline: new Date("2025-11-22"), taskStatusID: 3, teamHelpID: 3, helpReqAt: new Date("2024-01-01"), logPreview: "030-PLACEHOLDER", createdAt: new Date("2025-09-29"), helpReqReason: null },
+    { taskID: "TASK-20250930-000030", projectID: "PROJ-CRM-0006", taskName: "default-task-1", teamID: 2, deadline: new Date("2025-10-17"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "031-PLACEHOLDER", createdAt: new Date("2025-09-30"), helpReqReason: null },
+    { taskID: "TASK-20251001-000031", projectID: "PROJ-CRM-0007", taskName: "default-task-6", teamID: 2, deadline: new Date("2025-10-28"), taskStatusID: 1, teamHelpID: null, helpReqAt: null, logPreview: "032-PLACEHOLDER", createdAt: new Date("2025-10-01"), helpReqReason: null },
 ];
 
 // TODO: DELETE MOCKUP DATA

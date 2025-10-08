@@ -24,11 +24,6 @@ function Projects() {
         const data = await API.getAllActiveProjects();
         setProjectsList(data);
         setIsLoading(false);
-
-        // TODO: remove this
-        const kuy = await API.getWorkersByTaskId("TASK-20250914-000014");
-        console.log("yedheeeee");
-        console.log(kuy);
     }
 
     const deleteSelectedProject = async () => {

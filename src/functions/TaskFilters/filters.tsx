@@ -21,7 +21,7 @@ export function useFilteredTasks(
         if (activeStatFilter) {
             const incomplete = filteringTasks.filter(
                 // TODO: remove cancelled condition
-                (t) => t.status.statusName !== "Done" && t.status.statusName !== "Cancelled"
+                (t) => t.taskStatusName !== "Done" && t.taskStatusName !== "Cancelled"
             );
             switch (activeStatFilter) {
                 case "Overdue":
@@ -36,14 +36,16 @@ export function useFilteredTasks(
                     filteringTasks = incomplete;
                     break;
                 case "Done":
-                    filteringTasks = filteringTasks.filter((t) => t.status.statusName === "Done");
+                    filteringTasks = filteringTasks.filter((t) => t.taskStatusName === "Done");
                     break;
                 case "Help Me":
-                    filteringTasks = filteringTasks.filter((t) => t.status.statusName === "Help Me");
+                    filteringTasks = filteringTasks.filter((t) => t.taskStatusName === "Help Me");
                     break;
                 default:
                     console.error("PROJECTDETIAL KPI FILTERING UNREACHABLE");
             }
+            console.log("overdue filteringtask");
+            console.log(filteringTasks);
         }
 
         if (teamIDFilter) {

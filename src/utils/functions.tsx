@@ -3,6 +3,10 @@ export function formatDateYYYY_MM_DD(date: Date): string {
     // getMonth() + 1 because it starts counting at 0 (January = 0) FOR SOME REASON GOD KNOWS WHY WHY CANT WE JUST NUKE THIS STUPID SHITTY ASS LANGUAGE FROM HUMANITY ALREADY
 }
 
+export function formatDateYYYY_MM_DD_Slashes(date: Date): string {
+    return `${date.getDate().toString().padStart(2, "0")}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getFullYear().toString().padStart(2, "0")}`
+}
+
 export function calculateLeadTime(deadline: Date, requestDate: Date) {
     const diffTime = +(getOnlyDate(deadline)) - +(getOnlyDate(requestDate)) // just in case JS Date decided to be stupid like it always do
     const diffDays = Math.ceil(msToDay(diffTime));
