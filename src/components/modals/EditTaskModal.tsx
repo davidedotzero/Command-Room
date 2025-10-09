@@ -1,7 +1,7 @@
 import { createPortal } from "react-dom";
 import { DetailItem, FormButton, FormField, FormFieldSetWrapper } from "./forms/FormItems";
 import { useEffect, useState, type ChangeEvent } from "react";
-import type { EditLog, FilteringTask, TaskStatus, User } from "../../utils/types";
+import type { EditLog, FilteringTask, Task, TaskStatus, User } from "../../utils/types";
 import { API } from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
 import { EDIT_LOGS, TASKS } from "../../utils/mockdata";
@@ -126,7 +126,7 @@ function EditTaskModal(
             }
 
             // WARNING: doesn't work if both arrays are the "same" but different order but that's fine cuz we in the end both toDelete and toAdd is gonna be empty anyway 
-            if (equal(selectedWorkers, prevSelectedWorkers)) { // deep comparison
+            if (equal(selectedWorkers, prevSelectedWorkers)) { // deep comparison from fast-deep-equal
                 console.log("its the same bro");
                 break handleWorkersChange;
             }
@@ -150,6 +150,7 @@ function EditTaskModal(
 
             // TODO: handle api correctly
             // TODO: make all of this and below using only 1 api call and a big query
+
             if (toDelete.length > 0) await API.deleteTaskUsers(currentTask.taskID, toDelete);
             if (toAdd.length > 0) await API.addTaskUsers(currentTask.taskID, toAdd);
         }
@@ -163,29 +164,37 @@ function EditTaskModal(
             // await API.uploadNewPOToTask(currentTask.taskID, )
         }
 
-        // TODO: generate new elogid 
-        const newLog: EditLog = {
-            eLogID: "TEMPTEMPTEMPTEMTPEMTPE",
-            date: new Date(),
+        const newLog = {
             reason: formData.get("FormLogReason")!.toString(),
             fromStatusID: toStatusID === null ? null : currentTask.taskStatusID,
             toStatusID: toStatusID,
-            fromDeadline: toDeadline === null ? null : new Date(currentTask.deadline),
+            fromDeadline: toDeadline === null ? null : currentTask.deadline,
             toDeadline: toDeadline,
             taskID: currentTask.taskID,
             userID: user.userID,
         };
 
+        const updateTask = {
+            taskName: taskName,
+            deadline: toDeadline === null ? currentTask.deadline : toDeadline,
+            taskStatusID: toStatusID === null ? currentTask.taskStatusID : toStatusID,
+            teamHelpID: teamHelpID,
+            helpReqAt: helpReqAt,
+            helpReqReason: helpReqReason,
+            logPreview: logPreview,
+            teamID: selectedTeamID!.value,
+            taskID: currentTask.taskID,
+        };
+
+
         // TODO: handle api correctly
         await API.addEditLog(newLog);
-        await API.updateTask(currentTask.taskID, taskName, selectedTeamID!.value, toDeadline, teamHelpID, helpReqAt, toStatusID, logPreview, helpReqReason);
+        await API.updateTaskByTaskID(updateTask);
 
         onClose();
         parentUpdateCallback();
 
         // TODO: loading and confirm dialog and successful dialog
-        console.log(EDIT_LOGS);
-        console.log(TASKS.find(task => task.taskID === currentTask.taskID));
     }
 
     if (!listWorkers && !isLoading) {

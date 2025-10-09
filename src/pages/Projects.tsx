@@ -76,8 +76,8 @@ function Projects() {
 
 
     const deleteModalTexts = {
-        dialogTitle: "wow",
-        dialogDescription: "eiei",
+        dialogTitle: "ลบบ่",
+        dialogDescription: "อย่าลบเลยๆๆๆๆๆๆๆๆๆๆ",
         btnCancelText: "ยกเลิก",
         btnConfirmText: "ยืนยันการลบ",
     };

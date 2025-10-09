@@ -63,10 +63,27 @@ const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 const apiURL = "http://localhost:8080/api/";
 
 async function getAPI(endpoint: string, param: string = ""): Promise<any> {
-    // TODO: handle error responses
-    const res = await fetch(apiURL + endpoint + "/" + param);
-    const data = await res.json();
-    return data;
+    try {
+        const res = await fetch(apiURL + endpoint + "/" + param);
+
+        if (!res.ok) {
+            throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+
+        let data = null;
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            data = await res.json();
+        } else if (contentType && contentType.includes('multipart/form-data')) {
+            data = await res.formData();
+        } else {
+            data = await res.text();
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Error: ", error);
+    }
 }
 
 async function postAPI(endpoint: string, body: any): Promise<any> {
@@ -83,6 +100,7 @@ async function postAPI(endpoint: string, body: any): Promise<any> {
         }
         const result = await response.json();
         console.log('Success:', result);
+        // TODO: change there alerts
         alert('POST api done successfully!');
 
     } catch (error) {
@@ -91,6 +109,74 @@ async function postAPI(endpoint: string, body: any): Promise<any> {
     }
 }
 
+async function putAPI(endpoint: string, body: any): Promise<any> {
+    try {
+        const response = await fetch(apiURL + endpoint, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const result = await response.json();
+        console.log('Success:', result);
+        // TODO: change there alerts
+        alert('PUT api done successfully!');
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to run PUT api.');
+    }
+}
+
+async function patchAPI(endpoint: string, body: any, param: string = ""): Promise<any> {
+    try {
+        const response = await fetch(apiURL + endpoint + "/" + param, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const result = await response.json();
+        console.log('Success:', result);
+        // TODO: change there alerts
+        alert('PATCH api done successfully!');
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to run PATCH api.');
+    }
+}
+
+async function deleteAPI(endpoint: string, body: any): Promise<any> {
+    try {
+        const response = await fetch(apiURL + endpoint, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const result = await response.json();
+        console.log('Success:', result);
+        // TODO: change there alerts
+        alert('DELETE api done successfully!');
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to run DELETE api.');
+    }
+}
 
 export const API = {
     // TODO: THIS AUTH METHOD IS SHIT, MUST USE BETTER AUTH LATER KUYKUYUKYUKYUKYKUYKUYKUYKUYKUYKUKYUKYUYKUYKU
@@ -104,7 +190,7 @@ export const API = {
         return response[0];
     },
     getAllTasksDetailed: async (): Promise<FilteringTask[]> => {
-        let data: FilteringTask[] = await getAPI("getAllTasksDetailed");
+        let data: FilteringTask[] = await getAPI("tasks/");
 
         // need to parse date here cuz backend cant send Date obj to us sadge
         data = data.map(row => {
@@ -119,22 +205,22 @@ export const API = {
         return data;
     },
     getAllTeams: async (): Promise<Team[]> => {
-        const data = await getAPI("getAllTeams");
+        const data = await getAPI("const/teams");
         return data;
     },
     getAllTaskStatuses: async (): Promise<TaskStatus[]> => {
-        const data = await getAPI("getAllTaskStatuses");
+        const data = await getAPI("const/taskStatuses");
         return data;
     },
     getAllPoStatuses: async () => {
         return [...PO_STATUSES]
     },
     getAllProjects: async () => {
-        const data = await getAPI("getAllProjects")
+        const data = await getAPI("projects/")
         return data;
     },
     getAllDefaultTaskNames: async () => {
-        const data = await getAPI("getAllDefaultTaskNames");
+        const data = await getAPI("const/defaultTaskNames");
         return data;
     },
     getAllUsersAsc: async () => {
@@ -144,16 +230,18 @@ export const API = {
 
 
     getAllActiveProjects: async () => {
-        const data = await getAPI("getAllActiveProjects");
+        const data = await getAPI("projects/active");
         return data;
     },
     getProjectNameById: async (projectID: string) => {
         // // TODO: handle when name not found maybe in backend?
-        const data = await getAPI("getProjectNameById", projectID);
+        const data = await getAPI("projects/name", projectID);
         return data.projectName;
     },
     getLogsByTaskIdDesc: async (taskID: string) => {
         let data: EditLog[] = await getAPI("getLogsByTaskIdDesc", taskID);
+        console.log("pre");
+        console.log(data);
         data = data.map(row => {
             return {
                 ...row,
@@ -161,11 +249,13 @@ export const API = {
                 fromDeadline: row.fromDeadline !== null ? new Date(row.fromDeadline) : null,
                 toDeadline: row.toDeadline !== null ? new Date(row.toDeadline) : null
             };
-        })
+        });
+        console.log("post");
+        console.log(data);
         return data;
     },
     getTasksByProjectIdDetailed: async (projectID: string): Promise<FilteringTask[]> => {
-        let res: FilteringTask[] = await getAPI("getTasksByProjectIdDetailed", projectID);
+        let res: FilteringTask[] = await getAPI("tasks/pid", projectID);
 
         // need to parse date here cuz backend cant send Date obj to us sadge
         res = res.map(row => {
@@ -180,8 +270,7 @@ export const API = {
         return res;
     },
     getTasksByUserIdDetailed: async (userID: string): Promise<FilteringTask[]> => {
-        console.log(userID);
-        let res: FilteringTask[] = await getAPI("getTasksByUserIdDetailed", userID);
+        let res: FilteringTask[] = await getAPI("tasks/uid", userID);
         console.log(res);
 
         // need to parse date here cuz backend cant send Date obj to us sadge
@@ -196,138 +285,75 @@ export const API = {
 
         return res;
     },
+
+    getNewTaskID: async () => {
+        const data = await getAPI("gen_ids/task");
+        return data;
+    },
+
+
+    getAvgHelpLeadDaysBeforeDeadline: async () => {
+        const data = await getAPI("getAvgHelpLeadDaysBeforeDeadline");
+        return data.avgHelpLeadDay;
+    },
     getWorkersByTaskId: async (taskID: string) => {
         const userIDsOfTask = TASK_USER.filter(x => x.taskID === taskID);
         const users = leftJoinOne2One(userIDsOfTask, USERS, "userID", "userID", "workers");
         const result: User[] = users.map((x: any) => x.workers)
         return result;
     },
-    getPOandCustomerDetailByTaskID: async (taskID: string) => { // TODO: type this shit
-        const po = POs.filter(x => x.taskID === taskID);
-
-        const poJoinCustomer = leftJoinOne2One(po, CUSTOMERS, "customerID", "customerID", "customer");
-        // WARNING: assume that this will have 1 only object cuz im bodging this sheeshhhhhhhhhhhhh
-        console.log("kuy");
-        console.log(poJoinCustomer);
-        return poJoinCustomer[0];
-    },
-
-    getLatestTaskID: async () => {
-        const data = await getAPI("getLatestTaskID");
-        console.log(data);
-        const tasksSorted = TASKS.sort((a, b) => +b.createdAt - +a.createdAt);
-        return tasksSorted[0].taskID;
-    },
-
-
-    getAvgHelpLeadDaysBeforeDeadline: async () => {
-        const today = new Date();
-        const tasksNeedsHelpButNotOverdue = [...TASKS]
-            .filter(task => task.helpReqAt)
-            .filter(task => task.deadline > today);
-
-        const totalHelpLeadDay = tasksNeedsHelpButNotOverdue
-            .reduce((acc, task) => {
-                return acc + msToDay(+getOnlyDate(task.deadline) - +getOnlyDate(today))
-            }, 0);
-
-        const avgHelpLeadDaysBeforeDeadline = totalHelpLeadDay / tasksNeedsHelpButNotOverdue.length;
-
-        return avgHelpLeadDaysBeforeDeadline.toFixed(1);
-    },
-
 
     addTask: async (newTask: Task) => {
-        const response = await postAPI("addTask", newTask);
+        const response = await postAPI("tasks", newTask);
         // TODO: handle response???
         return response;
     },
-    addTasks: async (tasks: Task[]) => {
-        for (let task of tasks) {
-            TASKS.push(task);
-        }
-        return true;
-    },
-    addEditLog: async (newLog: EditLog) => {
-        EDIT_LOGS.push(newLog);
-        return true;
-    },
-    addProject: async (newProject: Project) => {
-        PROJECTS.push(newProject);
-        return true;
-    },
-    addTaskUsers: async (taskID: string, users: User[]) => {
-        for (let user of users) {
-            TASK_USER.push({ taskID: taskID, userID: user.userID })
-        }
-        return true;
+    addEditLog: async (newLog) => {
+        const response = await postAPI("logs/edit", newLog);
+        return response;
     },
 
-    updateTask: async (
-        taskID: string,
+    updateTaskByTaskID: async (updateTask: {
         taskName: string,
-        teamID: number,
         deadline: Date | null,
+        taskStatusID: number | null,
         teamHelpID: number | null,
         helpReqAt: Date | null,
-        taskStatusID: number | null,
+        helpReqReason: string | null
         logPreview: string,
-        helpReqReason: string | null) => {
-
-        for (let task of TASKS) {
-            if (taskID === task.taskID) {
-                task.taskName = taskName;
-                task.teamID = teamID;
-                task.deadline = deadline ?? task.deadline;
-                task.teamHelpID = teamHelpID;
-                task.helpReqAt = helpReqAt;
-                task.helpReqReason = helpReqReason;
-                task.taskStatusID = taskStatusID ?? task.taskStatusID;
-                task.logPreview = logPreview;
-                break;
-            }
-        }
+        teamID: number,
+        taskID: string,
+    }) => {
+        const response = await putAPI("tasks", updateTask);
+        return response;
     },
+
     updateProjectNameAtId: async (projectID: string, newProjectName: string) => {
-        for (let project of PROJECTS) {
-            if (projectID === project.projectID) {
-                project.projectName = newProjectName;
-                break;
-            }
-        }
-        return true;
+        const response = patchAPI("projects/name", { newProjectName }, projectID);
+        return response;
+    },
+    deleteProjectById: async (projectID: string, isArchived: boolean = true) => {
+        const response = patchAPI("projects/archive", { isArchived }, projectID);
+        return response;
     },
 
-    deleteProjectById: async (projectID: string) => {
-        let found = PROJECTS.find(project => project.projectID === projectID);
-        if (!found) return false;
+    addTaskUsers: async (taskID: string, usersToAdd: User[]) => {
+        let body = {
+            taskID: taskID,
+            users: usersToAdd
+        };
 
-        for (let project of PROJECTS) {
-            if (projectID === project.projectID) {
-                project.isArchived = true;
-                break;
-            }
-        }
-        return true;
+        const response = postAPI("taskusers", body);
+        return response;
     },
     deleteTaskUsers: async (taskID: string, usersToDelete: User[]) => {
-        let taskUserByTaskID = TASK_USER.filter(x => x.taskID === taskID);
-        for (let taskUser of taskUserByTaskID) {
-            for (let user of usersToDelete) {
-                if (taskUser.userID === user.userID) {
-                    const filtered = TASK_USER.filter(x => !(x.taskID === taskUser.taskID && x.userID === user.userID));
+        let body = {
+            taskID: taskID,
+            users: usersToDelete
+        };
 
-                    // WARNING: bodge asf cuz js imports are fucking immutable and we cant change it cuz js devs wanna shove functional paradigm and "purity" bullshit up our ass cuz this language did not have enough shit in it like our beloved c++ amirite?
-                    // fuck it its mock api anyway
-                    TASK_USER.splice(0, TASK_USER.length); // remove everything in place
-                    TASK_USER.push(...filtered);
-
-                    // WARNING: see? and we can still mutate it anyway so whats the fucking point?
-                    // and also why this lang does not have inplace filter function? its so confusing having to remind ourselves that this function mutates, but this does not ITS MAD!!!!!!
-                }
-            }
-        }
-        return true;
+        const response = deleteAPI("taskusers", body);
+        return response;
     },
 
 
@@ -383,5 +409,14 @@ export const API = {
         const posJoinPoStatus = leftJoinOne2One(posJoinCustomer, PO_STATUSES, "poStatusID", "poStatusID", "poStatus");
 
         return posJoinPoStatus;
+    },
+    getPOandCustomerDetailByTaskID: async (taskID: string) => { // TODO: type this shit
+        const po = POs.filter(x => x.taskID === taskID);
+
+        const poJoinCustomer = leftJoinOne2One(po, CUSTOMERS, "customerID", "customerID", "customer");
+        // WARNING: assume that this will have 1 only object cuz im bodging this sheeshhhhhhhhhhhhh
+        console.log("kuy");
+        console.log(poJoinCustomer);
+        return poJoinCustomer[0];
     },
 }

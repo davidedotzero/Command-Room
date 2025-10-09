@@ -100,7 +100,7 @@ function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, cu
                                     </span>
                                 </DetailItem>
                                 <DetailItem label="ขอความช่วยเหลือล่วงหน้า">
-                                    <p className="font-bold text-purple-800">{helpLeadTime}</p>
+                                    <p className="font-bold text-purple-800">{helpLeadTime} วัน</p>
                                 </DetailItem>
                                 <div className="md:col-span-3">
                                     <DetailItem label="รายละเอียด">

@@ -57,10 +57,8 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
             return;
         }
 
-        // TODO: generate ids on backend;
-        let a = await API.getLatestTaskID();
-        let newTaskID = genSingleNewID(a);
-
+        // TODO: insert newTaskID in backend
+        const newTaskID = await API.getNewTaskID();
         const newTask =
         {
             taskID: newTaskID,

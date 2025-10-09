@@ -3,8 +3,8 @@ export function formatDateYYYY_MM_DD(date: Date): string {
     // getMonth() + 1 because it starts counting at 0 (January = 0) FOR SOME REASON GOD KNOWS WHY WHY CANT WE JUST NUKE THIS STUPID SHITTY ASS LANGUAGE FROM HUMANITY ALREADY
 }
 
-export function formatDateYYYY_MM_DD_Slashes(date: Date): string {
-    return `${date.getDate().toString().padStart(2, "0")}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getFullYear().toString().padStart(2, "0")}`
+export function formatDateYYYY_MM_DD_Dashes(date: Date): string {
+    return `${date.getFullYear().toString()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`
 }
 
 export function calculateLeadTime(deadline: Date, requestDate: Date) {
@@ -78,7 +78,7 @@ export function genSingleNewID(latestID: string): string {
     let newDate: string | null = null;
 
     // parseYYYYMMDD will return Date() with no time so we can compare it directly like this
-    if (idDate === getOnlyDate(new Date())) {
+    if (idDate.getTime() === getOnlyDate(new Date()).getTime()) {
         newNum = idNum + 1;
         newDate = strDate;
     }
