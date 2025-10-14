@@ -5,6 +5,7 @@ import CreatableSelect from "react-select/creatable";
 import Select, { type SingleValue } from "react-select";
 import DatePicker from "react-datepicker";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
+import { useEffectDatePickerFix } from "../../utils/ReactDatePickerBodgeFixHook";
 // import { CalendarIcon } from "../../utils/icons";
 
 function CreateProjectModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
@@ -16,6 +17,8 @@ function CreateProjectModal({ isOpen, onClose }: { isOpen: boolean, onClose: () 
     const [selectedTask, setSelectedTask] = useState<{ value: string, label: string } | null>(null);
     const [selectedTeamID, setSelectedTeamID] = useState<{ value: number, label: string } | null>(null);
     const [selectedDeadline, setSelectedDate] = useState<Date | null>(null);
+
+    useEffectDatePickerFix();
 
     const handleSubmit = () => {
         console.log("EIEI");
@@ -39,18 +42,6 @@ function CreateProjectModal({ isOpen, onClose }: { isOpen: boolean, onClose: () 
         setSelectedTeamID({ value: foundTask.teamID, label: TEAMS.find(x => x.teamID === foundTask.teamID)!.teamName })
     }
 
-    // DATEPICKER W-FULL SUPER SCUFFED FIX LMAOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-    useEffect(() => {
-        const vals = document.getElementsByClassName("react-datepicker__input-container");
-        for (const val of vals) {
-            val.classList.add("w-full");
-        }
-
-        const juan = document.getElementsByClassName("react-datepicker-wrapper");
-        for (const val of juan) {
-            val.classList.add("w-full");
-        }
-    }, [])
 
 
     return createPortal(

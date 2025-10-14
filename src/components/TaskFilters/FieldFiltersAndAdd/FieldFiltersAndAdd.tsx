@@ -3,6 +3,7 @@ import type { Project, Team } from "../../../utils/types";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
 import { API } from "../../../utils/api";
 import DatePicker from "react-datepicker";
+import { useEffectDatePickerFix } from "../../utils/ReactDatePickerBodgeFixHook";
 
 function FieldFiltersAndAdd(
     { teamIDFilterState, searchFilterState, projectIDFilterState, startDateFilterState, endDateFilterState, createNewTaskButton, resetFiltersCallback, tasksLength }:
@@ -25,6 +26,8 @@ function FieldFiltersAndAdd(
 
     const { TEAMS } = useDbConst();
     const [projectList, setProjectList] = useState<Project[]>([]);
+
+    useEffectDatePickerFix();
 
     // TODO: SOOMtm bug when add project this not update?
     const fetchData = async () => {

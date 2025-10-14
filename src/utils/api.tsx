@@ -59,8 +59,8 @@ const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 //     }
 // }
 
-const apiURL = "https://command-room-backend.vercel.app/api/"
-// const apiURL = "http://localhost:8080/api/";
+// const apiURL = "https://command-room-backend.vercel.app/api/"
+const apiURL = "http://localhost:8080/api/";
 
 async function getAPI(endpoint: string, param: string = ""): Promise<any> {
     try {
@@ -187,7 +187,7 @@ export const API = {
             return null;
         }
 
-        return response[0];
+        return response;
     },
     getAllTasksDetailed: async (): Promise<FilteringTask[]> => {
         let data: FilteringTask[] = await getAPI("tasks");
