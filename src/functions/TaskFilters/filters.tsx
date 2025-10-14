@@ -25,11 +25,11 @@ export function useFilteredTasks(
             );
             switch (activeStatFilter) {
                 case "Overdue":
-                    filteringTasks = incomplete.filter((t) => t.deadline && t.deadline < TODAY);
+                    filteringTasks = incomplete.filter((t) => t.deadline && t.deadline < getOnlyDate(TODAY));
                     break;
                 case "Warning":
                     filteringTasks = incomplete.filter((t) => {
-                        return t.deadline >= TODAY && t.deadline <= WARNING_DATE
+                        return t.deadline >= TODAY && t.deadline <= getOnlyDate(WARNING_DATE);
                     });
                     break;
                 case "Incomplete":

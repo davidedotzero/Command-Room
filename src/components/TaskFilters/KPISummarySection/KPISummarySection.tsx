@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import type { FilteringTask } from "../../../utils/types";
 import StatDisplayCard from "./StatDisplayCard";
 import { RefreshIcon } from "../../utils/icons";
+import { getOnlyDate } from "../../../utils/functions";
 
 const statDescriptions = {
     overdue: "งานที่ยังไม่เสร็จและเลยกำหนดส่งแล้ว",
@@ -26,11 +27,11 @@ function KPISummarySection({ activeStatFilterState, tasks, avgHelpLeadDays, titl
         let overdue = 0, warning = 0, incomplete = 0, done = 0, helpme = 0;
         tasks.forEach(task => {
             // TODO: rewrite this counting logic
-            if (task.deadline && task.deadline < TODAY && task.taskStatusName !== "Done") {
+            if (task.deadline && task.deadline < getOnlyDate(TODAY) && task.taskStatusName !== "Done") {
                 overdue += 1;
             }
 
-            if (task.deadline >= TODAY && task.deadline <= WARNING_DATE && task.taskStatusName !== "Done") {
+            if (task.deadline >= TODAY && task.deadline <= getOnlyDate(WARNING_DATE) && task.taskStatusName !== "Done") {
                 warning += 1;
             }
 

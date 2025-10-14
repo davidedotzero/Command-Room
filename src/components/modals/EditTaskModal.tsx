@@ -120,40 +120,40 @@ function EditTaskModal(
         // we do this because if status is Help Me --> Help Me
         // no need to update teamHelpID, helpReqAt and helpReqReason
 
-        handleWorkersChange: {
-            if (!user?.isAdmin) {
-                break handleWorkersChange;
-            }
-
-            // WARNING: doesn't work if both arrays are the "same" but different order but that's fine cuz we in the end both toDelete and toAdd is gonna be empty anyway 
-            if (equal(selectedWorkers, prevSelectedWorkers)) { // deep comparison from fast-deep-equal
-                console.log("its the same bro");
-                break handleWorkersChange;
-            }
-
-            let toDelete: User[] = [];
-            for (let oldWorker of prevSelectedWorkers) {
-                if (!selectedWorkers.find(x => x.userID === oldWorker.userID)) {
-                    toDelete.push(oldWorker);
-                }
-            }
-
-            let toAdd: User[] = [];
-            for (let newWorker of selectedWorkers) {
-                if (!prevSelectedWorkers.find(x => x.userID === newWorker.userID)) {
-                    toAdd.push(newWorker);
-                }
-            }
-
-            console.log(toDelete);
-            console.log(toAdd);
-
-            // TODO: handle api correctly
-            // TODO: make all of this and below using only 1 api call and a big query
-
-            if (toDelete.length > 0) await API.deleteTaskUsers(currentTask.taskID, toDelete);
-            if (toAdd.length > 0) await API.addTaskUsers(currentTask.taskID, toAdd);
-        }
+        // handleWorkersChange: {
+        //     if (!user?.isAdmin) {
+        //         break handleWorkersChange;
+        //     }
+        //
+        //     // WARNING: doesn't work if both arrays are the "same" but different order but that's fine cuz we in the end both toDelete and toAdd is gonna be empty anyway 
+        //     if (equal(selectedWorkers, prevSelectedWorkers)) { // deep comparison from fast-deep-equal
+        //         console.log("its the same bro");
+        //         break handleWorkersChange;
+        //     }
+        //
+        //     let toDelete: User[] = [];
+        //     for (let oldWorker of prevSelectedWorkers) {
+        //         if (!selectedWorkers.find(x => x.userID === oldWorker.userID)) {
+        //             toDelete.push(oldWorker);
+        //         }
+        //     }
+        //
+        //     let toAdd: User[] = [];
+        //     for (let newWorker of selectedWorkers) {
+        //         if (!prevSelectedWorkers.find(x => x.userID === newWorker.userID)) {
+        //             toAdd.push(newWorker);
+        //         }
+        //     }
+        //
+        //     console.log(toDelete);
+        //     console.log(toAdd);
+        //
+        //     // TODO: handle api correctly
+        //     // TODO: make all of this and below using only 1 api call and a big query
+        //
+        //     if (toDelete.length > 0) await API.deleteTaskUsers(currentTask.taskID, toDelete);
+        //     if (toAdd.length > 0) await API.addTaskUsers(currentTask.taskID, toAdd);
+        // }
 
         handleFileUpload: {
             if (!selectedFile) {
@@ -212,7 +212,7 @@ function EditTaskModal(
     return createPortal(
         <>
             <div className="fixed inset-0 z-50 bg-white/50 bg-opacity-50 flex items-center justify-center">
-                <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl">
+                <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
                     <header className="flex justify-between items-center p-6 border-b sticky top-0 bg-white z-10">
                         <h2 className="text-xl font-bold text-gray-800">
                             {"แก้ไข Task"}
@@ -229,7 +229,7 @@ function EditTaskModal(
                     {/* // TODO: separate this sheesh to components */}
                     {/* // TODO: fix overflow when resizing textarea */}
                     <form action={handleSubmit} className="flex flex-col flex-1 min-h-0">
-                        <div className="overflow-y-scroll">
+                        <div className="overflow-y-auto">
                             <FormFieldSetWrapper>
                                 <div className="p-8">
                                     {/* === Section: รายละเอียดหลัก === */}
@@ -390,13 +390,13 @@ function EditTaskModal(
                                         {/* // TODO: make loading indicator when uploading file */}
                                         {
                                             // only dealer
-                                            currentTask.teamID === 2 && (
-                                                <div className="md:col-span-2 mt-4">
-                                                    <FormField label={"แนบไฟล์ PO"}>
-                                                        <input type="file" onChange={handleFileChange} className={baseInputClass} />
-                                                    </FormField>
-                                                </div>
-                                            )
+                                            // currentTask.teamID === 2 && (
+                                            // <div className="md:col-span-2 mt-4">
+                                            // <FormField label={"แนบไฟล์ PO"}>
+                                            // <input type="file" onChange={handleFileChange} className={baseInputClass} />
+                                            // </FormField>
+                                            // </div>
+                                            // )
                                         }
 
                                         <div className="md:col-span-2 mt-4">

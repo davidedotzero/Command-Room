@@ -69,6 +69,9 @@ function TableDisplay(
                             <th scope="col" className="px-6 py-3 font-medium text-left">
                                 Status
                             </th>
+                            <th scope="col" className="px-6 py-3 font-medium text-left">
+                                Project Name
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -142,7 +145,6 @@ function TableDisplay(
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 max-w-xs">
-                                        {/* {task.taskID} */}
                                         {
                                             task.workers === null ? "-" : task.workers.map(x => { return <AssigneeLabels key={x.userID} text={x.userName} /> })
                                         }
@@ -163,6 +165,9 @@ function TableDisplay(
                                         className={`px-6 py-4 font-semibold ${StatusColor.get(task.taskStatusName) || "text-gray-500"}`}
                                     >
                                         {task.taskStatusName}
+                                    </td>
+                                    <td className="px-6 py-4 font-medium text-gray-900 max-w-xs truncate" >
+                                        {task.projectName}
                                     </td>
                                 </tr>
                             );

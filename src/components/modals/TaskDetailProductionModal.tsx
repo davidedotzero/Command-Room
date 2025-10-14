@@ -40,7 +40,7 @@ function TaskDetailProductionModal({ isOpen, onClose, taskData, currentProjectNa
             <EditTaskModal isOpen={isEditTaskModalOpen} onClose={() => { closeEditTaskModal() }} taskData={currentTask} parentUpdateCallback={parentUpdateCallback_eiei} />
 
             <div className="fixed inset-0 z-50 bg-white/70 bg-opacity-50 flex items-center justify-center">
-                <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl">
+                <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
                     <header className="flex justify-between items-center p-6 border-b sticky top-0 bg-white z-10">
                         <h2 className="text-xl font-bold text-gray-800">
                             {"รายละเอียด Task"}
@@ -56,8 +56,8 @@ function TaskDetailProductionModal({ isOpen, onClose, taskData, currentProjectNa
 
                     {/* // TODO: why overflow is like this????????????????????????? */}
                     {/* // TODO: change from form to normal div???? */}
-                    <form action={handleSubmit} className="flex flex-col overflow-hidden flex-1 min-h-0">
-                        <div className="overflow-y-auto flex-1">
+                    <form action={handleSubmit} className="flex flex-col flex-1 min-h-0">
+                        <div className="overflow-y-auto">
                             <TaskDetailsView task={currentTask} currentProjectName={currentProjectName} />
                         </div>
 

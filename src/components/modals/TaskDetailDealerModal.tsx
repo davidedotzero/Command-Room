@@ -74,8 +74,8 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, 
             <EditTaskModal isOpen={isEditTaskModalOpen} onClose={() => { closeEditTaskModal() }} taskData={currentTask} parentUpdateCallback={parentUpdateCallback_eiei} customerAndPoData={customerData} />
 
             <div className="fixed inset-0 z-50 bg-white/70 bg-opacity-50 flex items-center justify-center">
-                <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-y-auto max-h-[90vh]">
-                    <header className="flex justify-between items-center p-6 border-b sticky top-0 bg-white z-10">
+                <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
+                    <header className="flex justify-between items-center p-6 border-b">
                         <h2 className="text-xl font-bold text-gray-800">
                             {"รายละเอียด Task"}
                         </h2>
@@ -88,22 +88,20 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, 
                         </button>
                     </header>
 
-                    {/* // TODO: why overflow is like this????????????????????????? */}
                     {/* // TODO: change from form to normal div???? */}
-                    <form action={handleSubmit} className="flex flex-col overflow-hidden flex-1 min-h-0">
-                        <div className="overflow-y-auto flex-1">
+                    <form action={handleSubmit} className="flex flex-col flex-1 min-h-0">
+                        <div className="overflow-y-auto">
                             {/* // TODO: extract log ui from TaskDetailsView */}
                             <TaskDetailsView task={currentTask} currentProjectName={currentProjectName} />
 
                             {/* // TODO: customer section */}
-                            <div className="p-6 border-b flex justify-center flex-col">
-                                <p>kor moon luk ka & po</p>
-                                <p>POID: {customerData ? customerData.poID : "-"}</p>
-                                <p>CustomerID: {customerData ? customerData.customerID : "-"}</p>
-                                <p>CustomerName: {customerData && customerData.customer ? customerData.customer.customerName : "-"}</p>
-                            </div>
+                            {/* <div className="p-6 border-b flex justify-center flex-col"> */}
+                            {/*     <p>kor moon luk ka & po</p> */}
+                            {/*     <p>POID: {customerData ? customerData.poID : "-"}</p> */}
+                            {/*     <p>CustomerID: {customerData ? customerData.customerID : "-"}</p> */}
+                            {/*     <p>CustomerName: {customerData && customerData.customer ? customerData.customer.customerName : "-"}</p> */}
+                            {/* </div> */}
                         </div>
-
 
                         <footer className="flex justify-end items-center p-6 border-t bg-gray-50 rounded-b-xl">
                             <button
@@ -116,14 +114,6 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, 
                             {/* // TODO: is there a scenario where this modal will be accessed as View only??? */}
                             <button
                                 type="submit"
-                                // [⭐ BUG FIX] ใช้ onClick + setTimeout(0) เพื่อป้องกัน Race Condition ในทุกกรณี (รวมถึง "Help Me")
-                                // TODO: race condition arai ni?
-                                onClick={() => {
-                                    // เลื่อนการเปลี่ยน State ออกไป เพื่อให้ Event Loop นี้จบก่อน
-                                    // setTimeout(() => setIsEditing(true), 0);
-                                    //TODO: EditTaskDialog
-
-                                }}
                                 className="ml-3 px-6 py-2 text-sm font-medium text-white bg-orange-500 border border-transparent rounded-md shadow-sm hover:bg-orange-600 focus:outline-none disabled:bg-gray-400"
                             >
                                 แก้ไข Task
