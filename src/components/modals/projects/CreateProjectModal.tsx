@@ -6,7 +6,15 @@ import Select, { type SingleValue } from "react-select";
 import DatePicker from "react-datepicker";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
 import { useEffectDatePickerFix } from "../../utils/ReactDatePickerBodgeFixHook";
+import { getOnlyDate } from "../../../utils/functions";
 // import { CalendarIcon } from "../../utils/icons";
+
+// TODO: abstract this sheesh
+interface NewTask {
+    taskName: string,
+    teamID: number,
+    deadline: Date,
+}
 
 function CreateProjectModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
     if (!isOpen) return null;
@@ -17,6 +25,9 @@ function CreateProjectModal({ isOpen, onClose }: { isOpen: boolean, onClose: () 
     const [selectedTask, setSelectedTask] = useState<{ value: string, label: string } | null>(null);
     const [selectedTeamID, setSelectedTeamID] = useState<{ value: number, label: string } | null>(null);
     const [selectedDeadline, setSelectedDate] = useState<Date | null>(null);
+
+    const [projectTasks, setProjectTasks] = useState<NewTask[]>([]);
+
 
     useEffectDatePickerFix();
 
@@ -42,17 +53,22 @@ function CreateProjectModal({ isOpen, onClose }: { isOpen: boolean, onClose: () 
         setSelectedTeamID({ value: foundTask.teamID, label: TEAMS.find(x => x.teamID === foundTask.teamID)!.teamName })
     }
 
+    function handleAddTask(): void {
+        // TODO: handle null
+        const newTask: NewTask = { taskName: selectedTask!.value, teamID: selectedTeamID!.value, deadline: getOnlyDate(selectedDeadline!) };
+        setProjectTasks([newTask, ...projectTasks]);
+    }
 
+    // return createPortal(
+    //     <>
+    //         {alert("ยังไม่เปิดให้ใช่งานตอนนี้")}
+    //     </>,
+    //     document.getElementById("modal-root")!);
 
-    return createPortal(
-        <>
-            {alert("ยังไม่เปิดให้ใช่งานตอนนี้")}
-        </>,
-        document.getElementById("modal-root")!);
     return createPortal(
         <>
             <div className="fixed inset-0 z-50 bg-white/70 bg-opacity-50 flex items-center justify-center">
-                <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl">
+                <div className="bg-white rounded-xl shadow-2xl w-full max-w-7xl flex flex-col max-h-[90vh] min-h-[90vh]">
                     <header className="flex justify-between items-center p-6 border-b">
                         <h2 className="text-xl font-bold text-gray-800">สร้างโปรเจกต์ใหม่</h2>
                         {/* // TODO: make above better looking */}
@@ -65,78 +81,125 @@ function CreateProjectModal({ isOpen, onClose }: { isOpen: boolean, onClose: () 
                         </button>
                     </header>
 
-                    <form action={handleSubmit}>
-                        <FormFieldSetWrapper>
-                            <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-                                <div className="md:col-span-2">
-                                    <FormField label="Project Name">
-                                        <input
-                                            type="text"
-                                            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm disabled:bg-gray-100 disabled:text-gray-500"
-                                            placeholder={"กรอกชื่อโปรเจกต์ใหม่"}
-                                            required
-                                        />
-                                    </FormField>
-                                </div>
-                                <div className="md:col-span-2">
-                                    <FormField label="Task">
-                                        <CreatableSelect
-                                            name="FormTaskName"
-                                            className={"shadow-sm"}
-                                            required
-                                            isClearable={true}
-                                            isSearchable={true}
-                                            placeholder={"กรอกชื่อ Task ใหม่หรือเลือกรายการจากที่มีอยู่..."}
-                                            options={DEFAULT_TASK_NAMES.map(t => ({ value: t.taskName, label: t.taskName }))}
-                                            value={selectedTask}
-                                            onChange={e => handleTaskChange(e)}
-                                        />
-                                    </FormField>
-                                </div>
-                                <FormField label="Team">
-                                    <Select
-                                        name="FormTeam"
-                                        className={"shadow-sm"}
-                                        required
-                                        isClearable={false}
-                                        isSearchable={true}
-                                        placeholder={"เลือกทีมที่รับผิดชอบ..."}
-                                        options={TEAMS.map(t => ({ value: t.teamID, label: t.teamName }))}
-                                        value={selectedTeamID}
-                                        onChange={e => setSelectedTeamID(e)}
-                                    />
-                                </FormField>
-                                <FormField label="Deadline">
-                                    {/* <div className="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm disabled:bg-gray-100 disabled:text-gray-500 flex item-center */}
-                                    {/* "> */}
-                                    <DatePicker
-                                        name="FormDeadline"
-                                        // className="flex-grow w-full"
-                                        required
-                                        // showIcon
-                                        // toggleCalendarOnIconClick
-                                        filterDate={(date) => { return date.getDay() !== 0 }}
-                                        isClearable={true}
-                                        placeholderText={"dd/MM/yyyy"}
-                                        minDate={new Date()}
-                                        selected={selectedDeadline}
-                                        onChange={e => setSelectedDate(e)}
-                                        className="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm disabled:bg-gray-100 disabled:text-gray-500 flex item-center"
-                                    />
-                                    {/*     <CalendarIcon /> */}
-                                    {/* </div> */}
-                                </FormField>
+                    <div className="flex overflow-y-auto">
+                        <div className="w-1/3">
+                            <form>
+                                <FormFieldSetWrapper>
+                                    <div className="border-b grid grid-cols-1 md:grid-cols-12 gap-x-6 gap-y-5 px-8 py-6">
+                                        <div className="md:col-span-12">
+                                            <FormField label="Project Name">
+                                                <input
+                                                    type="text"
+                                                    className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm disabled:bg-gray-100 disabled:text-gray-500"
+                                                    placeholder={"กรอกชื่อโปรเจกต์ใหม่"}
+                                                    required
+                                                />
+                                            </FormField>
+                                        </div>
+                                    </div>
+                                    <div className="border-b grid grid-cols-1 md:grid-cols-12 gap-x-6 gap-y-5 px-8 py-6">
+                                        <div className="md:col-span-12">
+                                            <FormField label="Task">
+                                                <CreatableSelect
+                                                    name="FormTaskName"
+                                                    className={"shadow-sm"}
+                                                    required
+                                                    isClearable={true}
+                                                    isSearchable={true}
+                                                    placeholder={"กรอกชื่อ Task ใหม่หรือเลือกรายการจากที่มีอยู่..."}
+                                                    options={DEFAULT_TASK_NAMES.map(t => ({ value: t.taskName, label: t.taskName }))}
+                                                    value={selectedTask}
+                                                    onChange={e => handleTaskChange(e)}
+                                                />
+                                            </FormField>
+                                        </div>
+                                        <div className="md:col-span-12">
+                                            <FormField label="Team">
+                                                <Select
+                                                    name="FormTeam"
+                                                    className={"shadow-sm"}
+                                                    required
+                                                    isClearable={false}
+                                                    isSearchable={true}
+                                                    placeholder={"เลือกทีมที่รับผิดชอบ..."}
+                                                    options={TEAMS.map(t => ({ value: t.teamID, label: t.teamName }))}
+                                                    value={selectedTeamID}
+                                                    onChange={e => setSelectedTeamID(e)}
+                                                />
+                                            </FormField>
+                                        </div>
+                                        <div className="md:col-span-8">
+                                            <FormField label="Deadline">
+                                                {/* <div className="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm disabled:bg-gray-100 disabled:text-gray-500 flex item-center */}
+                                                {/* "> */}
+                                                <DatePicker
+                                                    name="FormDeadline"
+                                                    // className="flex-grow w-full"
+                                                    required
+                                                    // showIcon
+                                                    // toggleCalendarOnIconClick
+                                                    filterDate={(date) => { return date.getDay() !== 0 }}
+                                                    isClearable={true}
+                                                    placeholderText={"..."}
+                                                    minDate={new Date()}
+                                                    selected={selectedDeadline}
+                                                    onChange={e => setSelectedDate(e)}
+                                                    className="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm disabled:bg-gray-100 disabled:text-gray-500 flex item-center"
+                                                />
+                                                {/*     <CalendarIcon /> */}
+                                                {/* </div> */}
+                                            </FormField>
+                                        </div>
+                                        <div className="md:col-span-4 flex justify-end items-end">
+                                            <FormButton type="button" onClick={handleAddTask} className={"ml-3 px-4 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:bg-purple-900"} children={"+เพิ่ม"} />
+                                        </div>
+                                    </div>
+                                </FormFieldSetWrapper>
+                            </form >
+
+                            <footer className="flex justify-end p-6 bg-gray-50 border-t rounded-b-xl">
+                                <FormButton type="button" onClick={onClose} className="px-4 py-2 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:bg-purple-900">
+                                    ยกเลิก
+                                </FormButton>
+                                <FormButton type="button" onClick={handleSubmit} className="ml-3 px-4 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:bg-purple-900" disabledText="กำลังสร้าง...">
+                                    สร้าง Project ใหม่
+                                </FormButton>
+                            </footer>
+                        </div>
+
+                        {/* // right */}
+                        <div className="w-2/3 overflow-x-auto border-l p-4">
+                            <div className="space-y-2">
+                                {
+                                    projectTasks.map(x => {
+                                        return (
+                                            <>
+                                                <div className="grid grid-cols-12 gap-3 items-center p-3 rounded-md transition-colors border bg-white hover:bg-orange-50 border-gray-300">
+                                                    <div className="col-span-1"><input type="checkbox" /></div>
+                                                    <div className="col-span-4"> {x.taskName} </div>
+                                                    <div className="col-span-4">
+                                                        <DatePicker
+                                                            // className="flex-grow w-full"
+                                                            required
+                                                            // showIcon
+                                                            // toggleCalendarOnIconClick
+                                                            filterDate={(date) => { return date.getDay() !== 0 }}
+                                                            isClearable={false}
+                                                            placeholderText={"..."}
+                                                            minDate={new Date()}
+                                                            // selected={selectedDeadline}
+                                                            // onChange={e => setSelectedDate(e)}
+                                                            className="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm disabled:bg-gray-100 disabled:text-gray-500 flex item-center"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </>
+                                        );
+                                    })
+                                }
                             </div>
-                        </FormFieldSetWrapper>
-                        <footer className="flex justify-end p-6 bg-gray-50 border-t rounded-b-xl">
-                            <FormButton type="button" onClick={onClose} className="px-4 py-2 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:bg-purple-900">
-                                ยกเลิก
-                            </FormButton>
-                            <FormButton type="submit" className="ml-3 px-4 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:bg-purple-900" disabledText="กำลังสร้าง...">
-                                สร้าง Project ใหม่
-                            </FormButton>
-                        </footer>
-                    </form >
+                        </div>
+                    </div>
                 </div >
             </div >
         </>,
