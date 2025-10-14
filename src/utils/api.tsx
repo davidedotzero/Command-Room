@@ -190,7 +190,7 @@ export const API = {
         return response[0];
     },
     getAllTasksDetailed: async (): Promise<FilteringTask[]> => {
-        let data: FilteringTask[] = await getAPI("tasks/");
+        let data: FilteringTask[] = await getAPI("tasks");
 
         // need to parse date here cuz backend cant send Date obj to us sadge
         data = data.map(row => {
@@ -216,7 +216,7 @@ export const API = {
         return [...PO_STATUSES]
     },
     getAllProjects: async () => {
-        const data = await getAPI("projects/")
+        const data = await getAPI("projects")
         return data;
     },
     getAllDefaultTaskNames: async () => {

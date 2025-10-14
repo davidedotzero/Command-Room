@@ -5,10 +5,9 @@ import CreatableSelect from "react-select/creatable";
 import Select, { type SingleValue } from "react-select";
 import DatePicker from "react-datepicker";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
-import { CalendarIcon } from "../../utils/icons";
+// import { CalendarIcon } from "../../utils/icons";
 
 function CreateProjectModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
-    if (isOpen) return alert("ยังไม่เปิดให้ใช่งานตอนนี้");
     if (!isOpen) return null;
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -53,6 +52,12 @@ function CreateProjectModal({ isOpen, onClose }: { isOpen: boolean, onClose: () 
         }
     }, [])
 
+
+    return createPortal(
+        <>
+            {alert("ยังไม่เปิดให้ใช่งานตอนนี้")}
+        </>,
+        document.getElementById("modal-root")!);
     return createPortal(
         <>
             <div className="fixed inset-0 z-50 bg-white/70 bg-opacity-50 flex items-center justify-center">

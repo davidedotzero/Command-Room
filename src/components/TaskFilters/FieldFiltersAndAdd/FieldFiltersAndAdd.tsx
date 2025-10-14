@@ -92,7 +92,7 @@ function FieldFiltersAndAdd(
                             onChange={(date) => setStartDateFilter(date)}
                             filterDate={(date) => { return date.getDay() !== 0 }}
                             isClearable={true}
-                            placeholderText={"start date eraraera"}
+                            placeholderText={"เลือก deadline เริ่มต้น"}
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                         />
                     </div>
@@ -105,7 +105,7 @@ function FieldFiltersAndAdd(
                             onChange={(date) => setEndDateFilter(date)}
                             filterDate={(date) => { return date.getDay() !== 0 }}
                             isClearable={true}
-                            placeholderText={"end date placeholderrrrr"}
+                            placeholderText={"เลือก deadline สิ้นสุด"}
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                         />
                     </div>
