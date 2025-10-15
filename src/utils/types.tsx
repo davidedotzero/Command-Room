@@ -4,6 +4,16 @@
 
 // TODO: will change this when i know what fields are supposed to be in projectTask
 // TODO: add preview log field
+
+// for adding new task on creating project in frontend 
+export interface NewTask {
+    id: number, // temporary id for frontends 
+    taskName: string,
+    team: Team,
+    deadline: Date,
+}
+
+// DB types =================================
 export interface Task {
     taskID: string,
     projectID: string,

@@ -1,6 +1,5 @@
-import { getOnlyDate, msToDay } from "./functions";
-import { TASKS, PROJECTS, TEAMS, TASK_STATUSES, EDIT_LOGS, PO_STATUSES, leftJoinOne2One, TASK_USER, USERS, CUSTOMERS, CUSTOMER_TYPES, POs } from "./mockdata";
-import type { DetailedCustomer, DetailedPO, EditLog, FilteringTask, Project, Task, TaskStatus, Team, User } from "./types";
+import { PO_STATUSES, leftJoinOne2One, TASK_USER, USERS, CUSTOMERS, CUSTOMER_TYPES, POs } from "./mockdata";
+import type { DetailedCustomer, DetailedPO, EditLog, FilteringTask, Project, Task, TaskStatus, Team, User, NewTask } from "./types";
 
 const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 //TODO: IMPORTANT!!!!! this file
@@ -353,6 +352,15 @@ export const API = {
         };
 
         const response = deleteAPI("taskusers", body);
+        return response;
+    },
+    addProjectAndTasks: async (projectName: string, projectTasks: NewTask[]) => {
+        const body = {
+            projectName: projectName,
+            tasks: projectTasks
+        };
+
+        const response = postAPI("projects", body);
         return response;
     },
 

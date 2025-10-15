@@ -2,6 +2,7 @@ import { StatusColor } from "../../../utils/constants";
 import { formatDateYYYY_MM_DD } from "../../../utils/functions";
 import type { FilteringTask } from "../../../utils/types";
 import AssigneeLabels from "../../utils/AssigneeLabels";
+import TeamLabel from "../../utils/TeamLabels";
 
 function TableDisplay(
     { filteredAndSortedTasks, setTaskRowData, openTaskDetailDealerModal, openTaskDetailProductionModal }:
@@ -140,9 +141,7 @@ function TableDisplay(
                                         {task.logPreview}
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className="px-2.5 py-1 text-xs font-semibold text-orange-800 bg-orange-100 rounded-full">
-                                            {task.teamName}
-                                        </span>
+                                        <TeamLabel text={task.teamName} />
                                     </td>
                                     <td className="px-6 py-4 max-w-xs">
                                         {

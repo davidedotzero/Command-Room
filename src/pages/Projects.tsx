@@ -85,7 +85,7 @@ function Projects() {
 
     return (
         <>
-            <CreateProjectModal isOpen={isCreateProjectModalOpen} onClose={closeCreateProjectModal} />
+            <CreateProjectModal isOpen={isCreateProjectModalOpen} onClose={closeCreateProjectModal} parentUpdateCallback={fetchData} />
             <EditProjectModal isOpen={isEditProjectModalOpen} onClose={closeEditProjectModal} selectedProjectID={selectedProjectID} selectedProjectName={selectedProjectName} parentUpdateCallback={fetchData} />
             <ConfirmModal isOpen={isDeleteProjectModalOpen} onClose={closeDeleteProjectModal} callback={deleteSelectedProject} texts={deleteModalTexts} />
             {/* // TODO: separate these to each components */}
