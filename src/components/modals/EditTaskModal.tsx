@@ -99,11 +99,19 @@ function EditTaskModal(
         let helpReqAt: Date | null = null;
         let helpReqReason: string | null = null;
 
-        if (toStatusID === currentTask.taskStatusID) toStatusID = null;
-        if (isOnlyDateEqual(toDeadline, new Date(currentTask.deadline))) toDeadline = null;
+        console.log({
+            reason: reason,
+            logPreview: logPreview,
+            toStatusID: toStatusID,
+            toDeadline: toDeadline,
+            teamHelpID: teamHelpID,
+            helpReqAt: helpReqAt,
+            helpReqReason: helpReqReason
+        });
 
         // handle when from something else ---> Help Me
         if (currentTask.taskStatusID !== 3 && toStatusID === 3) { // handle help me
+            console.log("case 1");
             teamHelpID = Number(formData.get("FormTeamHelp"));
             helpReqAt = new Date();
             helpReqReason = reason;
@@ -113,12 +121,34 @@ function EditTaskModal(
         // we clear help related fields from Task record
         if (currentTask.taskStatusID === 3 && toStatusID !== 3) {
             // console.log("clearing");
+            console.log("case 2");
             teamHelpID = null;
             helpReqAt = null;
             helpReqReason = null;
         }
-        // we do this because if status is Help Me --> Help Me
-        // no need to update teamHelpID, helpReqAt and helpReqReason
+
+        // handle when Help Me --> Help Me
+        // we use the old values
+        if (currentTask.taskStatusID === 3 && toStatusID === 3) {
+            console.log("case 3");
+
+            // doing currentTask.FOOBAR === null check cuz currently theres an anomaly in our data 
+            // where teamHelpID, helpReqAt, helpReqReason is blank while the status is HELP ME
+            // so we do this to "fix" them retroactively
+            // TLDR; these checks are just for fixing anomaly data when we were migrating from spreadsheet -> sql
+
+            if (currentTask.teamHelpID === null) teamHelpID = Number(formData.get("FormTeamHelp"))
+            else teamHelpID = currentTask.teamHelpID;
+
+            if (currentTask.helpReqAt === null) helpReqAt = new Date();
+            else helpReqAt = currentTask.helpReqAt;
+
+            if (currentTask.helpReqReason === null) helpReqReason = reason;
+            else helpReqReason = currentTask.helpReqReason;
+        }
+
+        if (toStatusID === currentTask.taskStatusID) toStatusID = null;
+        if (isOnlyDateEqual(toDeadline, new Date(currentTask.deadline))) toDeadline = null;
 
         // handleWorkersChange: {
         //     if (!user?.isAdmin) {
@@ -186,6 +216,7 @@ function EditTaskModal(
             taskID: currentTask.taskID,
         };
 
+        console.log(updateTask);
 
         // TODO: handle api correctly
         await API.addEditLog(newLog);
@@ -324,7 +355,6 @@ function EditTaskModal(
                                                 className={"shadow-sm " + baseInputClass}
                                                 required
                                                 filterDate={(date) => { return date.getDay() !== 0 }}
-                                                minDate={new Date()}
                                                 selected={selectedDeadline}
                                                 onChange={e => setSelectedDeadline(e!)}
                                             />
