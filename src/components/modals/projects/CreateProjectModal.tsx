@@ -104,11 +104,11 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
         setProjectTasks([newTask, ...projectTasks]);
     }
 
-    // return createPortal(
-    //     <>
-    //         {alert("ยังไม่เปิดให้ใช่งานตอนนี้")}
-    //     </>,
-    //     document.getElementById("modal-root")!);
+    return createPortal(
+        <>
+            {alert("ยังไม่เปิดให้ใช่งานตอนนี้")}
+        </>,
+        document.getElementById("modal-root")!);
 
     return createPortal(
         <>
