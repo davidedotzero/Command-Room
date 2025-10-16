@@ -30,6 +30,7 @@ function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, cu
         }
 
         for (let log of response) {
+            console.log(log.date);
             displayLog += `--- อัปเดตเมื่อ ${log.date.toLocaleString("en-CA", { timeZone: "Asia/Bangkok", hour12: false })} ---\n`
             if (log.fromDeadline && log.toDeadline) displayLog += `* เปลี่ยน Deadline: ${formatDateYYYY_MM_DD(log.fromDeadline!)} -> ${formatDateYYYY_MM_DD(log.toDeadline)
                 } \"\n`

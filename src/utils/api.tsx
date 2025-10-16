@@ -58,8 +58,8 @@ const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 //     }
 // }
 
-const apiURL = "https://command-room-backend.vercel.app/api/"
-// const apiURL = "http://localhost:8080/api/";
+// const apiURL = "https://command-room-backend.vercel.app/api/"
+const apiURL = "http://localhost:8080/api/";
 
 async function getAPI(endpoint: string, param: string = ""): Promise<any> {
     try {
@@ -100,11 +100,12 @@ async function postAPI(endpoint: string, body: any): Promise<any> {
         const result = await response.json();
         console.log('Success:', result);
         // TODO: change there alerts
-        alert('POST api done successfully!');
+
+        // alert('POST api done successfully!');
 
     } catch (error) {
         console.error('Error:', error);
-        alert('Failed to run POST api.');
+        // alert('Failed to run POST api.');
     }
 }
 
@@ -123,11 +124,12 @@ async function putAPI(endpoint: string, body: any): Promise<any> {
         const result = await response.json();
         console.log('Success:', result);
         // TODO: change there alerts
-        alert('PUT api done successfully!');
+
+        // alert('PUT api done successfully!');
 
     } catch (error) {
         console.error('Error:', error);
-        alert('Failed to run PUT api.');
+        // alert('Failed to run PUT api.');
     }
 }
 
@@ -146,11 +148,12 @@ async function patchAPI(endpoint: string, body: any, param: string = ""): Promis
         const result = await response.json();
         console.log('Success:', result);
         // TODO: change there alerts
-        alert('PATCH api done successfully!');
+
+        // alert('PATCH api done successfully!');
 
     } catch (error) {
         console.error('Error:', error);
-        alert('Failed to run PATCH api.');
+        // alert('Failed to run PATCH api.');
     }
 }
 
@@ -169,11 +172,13 @@ async function deleteAPI(endpoint: string, body: any): Promise<any> {
         const result = await response.json();
         console.log('Success:', result);
         // TODO: change there alerts
-        alert('DELETE api done successfully!');
+
+        // alert('DELETE api done successfully!');
 
     } catch (error) {
         console.error('Error:', error);
-        alert('Failed to run DELETE api.');
+
+        // alert('Failed to run DELETE api.');
     }
 }
 

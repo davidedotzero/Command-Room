@@ -74,14 +74,12 @@ function Projects() {
         </div>
     }
 
-
     const deleteModalTexts = {
-        dialogTitle: "ลบบ่",
-        dialogDescription: "อย่าลบเลยๆๆๆๆๆๆๆๆๆๆ",
+        dialogTitle: `ต้องการลบโปรเจกต์ \"${selectedProjectName}\" ไหม`,
+        dialogDescription: "เมื่อลบแล้วจะไม่สามารถย้อนกลับได้อีก",
         btnCancelText: "ยกเลิก",
         btnConfirmText: "ยืนยันการลบ",
     };
-
 
     return (
         <>
@@ -154,6 +152,7 @@ function Projects() {
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setSelectedProjectID(p.projectID);
+                                                setSelectedProjectName(p.projectName);
                                                 openDeleteProjectModal();
                                             }}
                                             className="text-gray-500 hover:text-red-600 p-2 rounded-full hover:bg-red-100"

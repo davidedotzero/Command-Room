@@ -11,6 +11,7 @@ export interface NewTask {
     taskName: string,
     team: Team,
     deadline: Date,
+    deleting?: boolean
 }
 
 // DB types =================================

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ElementRef } from "react";
+import { useEffect, useRef, useState, type ElementRef, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import { FormButton, FormField, FormFieldSetWrapper } from "../forms/FormItems";
 import CreatableSelect from "react-select/creatable";
@@ -11,6 +11,7 @@ import type { DefaultTaskName, Team, NewTask } from "../../../utils/types";
 import DefaultTaskNamesSelect from "../forms/DefaultTaskNamesSelect";
 import TeamLabel from "../../utils/TeamLabels";
 import { API } from "../../../utils/api";
+import { DeleteIcon } from "../../utils/icons";
 // import { CalendarIcon } from "../../utils/icons";
 
 
@@ -27,6 +28,7 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
     const [projectName, setProjectName] = useState<string>("");
     const [projectTasks, setProjectTasks] = useState<NewTask[]>([]);
 
+    const projectNameInput = useRef<HTMLInputElement>(null);
     const taskNameSelect = useRef<SelectInstance<{ value: DefaultTaskName | string, label: string }>>(null);
     const teamSelect = useRef<SelectInstance<{ value: Team, label: string }>>(null);
     const deadlinePicker = useRef<DatePicker>(null);
@@ -34,12 +36,19 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
     useEffectDatePickerFix();
 
     const handleSubmit = async () => {
-        // TODO: check add no task
-        // delete btn
+        setIsLoading(true);
+        console.log(projectTasks);
+        if (!(projectName.trim())) {
+            projectNameInput?.current?.setCustomValidity("Please fill out this field.");
+            projectNameInput?.current?.reportValidity();
+            return;
+        }
+
         const response = await API.addProjectAndTasks(projectName, projectTasks);
         // TODO: check response ok;
         parentUpdateCallback();
         onClose();
+        setIsLoading(false);
     }
 
     const handleTaskChange = async (e: SingleValue<{ value: DefaultTaskName | string, label: string }>) => {
@@ -67,6 +76,19 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
     function handleTaskItemDateChange(task: NewTask, newDate: Date) {
         const lnw = projectTasks.map(x => task.id === x.id ? { ...x, deadline: getOnlyDate(newDate) } : x);
         setProjectTasks(lnw);
+    }
+
+    function handleTaskItemDelete(task: NewTask, e: MouseEvent<HTMLButtonElement, MouseEvent>) {
+        // e.stopPropagation();
+        setProjectTasks(lnw =>
+            lnw.map(x => x.id === task.id ? { ...x, deleting: true } : x)
+        );
+
+        setTimeout(() => {
+            setProjectTasks(lnw =>
+                lnw.filter(x => x.id !== task.id)
+            );
+        }, 150); // 300 = transition animation 
     }
 
     function handleAddTask(): void {
@@ -104,11 +126,11 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
         setProjectTasks([newTask, ...projectTasks]);
     }
 
-    return createPortal(
-        <>
-            {alert("ยังไม่เปิดให้ใช่งานตอนนี้")}
-        </>,
-        document.getElementById("modal-root")!);
+    // return createPortal(
+    //     <>
+    //         {alert("ยังไม่เปิดให้ใช่งานตอนนี้")}
+    //     </>,
+    //     document.getElementById("modal-root")!);
 
     return createPortal(
         <>
@@ -139,6 +161,7 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
                                                     placeholder={"กรอกชื่อโปรเจกต์ใหม่"}
                                                     value={projectName}
                                                     onChange={e => setProjectName(e.target.value)}
+                                                    ref={projectNameInput}
                                                     required
                                                 />
                                             </FormField>
@@ -217,7 +240,7 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
                                     projectTasks.map((x) => {
                                         return (
                                             <>
-                                                <div className="grid grid-cols-12 gap-3 items-center p-3 rounded-md transition-colors border bg-white hover:bg-orange-50 border-gray-300">
+                                                <div className={`grid grid-cols-12 gap-3 items-center p-3 rounded-md border bg-white hover:bg-orange-50 border-gray-300 transition-all duration-150 ease-in-out ${x.deleting ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
                                                     <div className="col-span-1"><input type="checkbox" /></div>
                                                     <div className="col-span-4"> {x.taskName} </div>
                                                     <div className="col-span-4">
@@ -235,7 +258,19 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
                                                             className="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm disabled:bg-gray-100 disabled:text-gray-500 flex item-center"
                                                         />
                                                     </div>
-                                                    <div className="col-span-1"> <TeamLabel text={x.team.teamName} /> </div>
+                                                    <div className="col-span-2"> <TeamLabel text={x.team.teamName} /> </div>
+                                                    <div className="col-span-1">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                handleTaskItemDelete(x, e)
+                                                            }}
+                                                            className="text-gray-500 hover:text-red-600 p-2 rounded-full hover:bg-red-100"
+                                                            aria-label="Delete this task"
+                                                            title="Delete this task"
+                                                        >
+                                                            <DeleteIcon />
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </>
                                         );
