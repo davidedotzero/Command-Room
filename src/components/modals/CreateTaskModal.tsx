@@ -79,6 +79,7 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
             helpReqReason: null,
             updatedAt: null
         };
+        console.log(newTask);
 
         const res = await API.addTask(newTask);
         // TODO: handle result
