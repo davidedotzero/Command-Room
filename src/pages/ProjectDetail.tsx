@@ -12,7 +12,8 @@ import { API } from "../utils/api";
 import KPISummarySection from "../components/TaskFilters/KPISummarySection/KPISummarySection";
 import FieldFiltersAndAdd from "../components/TaskFilters/FieldFiltersAndAdd/FieldFiltersAndAdd";
 import TableDisplay from "../components/TaskFilters/TableDisplay/TableDisplay";
-import { useFilteredTasks } from "../functions/TaskFilters/filters";
+import { filterTasks } from "../functions/TaskFilters/filters";
+import { filteredByKPITasks } from "../functions/TaskFilters/KPIfilters";
 
 // TODO: fix re-renders on open CreateTaskModal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 function ProjectDetail() {
@@ -37,6 +38,7 @@ function ProjectDetail() {
     const [searchFilter, setSearchFilter] = useState<string>("");
     const [startDateFilter, setStartDateFilter] = useState<Date | null>(null);
     const [endDateFilter, setEndDateFilter] = useState<Date | null>(null);
+    const [showOnlyIncompleteChecked, setShowOnlyIncompleteChecked] = useState<boolean>(true);
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -66,7 +68,9 @@ function ProjectDetail() {
     //
     // }, [tasksByProjectIDDetailed, activeStatFilter]);
 
-    const filteredAndSortedTasks: FilteringTask[] = useFilteredTasks(tasksByProjectIDDetailed, activeStatFilter, teamIDFilter, searchFilter, startDateFilter, endDateFilter);
+    // const filteredAndSortedTasks: FilteringTask[] = filterTasks(tasksByProjectIDDetailed, activeStatFilter, teamIDFilter, searchFilter, startDateFilter, endDateFilter);
+    const filteredTasks: FilteringTask[] = filterTasks(tasksByProjectIDDetailed, teamIDFilter, searchFilter, startDateFilter, endDateFilter, showOnlyIncompleteChecked);
+    const eiei: FilteringTask[] = filteredByKPITasks(filteredTasks, activeStatFilter); // TODO: rename this
 
     const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
     function openCreateTaskModal() { setIsCreateTaskModalOpen(true); };
@@ -90,20 +94,21 @@ function ProjectDetail() {
     return (
         <>
             <CreateTaskModal isOpen={isCreateTaskModalOpen} onClose={() => { closeCreateTaskModal() }} currentProjectID={currentProjectID} parentUpdateCallback={fetchData} />
-            <TaskDetailProductionModal isOpen={isTaskDetailProductionModalOpen} onClose={() => { closeTaskDetailProductionModal() }} taskData={taskRowData} currentProjectName={currentProjectName} parentUpdateCallback={fetchData} />
+            <TaskDetailProductionModal isOpen={isTaskDetailProductionModalOpen} onClose={() => { closeTaskDetailProductionModal() }} taskData={taskRowData} parentUpdateCallback={fetchData} />
             <TaskDetailDealerModal isOpen={isTaskDetailDealerModalOpen} onClose={() => { closeTaskDetailDealerModal() }} taskData={taskRowData} currentProjectName={currentProjectName} parentUpdateCallback={fetchData} />
 
             <h1 className="text-2xl font-bold text-gray-800"> {currentProjectName}</h1> {/* // TODO: remove this */}
             <h1 className="text-2sm text-gray-800 mb-6"> {currentProjectID}</h1> {/* // TODO: remove this */}
             <div className="space-y-6">
                 {/*  TODO: split to separate components */}
-                <KPISummarySection title={"สรุปสถานะ Task ของโปรเจกต์นี้"} activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={tasksByProjectIDDetailed} />
+                <KPISummarySection title={"สรุปสถานะ Task ของโปรเจกต์นี้"} activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={filteredTasks} />
                 <FieldFiltersAndAdd
                     teamIDFilterState={[teamIDFilter, setTeamIDFilter]}
                     searchFilterState={[searchFilter, setSearchFilter]}
                     startDateFilterState={[startDateFilter, setStartDateFilter]}
                     endDateFilterState={[endDateFilter, setEndDateFilter]}
-                    tasksLength={filteredAndSortedTasks.length}
+                    showOnlyIncompleteCheckedState={[showOnlyIncompleteChecked, setShowOnlyIncompleteChecked]}
+                    tasksLength={eiei.length}
                     createNewTaskButton={
                         isCurrentProjectIDValid ? (
                             <button
@@ -119,7 +124,7 @@ function ProjectDetail() {
                             </div>
                         )
                     } />
-                <TableDisplay filteredAndSortedTasks={filteredAndSortedTasks} setTaskRowData={setTaskRowData} openTaskDetailDealerModal={openTaskDetailDealerModal} openTaskDetailProductionModal={openTaskDetailProductionModal} />
+                <TableDisplay hideProjNameColumn={true} filteredAndSortedTasks={eiei} setTaskRowData={setTaskRowData} openTaskDetailDealerModal={openTaskDetailDealerModal} openTaskDetailProductionModal={openTaskDetailProductionModal} />
             </div>
         </>
     );

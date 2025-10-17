@@ -5,12 +5,13 @@ import AssigneeLabels from "../../utils/AssigneeLabels";
 import TeamLabel from "../../utils/TeamLabels";
 
 function TableDisplay(
-    { filteredAndSortedTasks, setTaskRowData, openTaskDetailDealerModal, openTaskDetailProductionModal }:
+    { filteredAndSortedTasks, setTaskRowData, openTaskDetailDealerModal, openTaskDetailProductionModal, hideProjNameColumn }:
         {
             filteredAndSortedTasks: FilteringTask[],
             setTaskRowData: React.Dispatch<React.SetStateAction<FilteringTask | null>>,
             openTaskDetailDealerModal: () => void,
             openTaskDetailProductionModal: () => void,
+            hideProjNameColumn?: boolean
         }) {
 
     return (
@@ -70,7 +71,7 @@ function TableDisplay(
                             <th scope="col" className="px-6 py-3 font-medium text-left">
                                 Status
                             </th>
-                            <th scope="col" className="px-6 py-3 font-medium text-left">
+                            <th scope="col" className={`px-6 py-3 font-medium text-left ${hideProjNameColumn ? "hidden" : ""}`}>
                                 Project Name
                             </th>
                         </tr>
@@ -91,6 +92,7 @@ function TableDisplay(
                                         setTaskRowData(task);
 
                                         // TODO: should compare by teamID but this works for now
+                                        // BUG: 
                                         if (task.teamName === "DEALER") {
                                             openTaskDetailDealerModal();
                                             console.log("yes");
@@ -165,7 +167,7 @@ function TableDisplay(
                                     >
                                         {task.taskStatusName}
                                     </td>
-                                    <td className="px-6 py-4 font-medium text-gray-900 max-w-xs truncate" >
+                                    <td className={`px-6 py-4 font-medium text-gray-900 max-w-xs truncate ${hideProjNameColumn ? "hidden" : ""}`} >
                                         {task.projectName}
                                     </td>
                                 </tr>
@@ -183,7 +185,7 @@ function TableDisplay(
 
                     </tbody>
                 </table>
-            </div>
+            </div >
         </>
     );
 }

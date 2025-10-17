@@ -6,15 +6,15 @@ import DatePicker from "react-datepicker";
 import { useEffectDatePickerFix } from "../../utils/ReactDatePickerBodgeFixHook";
 
 function FieldFiltersAndAdd(
-    { teamIDFilterState, searchFilterState, projectIDFilterState, startDateFilterState, endDateFilterState, createNewTaskButton, resetFiltersCallback, tasksLength }:
+    { teamIDFilterState, searchFilterState, projectIDFilterState, startDateFilterState, endDateFilterState, showOnlyIncompleteCheckedState, createNewTaskButton, tasksLength }:
         {
             teamIDFilterState: [number | null, React.Dispatch<React.SetStateAction<number | null>>],
             searchFilterState: [string, React.Dispatch<React.SetStateAction<string>>],
             projectIDFilterState?: [string | null, React.Dispatch<React.SetStateAction<string | null>>],
             startDateFilterState: [Date | null, React.Dispatch<React.SetStateAction<Date | null>>],
             endDateFilterState: [Date | null, React.Dispatch<React.SetStateAction<Date | null>>],
+            showOnlyIncompleteCheckedState: [boolean, React.Dispatch<React.SetStateAction<boolean>>],
             createNewTaskButton?: ReactElement,
-            resetFilterCallback?: () => void,
             tasksLength: number
         }) {
 
@@ -24,13 +24,15 @@ function FieldFiltersAndAdd(
     const [startDateFilter, setStartDateFilter] = startDateFilterState;
     const [endDateFilter, setEndDateFilter] = endDateFilterState;
 
+    const [showOnlyIncompleteChecked, setShowOnlyIncompleteChecked] = showOnlyIncompleteCheckedState;
+
     const { TEAMS } = useDbConst();
     const [projectList, setProjectList] = useState<Project[]>([]);
 
     useEffectDatePickerFix();
 
-    // TODO: SOOMtm bug when add project this not update?
     const fetchData = async () => {
+        // TODO: dont fetch archived project
         const res = await API.getAllProjects();
         setProjectList(res);
     }
@@ -38,6 +40,14 @@ function FieldFiltersAndAdd(
     useEffect(() => {
         fetchData();
     }, [])
+
+    function resetFilters() {
+        setTeamIDFilter(null);
+        setSearchFilter("");
+        setProjectIDFilter(null);
+        setStartDateFilter(null);
+        setEndDateFilter(null);
+    }
 
     return (
         <>
@@ -124,6 +134,12 @@ function FieldFiltersAndAdd(
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                         />
                     </div>
+                    <div className="col-span-2">
+                        <label className="text-sm font-medium text-gray-700">
+                            <input type="checkbox" className="mr-1" checked={showOnlyIncompleteChecked} onChange={(e) => { setShowOnlyIncompleteChecked(e.target.checked) }} />
+                            แสดงเฉพาะ Task ที่ยังไม่เสร็จ
+                        </label>
+                    </div>
                 </div>
 
                 <div className="flex justify-between items-center pt-4 border-t mt-6">
@@ -135,7 +151,7 @@ function FieldFiltersAndAdd(
                     <button
                         // TODO: resetFilters
                         onClick={() => {
-                            // resetFilters();
+                            resetFilters();
                         }}
                         className="px-4 py-2 text-sm text-gray-600 hover:text-orange-500 transition duration-150 disabled:opacity-40"
                     >

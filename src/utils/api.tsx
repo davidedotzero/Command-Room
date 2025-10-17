@@ -1,5 +1,6 @@
+import { removeLastZchar } from "./functions";
 import { PO_STATUSES, leftJoinOne2One, TASK_USER, USERS, CUSTOMERS, CUSTOMER_TYPES, POs } from "./mockdata";
-import type { DetailedCustomer, DetailedPO, EditLog, FilteringTask, Project, Task, TaskStatus, Team, User, NewTask } from "./types";
+import type { DetailedCustomer, DetailedPO, EditLog, FilteringTask, Project, Task, TaskStatus, Team, User, NewTask, EditLogDetailed } from "./types";
 
 //TODO: IMPORTANT!!!!! this file
 
@@ -193,7 +194,6 @@ export const API = {
     },
     getAllTasksDetailed: async (): Promise<FilteringTask[]> => {
         let data: FilteringTask[] = await getAPI("tasks");
-        console.log(data);
 
         // TODO: check responses
 
@@ -244,20 +244,16 @@ export const API = {
         return data.projectName;
     },
     getLogsByTaskIdDesc: async (taskID: string) => {
-        let data: EditLog[] = await getAPI("getLogsByTaskIdDesc", taskID);
-        console.log("pre");
-        console.log(data);
-        data = data.map(row => {
+        let data: EditLogDetailed[] = await getAPI("logs/edit", taskID);
+        let resultData = data.map(row => {
             return {
                 ...row,
-                date: new Date(row.date),
+                date: row.date === null ? null : new Date(removeLastZchar(row.date)), // super low iq fix for UTC timestamp sent from db
                 fromDeadline: row.fromDeadline !== null ? new Date(row.fromDeadline) : null,
                 toDeadline: row.toDeadline !== null ? new Date(row.toDeadline) : null
             };
         });
-        console.log("post");
-        console.log(data);
-        return data;
+        return resultData;
     },
     getTasksByProjectIdDetailed: async (projectID: string): Promise<FilteringTask[]> => {
         let res: FilteringTask[] = await getAPI("tasks/pid", projectID);

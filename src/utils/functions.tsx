@@ -40,58 +40,25 @@ export function getOnlyDate(date: Date) {
     return new Date(date.setHours(0, 0, 0, 0));
 }
 
-
-export function parseYYYYMMDD(dateString: string) {
-    const year = parseInt(dateString.substring(0, 4), 10);
-    const month = parseInt(dateString.substring(4, 6), 10);
-    const day = parseInt(dateString.substring(6, 8), 10);
-
-    // this will return Date with no time
-    return new Date(year, month - 1, day);
-}
-
 export function msToDay(ms: number): number {
     return ms / (1000 * 60 * 60 * 24);
 }
 
-// TODO: validateTaskID and validateUserID cuz they are not the same
-export function validateID(id: string): boolean {
-    const idRegex: RegExp = /^[^-]+-\d{8}-\d{6}$/;
-    if (!idRegex.test(id)) {
-        return false;
+
+// low iq solution for handling returned date ISOString value from database
+// since in DB is UTC+7 but Vercel is UTC the date in db gets interpreted as UTC then get sent to us
+// effectively making our received datetime +7hrs so we just remove the 'Z' char from the ISOString telling js to convert the date as is
+//
+// also our dev server is on UTC xd
+export function removeLastZchar(date: string): string | null {
+    if (!date) {
+        return null;
     }
 
-    return true;
+    if (date.endsWith('Z')) {
+        return date.slice(0, -1);
+    }
+
+    return date;
 }
 
-export function genSingleNewID(latestID: string): string {
-    if (!validateID(latestID)) {
-        throw new Error(`Given ID ${latestID} does not match the format PREFIX-YYYYMMDD-XXXXX.`);
-    }
-
-    const split = latestID.split("-");
-    const [prefix, strDate, strNum] = split;
-
-    const idNum = Number(strNum);
-    const idDate = parseYYYYMMDD(strDate);
-    let newNum: number | null = null;
-    let newDate: string | null = null;
-
-    // parseYYYYMMDD will return Date() with no time so we can compare it directly like this
-    if (idDate.getTime() === getOnlyDate(new Date()).getTime()) {
-        newNum = idNum + 1;
-        newDate = strDate;
-    }
-    else {
-        newNum = 1; // reset id for new date
-        const a = new Date();
-        newDate = "" + a.getFullYear() + String(a.getMonth() + 1).padStart(2, "0") + String(a.getDate()).padStart(2, "0")
-    }
-
-    return `${prefix}-${newDate}-${String(newNum).padStart(6, "0")}`;
-}
-
-export function genMultipleNewID(latestID: string, count: number): string[] {
-    throw new Error("Not implemented.");
-    return [""];
-}

@@ -31,7 +31,7 @@ function KPISummarySection({ activeStatFilterState, tasks, avgHelpLeadDays, titl
                 overdue += 1;
             }
 
-            if (task.deadline >= TODAY && task.deadline <= getOnlyDate(WARNING_DATE) && task.taskStatusName !== "Done") {
+            if (task.deadline >= getOnlyDate(TODAY) && task.deadline <= getOnlyDate(WARNING_DATE) && task.taskStatusName !== "Done") {
                 warning += 1;
             }
 
