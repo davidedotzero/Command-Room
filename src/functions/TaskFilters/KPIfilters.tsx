@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import type { FilteringTask } from "../../utils/types";
 import { getOnlyDate } from "../../utils/functions";
 
-export function useFilteredByKPITasks(
+export function filteredByKPITasks(
     filteredTasks: FilteringTask[],
     activeStatFilter: string | null,
 ) {
