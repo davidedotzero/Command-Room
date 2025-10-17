@@ -56,7 +56,7 @@ export function useFilteredTasks(
             let lowerSearchFilter = searchFilter.toLowerCase();
             filteringTasks = filteringTasks.filter((t) =>
                 t.taskName.toLowerCase().includes(lowerSearchFilter) ||
-                t.logPreview.toLowerCase().includes(lowerSearchFilter) // TODO: should be search on full log but this will do for now
+                t.logPreview?.toLowerCase().includes(lowerSearchFilter) // TODO: should be search on full log but this will do for now
             );
         }
 

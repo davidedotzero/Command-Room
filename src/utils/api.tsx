@@ -1,7 +1,6 @@
 import { PO_STATUSES, leftJoinOne2One, TASK_USER, USERS, CUSTOMERS, CUSTOMER_TYPES, POs } from "./mockdata";
 import type { DetailedCustomer, DetailedPO, EditLog, FilteringTask, Project, Task, TaskStatus, Team, User, NewTask } from "./types";
 
-const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 //TODO: IMPORTANT!!!!! this file
 
 // export async function callAPI<T>(op: string, payload: object): Promise<T> {
@@ -58,9 +57,7 @@ const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 //     }
 // }
 
-const apiURL = "https://command-room-backend.vercel.app/api/"
-// const apiURL = "https://command-room-backend-ijjm52okw-lnwjuanzas-projects.vercel.app/api/";
-// const apiURL = "http://localhost:8080/api/";
+const apiURL = import.meta.env.VITE_API_URL;
 
 async function getAPI(endpoint: string, param: string = ""): Promise<any> {
     try {
@@ -196,6 +193,9 @@ export const API = {
     },
     getAllTasksDetailed: async (): Promise<FilteringTask[]> => {
         let data: FilteringTask[] = await getAPI("tasks");
+        console.log(data);
+
+        // TODO: check responses
 
         // need to parse date here cuz backend cant send Date obj to us sadge
         data = data.map(row => {
