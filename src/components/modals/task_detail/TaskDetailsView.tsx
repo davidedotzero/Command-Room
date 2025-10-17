@@ -31,9 +31,9 @@ function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, cu
 
         for (let log of response) {
             console.log(log.date);
-            displayLog += `--- อัปเดตเมื่อ ${log.date.toLocaleString("en-CA", { timeZone: "Asia/Bangkok", hour12: false })} ---\n`
-            if (log.fromDeadline && log.toDeadline) displayLog += `* เปลี่ยน Deadline: ${formatDateYYYY_MM_DD(log.fromDeadline!)} -> ${formatDateYYYY_MM_DD(log.toDeadline)
-                } \"\n`
+            displayLog += `--- อัปเดตเมื่อ ${log.date === null ? "N/A" : log.date.toLocaleString("en-CA", { timeZone: "Asia/Bangkok", hour12: false })} โดย ${log.userName === null || log.userID === "USER-0000-000000" ? "N/A" : log.userName}---\n`
+
+            if (log.fromDeadline && log.toDeadline) displayLog += `* เปลี่ยน Deadline: ${formatDateYYYY_MM_DD(log.fromDeadline!)} -> ${formatDateYYYY_MM_DD(log.toDeadline)} \"\n`
             if (log.fromStatusID && log.toStatusID) displayLog += `* เปลี่ยน Status: ${TASK_STATUSES.find(t => t.taskStatusID === log.fromStatusID)?.taskStatusName} -> ${TASK_STATUSES.find(t => t.taskStatusID === log.toStatusID)?.taskStatusName}\n`
             displayLog += `รายละเอียด / เหตุผล: ${log.reason}\n`
             displayLog += '---------------------------\n\n'

@@ -71,6 +71,10 @@ export interface EditLog {
     toDeadline: Date | null;
 }
 
+export interface EditLogDetailed extends EditLog {
+    userName: string | null;
+}
+
 // Task[] after joining with necessary tables
 export interface FilteringTask extends Task {
     teamName: string; // Team: teamName

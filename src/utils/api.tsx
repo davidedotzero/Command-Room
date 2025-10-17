@@ -1,5 +1,6 @@
+import { removeLastZchar } from "./functions";
 import { PO_STATUSES, leftJoinOne2One, TASK_USER, USERS, CUSTOMERS, CUSTOMER_TYPES, POs } from "./mockdata";
-import type { DetailedCustomer, DetailedPO, EditLog, FilteringTask, Project, Task, TaskStatus, Team, User, NewTask } from "./types";
+import type { DetailedCustomer, DetailedPO, EditLog, FilteringTask, Project, Task, TaskStatus, Team, User, NewTask, EditLogDetailed } from "./types";
 
 //TODO: IMPORTANT!!!!! this file
 
@@ -244,13 +245,13 @@ export const API = {
         return data.projectName;
     },
     getLogsByTaskIdDesc: async (taskID: string) => {
-        let data: EditLog[] = await getAPI("getLogsByTaskIdDesc", taskID);
+        let data: EditLogDetailed[] = await getAPI("logs/edit", taskID);
         console.log("pre");
         console.log(data);
         data = data.map(row => {
             return {
                 ...row,
-                date: new Date(row.date),
+                date: row.date === null ? null : new Date(removeLastZchar(row.date)), // super low iq fix for UTC timestamp sent from db
                 fromDeadline: row.fromDeadline !== null ? new Date(row.fromDeadline) : null,
                 toDeadline: row.toDeadline !== null ? new Date(row.toDeadline) : null
             };

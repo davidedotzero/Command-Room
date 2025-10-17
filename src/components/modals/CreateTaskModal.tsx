@@ -7,7 +7,7 @@ import CreatableSelect from "react-select/creatable";
 import { useDbConst } from "../../contexts/DbConstDataContext";
 import DatePicker from "react-datepicker";
 import { API } from "../../utils/api";
-import { genSingleNewID, getOnlyDate } from "../../utils/functions";
+import { getOnlyDate } from "../../utils/functions";
 import { useEffectDatePickerFix } from "../utils/ReactDatePickerBodgeFixHook";
 
 
