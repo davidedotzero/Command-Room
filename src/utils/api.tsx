@@ -1,7 +1,6 @@
 import { PO_STATUSES, leftJoinOne2One, TASK_USER, USERS, CUSTOMERS, CUSTOMER_TYPES, POs } from "./mockdata";
 import type { DetailedCustomer, DetailedPO, EditLog, FilteringTask, Project, Task, TaskStatus, Team, User, NewTask } from "./types";
 
-const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 //TODO: IMPORTANT!!!!! this file
 
 // export async function callAPI<T>(op: string, payload: object): Promise<T> {
@@ -58,9 +57,7 @@ const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 //     }
 // }
 
-const apiURL = import.meta.env.API_URL;
-console.log("lnw");
-console.log(apiURL);
+const apiURL = import.meta.env.VITE_API_URL;
 
 async function getAPI(endpoint: string, param: string = ""): Promise<any> {
     try {
