@@ -44,6 +44,22 @@ export function msToDay(ms: number): number {
     return ms / (1000 * 60 * 60 * 24);
 }
 
+export async function copyHtmlToClipboard(content: string) {
+    // const htmlContent = document.getElementById('myContent').innerHTML;
+    try {
+        const blob = new Blob([content], { type: 'text/html' });
+        const clipboardItem = new ClipboardItem({ 'text/html': blob });
+
+        await navigator.clipboard.write([clipboardItem]);
+        // TODO: better alert
+        console.log('HTML content copied to clipboard!');
+
+    } catch (err) {
+        // TODO: better alert
+        console.error('Failed to copy HTML: ', err);
+    }
+}
+
 // low iq solution for handling returned date ISOString value from database
 // since in DB is UTC+7 but Vercel is UTC the date in db gets interpreted as UTC then get sent to us
 // effectively making our received datetime +7hrs so we just remove the 'Z' char from the ISOString telling js to convert the date as is

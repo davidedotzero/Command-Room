@@ -13,6 +13,8 @@ function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, 
     if (!isOpen) return null;
     if (!taskData) return null;
 
+    console.log("dealer");
+
     // TODO: separate this to customerdetailview component
     const [customerData, setCustomerData] = useState({});
 

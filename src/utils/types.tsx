@@ -83,6 +83,7 @@ export interface FilteringTask extends Task {
     workers: User[];
     po: PO | null;
     customer: Customer | null;
+    projectName: string;
 }
 
 export interface DetailedCustomer extends Customer {

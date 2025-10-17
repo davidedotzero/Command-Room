@@ -91,6 +91,7 @@ function TableDisplay(
                                         setTaskRowData(task);
 
                                         // TODO: should compare by teamID but this works for now
+                                        // BUG: 
                                         if (task.teamName === "DEALER") {
                                             openTaskDetailDealerModal();
                                             console.log("yes");

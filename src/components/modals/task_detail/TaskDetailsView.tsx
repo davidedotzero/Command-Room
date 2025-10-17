@@ -1,45 +1,14 @@
-import { useEffect, useState } from "react";
 import { StatusColor } from "../../../utils/constants";
 import { calculateLeadTime, formatDateYYYY_MM_DD } from "../../../utils/functions";
 import { DetailItem } from "../forms/FormItems";
 import type { FilteringTask } from "../../../utils/types";
-import { API } from "../../../utils/api";
-import { useDbConst } from "../../../contexts/DbConstDataContext";
 import AssigneeLabels from "../../utils/AssigneeLabels";
+import TeamLabel from "../../utils/TeamLabels";
 
 // TODO: types for selectedTask
-function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, currentProjectName: string }) {
+function TaskDetailsView({ task }: { task: FilteringTask }) {
     const currentTask = task;
     const helpLeadTime = currentTask.helpReqAt === null ? 0 : calculateLeadTime(new Date(currentTask.deadline), new Date(currentTask.helpReqAt));
-
-    const [taskLogs, setTaskLogs] = useState("Loading...");
-
-    const { TASK_STATUSES } = useDbConst();
-
-    useEffect(() => {
-        fetchData(currentTask.taskID);
-    }, [])
-
-    const fetchData = async (taskID: string) => {
-        const response = await API.getLogsByTaskIdDesc(currentTask.taskID);
-        let displayLog = "";
-        if (!response || response.length <= 0) {
-            displayLog = "-";
-            setTaskLogs(displayLog);
-            return;
-        }
-
-        for (let log of response) {
-            console.log(log.date);
-            displayLog += `--- อัปเดตเมื่อ ${log.date === null ? "N/A" : log.date.toLocaleString("en-CA", { timeZone: "Asia/Bangkok", hour12: false })} โดย ${log.userName === null || log.userID === "USER-0000-000000" ? "N/A" : log.userName}---\n`
-
-            if (log.fromDeadline && log.toDeadline) displayLog += `* เปลี่ยน Deadline: ${formatDateYYYY_MM_DD(log.fromDeadline!)} -> ${formatDateYYYY_MM_DD(log.toDeadline)} \"\n`
-            if (log.fromStatusID && log.toStatusID) displayLog += `* เปลี่ยน Status: ${TASK_STATUSES.find(t => t.taskStatusID === log.fromStatusID)?.taskStatusName} -> ${TASK_STATUSES.find(t => t.taskStatusID === log.toStatusID)?.taskStatusName}\n`
-            displayLog += `รายละเอียด / เหตุผล: ${log.reason}\n`
-            displayLog += '---------------------------\n\n'
-        }
-        setTaskLogs(displayLog);
-    };
 
     return (
         <>
@@ -51,14 +20,12 @@ function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, cu
                         <DetailItem label="Task">
                             <p className="text-xl font-bold text-gray-800">{currentTask.taskName || "-"}</p>
                             <strong>ของ Project:</strong>
-                            <p>{currentProjectName}</p>
+                            <p>{currentTask.projectName}</p>
                         </DetailItem>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                         <DetailItem label="Team">
-                            <span className="px-2.5 py-1 text-sm font-semibold text-orange-800 bg-orange-100 rounded-full">
-                                {currentTask.teamName}
-                            </span>
+                            <TeamLabel text={currentTask.teamName} />
                         </DetailItem>
 
                         <DetailItem label="Status">
@@ -89,21 +56,30 @@ function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, cu
                             <h4 className="text-md font-bold text-purple-800 mb-4">
                                 รายละเอียดการร้องขอความช่วยเหลือ
                             </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5">
-                                <DetailItem label="วันที่ร้องขอ">
-                                    <p className="font-semibold">
-                                        {currentTask.helpReqAt === null ? "-" : formatDateYYYY_MM_DD(new Date(currentTask.helpReqAt))}
-                                    </p>
-                                </DetailItem>
-                                <DetailItem label="ขอความช่วยเหลือจาก">
-                                    <span className="px-2.5 py-1 text-sm font-semibold text-purple-800 bg-purple-200 rounded-full">
-                                        {currentTask.teamHelpName}
-                                    </span>
-                                </DetailItem>
-                                <DetailItem label="ขอความช่วยเหลือล่วงหน้า">
-                                    <p className="font-bold text-purple-800">{helpLeadTime} วัน</p>
-                                </DetailItem>
-                                <div className="md:col-span-3">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+                                <div className="col-span-1">
+                                    <DetailItem label="วันที่ร้องขอ">
+                                        <p className="font-semibold">
+                                            {currentTask.helpReqAt === null ? "-" : formatDateYYYY_MM_DD(new Date(currentTask.helpReqAt))}
+                                        </p>
+                                    </DetailItem>
+                                </div>
+
+                                <div className="col-span-1">
+                                    <DetailItem label="ขอความช่วยเหลือล่วงหน้า">
+                                        <p className="font-bold text-purple-800">{helpLeadTime} วัน</p>
+                                    </DetailItem>
+                                </div>
+
+                                <div className="col-span-2">
+                                    <DetailItem label="ขอความช่วยเหลือจาก">
+                                        <span className="px-2.5 py-1 text-sm font-semibold text-purple-800 bg-purple-200 rounded-full">
+                                            {currentTask.teamHelpName}
+                                        </span>
+                                    </DetailItem>
+                                </div>
+
+                                <div className="md:col-span-2">
                                     <DetailItem label="รายละเอียด">
                                         <p className="p-3 bg-purple-100 rounded-md border border-purple-200 min-h-[50px] whitespace-pre-wrap">
                                             {/* // TODO: fetch latest help log or all log? */}
@@ -115,15 +91,6 @@ function TaskDetailsView({ task, currentProjectName }: { task: FilteringTask, cu
                         </div>
                     </div>
                 )}
-
-                <div className="grid grid-cols-1 gap-y-6">
-                    <DetailItem label="Notes / Result (Log)">
-                        <p className="p-3 bg-gray-50 rounded-md border min-h-[100px] max-h-[300px] whitespace-pre-wrap disabled overflow-y-scroll">
-                            {/* // TODO: fetch this properly later */}
-                            {taskLogs}
-                        </p>
-                    </DetailItem>
-                </div>
             </div >
         </>
     );

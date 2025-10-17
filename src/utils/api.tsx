@@ -194,7 +194,6 @@ export const API = {
     },
     getAllTasksDetailed: async (): Promise<FilteringTask[]> => {
         let data: FilteringTask[] = await getAPI("tasks");
-        console.log(data);
 
         // TODO: check responses
 
