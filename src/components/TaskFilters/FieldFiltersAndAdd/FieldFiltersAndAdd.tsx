@@ -29,8 +29,8 @@ function FieldFiltersAndAdd(
 
     useEffectDatePickerFix();
 
-    // TODO: SOOMtm bug when add project this not update?
     const fetchData = async () => {
+        // TODO: dont fetch archived project
         const res = await API.getAllProjects();
         setProjectList(res);
     }
@@ -38,6 +38,14 @@ function FieldFiltersAndAdd(
     useEffect(() => {
         fetchData();
     }, [])
+
+    function resetFilters() {
+        setTeamIDFilter(null);
+        setSearchFilter("");
+        setProjectIDFilter(null);
+        setStartDateFilter(null);
+        setEndDateFilter(null);
+    }
 
     return (
         <>
@@ -135,7 +143,7 @@ function FieldFiltersAndAdd(
                     <button
                         // TODO: resetFilters
                         onClick={() => {
-                            // resetFilters();
+                            resetFilters();
                         }}
                         className="px-4 py-2 text-sm text-gray-600 hover:text-orange-500 transition duration-150 disabled:opacity-40"
                     >

@@ -25,13 +25,15 @@ function KPISummarySection({ activeStatFilterState, tasks, avgHelpLeadDays, titl
         const WARNING_DATE: Date = new Date(new Date().setDate(TODAY.getDate() + DAY_AHEAD)); // LMAOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 
         let overdue = 0, warning = 0, incomplete = 0, done = 0, helpme = 0;
+        console.log("btn ======")
         tasks.forEach(task => {
             // TODO: rewrite this counting logic
             if (task.deadline && task.deadline < getOnlyDate(TODAY) && task.taskStatusName !== "Done") {
                 overdue += 1;
             }
 
-            if (task.deadline >= TODAY && task.deadline <= getOnlyDate(WARNING_DATE) && task.taskStatusName !== "Done") {
+            if (task.deadline >= getOnlyDate(TODAY) && task.deadline <= getOnlyDate(WARNING_DATE) && task.taskStatusName !== "Done") {
+                console.log(task);
                 warning += 1;
             }
 
