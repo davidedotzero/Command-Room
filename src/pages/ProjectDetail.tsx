@@ -97,7 +97,7 @@ function ProjectDetail() {
             <h1 className="text-2sm text-gray-800 mb-6"> {currentProjectID}</h1> {/* // TODO: remove this */}
             <div className="space-y-6">
                 {/*  TODO: split to separate components */}
-                <KPISummarySection title={"สรุปสถานะ Task ของโปรเจกต์นี้"} activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={tasksByProjectIDDetailed} />
+                <KPISummarySection title={"สรุปสถานะ Task ของโปรเจกต์นี้"} activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={filteredAndSortedTasks} />
                 <FieldFiltersAndAdd
                     teamIDFilterState={[teamIDFilter, setTeamIDFilter]}
                     searchFilterState={[searchFilter, setSearchFilter]}

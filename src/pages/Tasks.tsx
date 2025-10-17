@@ -71,14 +71,14 @@ function Tasks() {
 
     return (
         <>
-            <TaskDetailProductionModal isOpen={isTaskDetailProductionModalOpen} onClose={() => { closeTaskDetailProductionModal() }} taskData={taskRowData} currentProjectName={"PLACEHOLDER-NO PROJECTNAME"} parentUpdateCallback={fetchData} />
+            <TaskDetailProductionModal isOpen={isTaskDetailProductionModalOpen} onClose={() => { closeTaskDetailProductionModal() }} taskData={taskRowData} parentUpdateCallback={fetchData} />
             <TaskDetailDealerModal isOpen={isTaskDetailDealerModalOpen} onClose={() => { closeTaskDetailDealerModal() }} taskData={taskRowData} currentProjectName={"PLACEHOLDER-NO PROJECTNAME"} parentUpdateCallback={fetchData} />
 
             <h1 className="text-2xl font-bold text-gray-800 mb-6">
                 Dashboard & Global Filters
             </h1>
             <div className="space-y-6">
-                <KPISummarySection title={"สรุปสถานะ Task ทั้งหมด"} activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={allTasks} avgHelpLeadDays={avgHelpLeadDays} />
+                <KPISummarySection title={"สรุปสถานะ Task ทั้งหมด"} activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={filteredAndSortedTasks} avgHelpLeadDays={avgHelpLeadDays} />
                 <FieldFiltersAndAdd
                     teamIDFilterState={[teamIDFilter, setTeamIDFilter]}
                     searchFilterState={[searchFilter, setSearchFilter]}

@@ -245,9 +245,7 @@ export const API = {
     },
     getLogsByTaskIdDesc: async (taskID: string) => {
         let data: EditLogDetailed[] = await getAPI("logs/edit", taskID);
-        console.log("pre");
-        console.log(data);
-        data = data.map(row => {
+        let resultData = data.map(row => {
             return {
                 ...row,
                 date: row.date === null ? null : new Date(removeLastZchar(row.date)), // super low iq fix for UTC timestamp sent from db
@@ -255,9 +253,7 @@ export const API = {
                 toDeadline: row.toDeadline !== null ? new Date(row.toDeadline) : null
             };
         });
-        console.log("post");
-        console.log(data);
-        return data;
+        return resultData;
     },
     getTasksByProjectIdDetailed: async (projectID: string): Promise<FilteringTask[]> => {
         let res: FilteringTask[] = await getAPI("tasks/pid", projectID);
