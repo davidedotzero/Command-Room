@@ -58,8 +58,9 @@ const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 //     }
 // }
 
-// const apiURL = "https://command-room-backend.vercel.app/api/"
-const apiURL = "http://localhost:8080/api/";
+const apiURL = import.meta.env.API_URL;
+console.log("lnw");
+console.log(apiURL);
 
 async function getAPI(endpoint: string, param: string = ""): Promise<any> {
     try {
@@ -195,6 +196,9 @@ export const API = {
     },
     getAllTasksDetailed: async (): Promise<FilteringTask[]> => {
         let data: FilteringTask[] = await getAPI("tasks");
+        console.log(data);
+
+        // TODO: check responses
 
         // need to parse date here cuz backend cant send Date obj to us sadge
         data = data.map(row => {
