@@ -24,6 +24,7 @@ function Tasks() {
     const [projectFilter, setProjectFilter] = useState<string | null>("");
     const [startDateFilter, setStartDateFilter] = useState<Date | null>(null);
     const [endDateFilter, setEndDateFilter] = useState<Date | null>(null);
+    const [showOnlyIncompleteChecked, setShowOnlyIncompleteChecked] = useState<boolean>(true);
 
     const { user } = useAuth();
 
@@ -52,7 +53,7 @@ function Tasks() {
     }, []);
 
 
-    const filteredTasks: FilteringTask[] = filterTasks(allTasks, teamIDFilter, searchFilter, startDateFilter, endDateFilter, projectFilter);
+    const filteredTasks: FilteringTask[] = filterTasks(allTasks, teamIDFilter, searchFilter, startDateFilter, endDateFilter, showOnlyIncompleteChecked, projectFilter);
     const eiei: FilteringTask[] = filteredByKPITasks(filteredTasks, activeStatFilter); // TODO: rename this
 
     const [isTaskDetailProductionModalOpen, setIsTaskDetailProductionModalOpen] = useState(false);
@@ -85,6 +86,7 @@ function Tasks() {
                     projectIDFilterState={[projectFilter, setProjectFilter]}
                     startDateFilterState={[startDateFilter, setStartDateFilter]}
                     endDateFilterState={[endDateFilter, setEndDateFilter]}
+                    showOnlyIncompleteCheckedState={[showOnlyIncompleteChecked, setShowOnlyIncompleteChecked]}
                     tasksLength={eiei.length} />
                 <TableDisplay filteredAndSortedTasks={eiei} setTaskRowData={setTaskRowData} openTaskDetailDealerModal={openTaskDetailDealerModal} openTaskDetailProductionModal={openTaskDetailProductionModal} />
             </div>

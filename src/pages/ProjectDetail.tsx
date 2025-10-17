@@ -38,6 +38,7 @@ function ProjectDetail() {
     const [searchFilter, setSearchFilter] = useState<string>("");
     const [startDateFilter, setStartDateFilter] = useState<Date | null>(null);
     const [endDateFilter, setEndDateFilter] = useState<Date | null>(null);
+    const [showOnlyIncompleteChecked, setShowOnlyIncompleteChecked] = useState<boolean>(true);
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -68,7 +69,7 @@ function ProjectDetail() {
     // }, [tasksByProjectIDDetailed, activeStatFilter]);
 
     // const filteredAndSortedTasks: FilteringTask[] = filterTasks(tasksByProjectIDDetailed, activeStatFilter, teamIDFilter, searchFilter, startDateFilter, endDateFilter);
-    const filteredTasks: FilteringTask[] = filterTasks(tasksByProjectIDDetailed, teamIDFilter, searchFilter, startDateFilter, endDateFilter);
+    const filteredTasks: FilteringTask[] = filterTasks(tasksByProjectIDDetailed, teamIDFilter, searchFilter, startDateFilter, endDateFilter, showOnlyIncompleteChecked);
     const eiei: FilteringTask[] = filteredByKPITasks(filteredTasks, activeStatFilter); // TODO: rename this
 
     const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
@@ -106,6 +107,7 @@ function ProjectDetail() {
                     searchFilterState={[searchFilter, setSearchFilter]}
                     startDateFilterState={[startDateFilter, setStartDateFilter]}
                     endDateFilterState={[endDateFilter, setEndDateFilter]}
+                    showOnlyIncompleteCheckedState={[showOnlyIncompleteChecked, setShowOnlyIncompleteChecked]}
                     tasksLength={eiei.length}
                     createNewTaskButton={
                         isCurrentProjectIDValid ? (

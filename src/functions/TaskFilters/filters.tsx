@@ -8,10 +8,16 @@ export function filterTasks(
     searchFilter: string,
     startDateFilter: Date | null,
     endDateFilter: Date | null,
+    showOnlyIncompleteChecked: boolean,
     projectFilter?: string | null,
 ) {
     const filteredAndSortedTasks: FilteringTask[] = useMemo(() => {
         let filteringTasks = tasksDetailed;
+
+        if (showOnlyIncompleteChecked) {
+            // TODO: use enum here
+            filteringTasks = filteringTasks.filter(t => t.taskStatusID != 2);
+        }
 
         if (teamIDFilter) {
             filteringTasks = filteringTasks.filter((t) => t.teamID === Number(teamIDFilter) || t.teamHelpID === (Number(teamIDFilter)));
@@ -41,7 +47,7 @@ export function filterTasks(
 
         return filteringTasks;
     },
-        [tasksDetailed, teamIDFilter, searchFilter, projectFilter, startDateFilter, endDateFilter]
+        [tasksDetailed, teamIDFilter, searchFilter, projectFilter, startDateFilter, endDateFilter, showOnlyIncompleteChecked]
     );
 
     return filteredAndSortedTasks;
