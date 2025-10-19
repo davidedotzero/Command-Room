@@ -9,6 +9,7 @@ import FieldFiltersAndAdd from "../components/TaskFilters/FieldFiltersAndAdd/Fie
 import TableDisplay from "../components/TaskFilters/TableDisplay/TableDisplay";
 import { useAuth } from "../contexts/AuthContext";
 import { filteredByKPITasks } from "../functions/TaskFilters/KPIfilters";
+import FullscreenSpinner from "../components/Spinners/FullscreenSpinner";
 
 function Tasks() {
     const [allTasks, setAllTasks] = useState<FilteringTask[]>([]); // TODO: rename this
@@ -65,9 +66,7 @@ function Tasks() {
     function closeTaskDetailDealerModal() { setIsTaskDetailDealerModalOpen(false); };
 
     if (isLoading) {
-        return <div>
-            Loading...
-        </div>
+        return <FullscreenSpinner />
     }
 
     return (
