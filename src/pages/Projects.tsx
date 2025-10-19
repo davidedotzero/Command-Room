@@ -7,6 +7,7 @@ import CreateProjectModal from "../components/modals/projects/CreateProjectModal
 import EditProjectModal from "../components/modals/EditProjectModal";
 import ConfirmModal from "../components/modals/ConfirmModal";
 import { useAuth } from "../contexts/AuthContext";
+import FullscreenSpinner from "../components/Spinners/FullscreenSpinner";
 
 function Projects() {
     const navigate = useNavigate();
@@ -21,7 +22,7 @@ function Projects() {
 
     const fetchData = async () => {
         setIsLoading(true);
-        const data = await API.getAllActiveProjects();
+        const data = await API.getAllActiveProjectsDetailed();
         setProjectsList(data);
         setIsLoading(false);
     }
@@ -69,9 +70,7 @@ function Projects() {
     // TODO: show only not done project (toggled by a checkbox or smth)
 
     if (isLoading) {
-        return <div>
-            Loading...
-        </div>
+        return <FullscreenSpinner />
     }
 
     const deleteModalTexts = {
@@ -129,6 +128,13 @@ function Projects() {
                             <div className="flex justify-between items-start">
                                 <h3 className="font-bold text-lg text-gray-800 flex-1 pr-4">
                                     {p.projectName}
+                                </h3>
+                            </div>
+                            <div className="flex justify-between items-start">
+                                <h3 className="font-bold text-lg text-green-600 flex-1 pr-4">
+                                    {
+                                        p.recent7days > 0 ? `อัปเดต ${p.recent7days} ครั้งในสัปดาห์นี้` : ""
+                                    }
                                 </h3>
                             </div>
                             <div className="flex items-center justify-between mt-4">
