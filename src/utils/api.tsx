@@ -228,13 +228,13 @@ export const API = {
         const data = await getAPI("const/defaultTaskNames");
         return data;
     },
-    getAllUsersAsc: async () => {
-        const data = await getAPI("getAllUsersAsc");
+    getWorkers: async () => {
+        const data = await getAPI("getWorkers");
         return data;
     },
 
 
-    getAllActiveProjects: async () => {
+    getAllActiveProjectsDetailed: async () => {
         const data = await getAPI("projects/active");
         return data;
     },
