@@ -1,3 +1,15 @@
+load spinner @tasks, projects, logView
+remove NOUSER worker select
+enable worker insertion and deletion
+projects tasks update in week
+toast clipboard
+
+added swal2
+
+remove unnecessary columns from TableDisplay
+help me row highlight color
+=================================================
+
 in AuthContext.tsx, SCRIPT_URL being defined with VITE_* prefix maybe potentially dangerous cuz script url exposing to client blablablalablablalb
 
 title on iconbutton hover
