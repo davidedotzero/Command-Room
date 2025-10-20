@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 // DATEPICKER W-FULL SUPER SCUFFED FIX LMAOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-export function useEffectDatePickerFix() {
+export function useEffectDatePickerFix(dependencies?: any) {
     useEffect(() => {
         const vals = document.getElementsByClassName("react-datepicker__input-container");
         for (const val of vals) {
@@ -12,5 +12,7 @@ export function useEffectDatePickerFix() {
         for (const val of juan) {
             val.classList.add("w-full");
         }
-    }, []);
+
+        console.log("EIEIEIEIEIEIEIEIEI");
+    }, dependencies ? [...dependencies] : []);
 }

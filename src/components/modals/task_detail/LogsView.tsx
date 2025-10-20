@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DetailItem } from "../forms/FormItems";
 import { API } from "../../../utils/api";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
-import { formatDateYYYY_MM_DD, testDelay } from "../../../utils/functions";
+import { formatDateYYYY_MM_DD, getOnlyDate, testDelay } from "../../../utils/functions";
 import type { EditLogDetailed } from "../../../utils/types";
 import { CopyIcon } from "../../utils/icons";
 import InlineSpinner from "../../Spinners/InlineSpinner";
 import Swal from "sweetalert2";
+import DatePicker from "react-datepicker";
+import { useEffectDatePickerFix } from "../../utils/ReactDatePickerBodgeFixHook";
 
 function LogsView({ taskID }: { taskID: string }) {
     const { TASK_STATUSES } = useDbConst();
@@ -14,8 +16,13 @@ function LogsView({ taskID }: { taskID: string }) {
     // const [taskLogs, setTaskLogs] = useState("Loading...");
     const [taskLogs, setTaskLogs] = useState<EditLogDetailed[]>([]);
 
+    const [startDateFilter, setStartDateFilter] = useState<Date | null>();
+    const [endDateFilter, setEndDateFilter] = useState<Date | null>();
+
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [showSpinner, setShowSpinner] = useState<boolean>(false);
+
+    useEffectDatePickerFix([isLoading]);
 
     useEffect(() => {
         fetchData();
@@ -32,6 +39,25 @@ function LogsView({ taskID }: { taskID: string }) {
         setTaskLogs(response);
         setIsLoading(false);
     };
+
+
+    const filteredLogs: EditLogDetailed[] = useMemo(() => {
+        if (!taskLogs) {
+            return taskLogs;
+        }
+
+        let filteringLogs = taskLogs;
+
+        if (startDateFilter) {
+            filteringLogs = filteringLogs.filter((t) => getOnlyDate(t.date) >= getOnlyDate(startDateFilter));
+        }
+
+        if (endDateFilter) {
+            filteringLogs = filteringLogs.filter((t) => getOnlyDate(t.date) <= getOnlyDate(endDateFilter));
+        }
+
+        return filteringLogs;
+    }, [taskLogs, startDateFilter, endDateFilter]);
 
 
     async function handleCopyLog(id: string) {
@@ -69,12 +95,28 @@ function LogsView({ taskID }: { taskID: string }) {
                 didOpen: (toast) => {
                     toast.addEventListener('click', Swal.close);
                 }
-            })
-            console.log('HTML content copied to clipboard!');
-
+            });
         } catch (err) {
-            // TODO: better alert
-            console.error('Failed to copy HTML: ', err);
+            Swal.fire({
+                text: "คัดลอกลงคลิปบอร์ดผิดพลาด",
+                position: "bottom-end",
+                toast: true,
+                timer: 3000,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                customClass: {
+                    popup: '!rounded-md !border !border-red-500 !bg-red-200 !text-red-900'
+                },
+                showClass: {
+                    popup: 'none'
+                },
+                hideClass: {
+                    popup: 'swal2-hide'
+                },
+                didOpen: (toast) => {
+                    toast.addEventListener('click', Swal.close);
+                }
+            });
         }
     }
 
@@ -110,11 +152,40 @@ function LogsView({ taskID }: { taskID: string }) {
 
         return (
             <>
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-1">
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">
+                            Start Date
+                        </label>
+                        <DatePicker
+                            selected={startDateFilter}
+                            onChange={(date) => setStartDateFilter(date)}
+                            filterDate={(date) => { return date.getDay() !== 0 }}
+                            isClearable={true}
+                            placeholderText={"เลือก deadline เริ่มต้น"}
+                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">
+                            End Date
+                        </label>
+                        <DatePicker
+                            selected={endDateFilter}
+                            onChange={(date) => setEndDateFilter(date)}
+                            filterDate={(date) => { return date.getDay() !== 0 }}
+                            isClearable={true}
+                            placeholderText={"เลือก deadline สิ้นสุด"}
+                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                        />
+                    </div>
+                </div>
+
                 {
                     <DetailItem label="Notes / Result (Log)">
                         <div className="space-y-2">
                             {
-                                taskLogs.map(x => {
+                                filteredLogs.map(x => {
                                     let displayLog = "";
 
                                     displayLog += `--- อัปเดตเมื่อ ${x.date === null ? "N/A" : x.date.toLocaleString("en-CA", { timeZone: "Asia/Bangkok", hour12: false })} โดย ${x.userName === null || x.userID === "USER-0000-000000" ? "N/A" : x.userName}---\n`
