@@ -44,6 +44,10 @@ export function msToDay(ms: number): number {
     return ms / (1000 * 60 * 60 * 24);
 }
 
+// WARNING: for testing purpose only
+export async function testDelay(ms: number) {
+    await new Promise(resolve => setTimeout(resolve, ms));
+}
 
 // low iq solution for handling returned date ISOString value from database
 // since in DB is UTC+7 but Vercel is UTC the date in db gets interpreted as UTC then get sent to us

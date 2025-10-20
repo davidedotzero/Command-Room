@@ -2,30 +2,35 @@ import { useEffect, useState } from "react";
 import { DetailItem } from "../forms/FormItems";
 import { API } from "../../../utils/api";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
-import { formatDateYYYY_MM_DD } from "../../../utils/functions";
+import { formatDateYYYY_MM_DD, testDelay } from "../../../utils/functions";
 import type { EditLogDetailed } from "../../../utils/types";
 import { CopyIcon } from "../../utils/icons";
+import InlineSpinner from "../../Spinners/InlineSpinner";
+import Swal from "sweetalert2";
 
 function LogsView({ taskID }: { taskID: string }) {
     const { TASK_STATUSES } = useDbConst();
 
     // const [taskLogs, setTaskLogs] = useState("Loading...");
     const [taskLogs, setTaskLogs] = useState<EditLogDetailed[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [showSpinner, setShowSpinner] = useState<boolean>(false);
 
     useEffect(() => {
-        setIsLoading(true);
         fetchData();
-        setIsLoading(false);
     }, [])
 
     const fetchData = async () => {
+        setIsLoading(true);
         const response = await API.getLogsByTaskIdDesc(taskID);
-        if (!response || response.length <= 0) {
-            return;
-        }
+        await testDelay(50)
+        // if (!response || response.length <= 0) {
+        //     return;
+        // }
 
         setTaskLogs(response);
+        setIsLoading(false);
     };
 
 
@@ -45,7 +50,26 @@ function LogsView({ taskID }: { taskID: string }) {
 
         try {
             await navigator.clipboard.writeText(copyingLog.reason);
-            // TODO: better alert
+            Swal.fire({
+                text: "คัดลอกลงคลิปบอร์ดแล้ว",
+                position: "bottom-end",
+                toast: true,
+                timer: 3000,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                customClass: {
+                    popup: '!rounded-md !border !border-blue-500 !bg-blue-200 !text-blue-900'
+                },
+                showClass: {
+                    popup: 'none'
+                },
+                hideClass: {
+                    popup: 'swal2-hide'
+                },
+                didOpen: (toast) => {
+                    toast.addEventListener('click', Swal.close);
+                }
+            })
             console.log('HTML content copied to clipboard!');
 
         } catch (err) {
@@ -54,15 +78,39 @@ function LogsView({ taskID }: { taskID: string }) {
         }
     }
 
-    return (
-        <>
-            {isLoading ? "Loading..." :
-                taskLogs.length <= 0 || taskLogs === null ?
-                    (
-                        <div className="w-full flex justify-center items-center italic text-gray-500">
-                            {"ไม่พบ log ใน task นี้"}
-                        </div>
-                    ) :
+    useEffect(() => {
+        let timer: NodeJS.Timeout;
+        if (isLoading) {
+            timer = setTimeout(() => {
+                setShowSpinner(true);
+            }, 200);
+        } else {
+            // @ts-expect-error
+            clearTimeout(timer);
+            setShowSpinner(false);
+        }
+
+        return () => {
+            clearTimeout(timer);
+        }
+    }, [isLoading]);
+
+    if (showSpinner) {
+        return <InlineSpinner />
+    }
+
+    if (!isLoading) {
+        if (taskLogs.length <= 0 || taskLogs === null) {
+            return (
+                <div className="w-full flex justify-center items-center italic text-gray-500">
+                    {"ไม่พบ log ใน task นี้"}
+                </div>
+            );
+        }
+
+        return (
+            <>
+                {
                     <DetailItem label="Notes / Result (Log)">
                         <div className="space-y-2">
                             {
@@ -95,10 +143,11 @@ function LogsView({ taskID }: { taskID: string }) {
                                     )
                                 })
                             }
-                        </div>
-                    </DetailItem>
-            }
-        </>
-    );
+                        </div >
+                    </DetailItem >
+                }
+            </>
+        );
+    }
 }
 export default LogsView;

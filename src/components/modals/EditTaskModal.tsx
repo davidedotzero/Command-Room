@@ -53,7 +53,7 @@ function EditTaskModal(
     const prevSelectedWorkers = currentTask.workers === null ? [] : currentTask.workers;
 
     const fetchData = async () => {
-        const _listWorkers = await API.getAllUsersAsc();
+        const _listWorkers = await API.getWorkers();
         // TODO: FilteringTask:workers | null add this sheesh 
         if (currentTask.workers === null) {
             setListWorkers(_listWorkers);
@@ -150,49 +150,48 @@ function EditTaskModal(
         if (toStatusID === currentTask.taskStatusID) toStatusID = null;
         if (isOnlyDateEqual(toDeadline, new Date(currentTask.deadline))) toDeadline = null;
 
-        // handleWorkersChange: {
-        //     if (!user?.isAdmin) {
-        //         break handleWorkersChange;
-        //     }
-        //
-        //     // WARNING: doesn't work if both arrays are the "same" but different order but that's fine cuz we in the end both toDelete and toAdd is gonna be empty anyway 
-        //     if (equal(selectedWorkers, prevSelectedWorkers)) { // deep comparison from fast-deep-equal
-        //         console.log("its the same bro");
-        //         break handleWorkersChange;
-        //     }
-        //
-        //     let toDelete: User[] = [];
-        //     for (let oldWorker of prevSelectedWorkers) {
-        //         if (!selectedWorkers.find(x => x.userID === oldWorker.userID)) {
-        //             toDelete.push(oldWorker);
-        //         }
-        //     }
-        //
-        //     let toAdd: User[] = [];
-        //     for (let newWorker of selectedWorkers) {
-        //         if (!prevSelectedWorkers.find(x => x.userID === newWorker.userID)) {
-        //             toAdd.push(newWorker);
-        //         }
-        //     }
-        //
-        //     console.log(toDelete);
-        //     console.log(toAdd);
-        //
-        //     // TODO: handle api correctly
-        //     // TODO: make all of this and below using only 1 api call and a big query
-        //
-        //     if (toDelete.length > 0) await API.deleteTaskUsers(currentTask.taskID, toDelete);
-        //     if (toAdd.length > 0) await API.addTaskUsers(currentTask.taskID, toAdd);
-        // }
-
-        handleFileUpload: {
-            if (!selectedFile) {
-                break handleFileUpload;
+        handleWorkersChange: {
+            if (!user?.isAdmin) {
+                break handleWorkersChange;
             }
 
-            // TODO: do this properly 
-            // await API.uploadNewPOToTask(currentTask.taskID, )
+            // WARNING: doesn't work if both arrays are the "same" but different order but that's fine cuz we in the end both toDelete and toAdd is gonna be empty anyway 
+            if (equal(selectedWorkers, prevSelectedWorkers)) { // deep comparison from fast-deep-equal
+                break handleWorkersChange;
+            }
+
+            let toDelete: User[] = [];
+            for (let oldWorker of prevSelectedWorkers) {
+                if (!selectedWorkers.find(x => x.userID === oldWorker.userID)) {
+                    toDelete.push(oldWorker);
+                }
+            }
+
+            let toAdd: User[] = [];
+            for (let newWorker of selectedWorkers) {
+                if (!prevSelectedWorkers.find(x => x.userID === newWorker.userID)) {
+                    toAdd.push(newWorker);
+                }
+            }
+
+            console.log(toDelete);
+            console.log(toAdd);
+
+            // TODO: handle api correctly
+            // TODO: make all of this and below using only 1 api call and a big transaction
+
+            if (toDelete.length > 0) await API.deleteTaskUsers(currentTask.taskID, toDelete);
+            if (toAdd.length > 0) await API.addTaskUsers(currentTask.taskID, toAdd);
         }
+
+        // handleFileUpload: {
+        //     if (!selectedFile) {
+        //         break handleFileUpload;
+        //     }
+        //
+        //     // TODO: do this properly 
+        //     // await API.uploadNewPOToTask(currentTask.taskID, )
+        // }
 
         const newLog = {
             reason: formData.get("FormLogReason")!.toString(),
