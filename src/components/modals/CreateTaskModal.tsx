@@ -155,7 +155,6 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
                                 </div>
                                 <FormField label="Team">
                                     <Select
-                                        name="FormTeam"
                                         className={"shadow-sm"}
                                         required
                                         isClearable={false}
@@ -168,7 +167,6 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
                                 </FormField>
                                 <FormField label="Deadline">
                                     <DatePicker
-                                        name="FormDeadline"
                                         className={"w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"}
                                         required
                                         filterDate={(date) => { return date.getDay() !== 0 }}

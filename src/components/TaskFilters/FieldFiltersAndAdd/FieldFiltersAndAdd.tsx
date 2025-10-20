@@ -58,9 +58,9 @@ function FieldFiltersAndAdd(
                     </h3>
                     {createNewTaskButton}
                 </div>
-                <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid xs:grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* // TODO: abstract this to comboBox component or add this via prop children */}
-                    <div>
+                    <div className="xs:col-span-1 sm:col-span-1 md:col-span-1">
                         <label className="text-sm font-medium text-gray-700 mb-1 block">
                             Team / Assignee
                         </label>
@@ -78,7 +78,7 @@ function FieldFiltersAndAdd(
                     </div>
                     {
                         projectIDFilterState && (
-                            <div>
+                            <div className="xs:col-span-1 sm:col-span-1 md:col-span-1">
                                 <label className="text-sm font-medium text-gray-700 mb-1 block">
                                     Project
                                 </label>
@@ -96,7 +96,7 @@ function FieldFiltersAndAdd(
                             </div>
                         )
                     }
-                    <div className="col-span-1">
+                    <div className="xs:col-span-1 sm:col-span-1 md:col-span-1">
                         <label className="text-sm font-medium text-gray-700 mb-1 block">
                             Start Date
                         </label>
@@ -109,7 +109,7 @@ function FieldFiltersAndAdd(
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                         />
                     </div>
-                    <div className="col-span-1">
+                    <div className="xs:col-span-1 sm:col-span-1 md:col-span-1">
                         <label className="text-sm font-medium text-gray-700 mb-1 block">
                             End Date
                         </label>
@@ -122,7 +122,7 @@ function FieldFiltersAndAdd(
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                         />
                     </div>
-                    <div className="col-span-2">
+                    <div className="xs:col-span-1 sm:col-span-1 md:col-span-2">
                         <label className="text-sm font-medium text-gray-700 mb-1 block">
                             ค้นหา Task / Note
                         </label>
@@ -134,7 +134,7 @@ function FieldFiltersAndAdd(
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                         />
                     </div>
-                    <div className="col-span-2">
+                    <div className="xs:col-span-1 sm:col-span-1 col-span-2 flex items-center">
                         <label className="text-sm font-medium text-gray-700">
                             <input type="checkbox" className="mr-1" checked={showOnlyIncompleteChecked} onChange={(e) => { setShowOnlyIncompleteChecked(e.target.checked) }} />
                             แสดงเฉพาะ Task ที่ยังไม่เสร็จ
