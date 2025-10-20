@@ -12,7 +12,5 @@ export function useEffectDatePickerFix(dependencies?: any) {
         for (const val of juan) {
             val.classList.add("w-full");
         }
-
-        console.log("EIEIEIEIEIEIEIEIEI");
     }, dependencies ? [...dependencies] : []);
 }

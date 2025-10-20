@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type ElementRef, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import { FormButton, FormField, FormFieldSetWrapper } from "../forms/FormItems";
-import CreatableSelect from "react-select/creatable";
 import Select, { type SelectInstance, type SingleValue } from "react-select";
 import DatePicker from "react-datepicker";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
