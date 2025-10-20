@@ -161,16 +161,20 @@ function EditTaskModal(
             }
 
             let toDelete: User[] = [];
-            for (let oldWorker of prevSelectedWorkers) {
-                if (!selectedWorkers.find(x => x.userID === oldWorker.userID)) {
-                    toDelete.push(oldWorker);
+            if (prevSelectedWorkers) {
+                for (let oldWorker of prevSelectedWorkers) {
+                    if (!selectedWorkers.find(x => x.userID === oldWorker.userID)) {
+                        toDelete.push(oldWorker);
+                    }
                 }
             }
 
             let toAdd: User[] = [];
-            for (let newWorker of selectedWorkers) {
-                if (!prevSelectedWorkers.find(x => x.userID === newWorker.userID)) {
-                    toAdd.push(newWorker);
+            if (selectedWorkers) {
+                for (let newWorker of selectedWorkers) {
+                    if (!prevSelectedWorkers.find(x => x.userID === newWorker.userID)) {
+                        toAdd.push(newWorker);
+                    }
                 }
             }
 
