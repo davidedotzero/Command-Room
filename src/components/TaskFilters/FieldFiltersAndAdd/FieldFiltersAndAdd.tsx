@@ -58,7 +58,7 @@ function FieldFiltersAndAdd(
                     </h3>
                     {createNewTaskButton}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-4">
                     {/* // TODO: abstract this to comboBox component or add this via prop children */}
                     <div>
                         <label className="text-sm font-medium text-gray-700 mb-1 block">
@@ -109,7 +109,7 @@ function FieldFiltersAndAdd(
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                         />
                     </div>
-                    <div>
+                    <div className="col-span-1">
                         <label className="text-sm font-medium text-gray-700 mb-1 block">
                             End Date
                         </label>
