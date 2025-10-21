@@ -122,7 +122,7 @@ function Projects() {
                     {filteredProjects.map((p) => (
                         <div
                             key={p.projectID}
-                            className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-orange-500 hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+                            className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-orange-500 hover:shadow-lg transition-shadow duration-300 cursor-pointer flex flex-col"
                             onClick={() => navigate(`/projects/p/${p.projectID}`)}
                         >
                             <div className="flex justify-between items-start">
@@ -137,7 +137,7 @@ function Projects() {
                                     }
                                 </h3>
                             </div>
-                            <div className="flex items-center justify-between mt-4">
+                            <div className="flex items-center justify-between mt-auto">
                                 <p className="text-sm text-gray-500 font-mono">{p.projectID}</p>
                                 {user?.isAdmin && (
                                     <div className="flex items-center space-x-1">
