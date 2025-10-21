@@ -68,7 +68,6 @@ function TaskDetailProductionModal({ isOpen, onClose, taskData, parentUpdateCall
                                 >
                                     ปิด
                                 </button>
-                                {/* // TODO: is there a scenario where this modal will be accessed as View only??? */}
                                 <button
                                     type="submit"
                                     // [⭐ BUG FIX] ใช้ onClick + setTimeout(0) เพื่อป้องกัน Race Condition ในทุกกรณี (รวมถึง "Help Me")
@@ -85,7 +84,7 @@ function TaskDetailProductionModal({ isOpen, onClose, taskData, parentUpdateCall
                             </footer>
                         </div>
 
-                        <div className="w-3/5 overflow-x-auto border-l p-4">
+                        <div className="w-3/5 overflow-x-auto border-l">
                             <div className="grid grid-cols-1 gap-y-6">
                                 <LogsView taskID={currentTask.taskID} />
                             </div>

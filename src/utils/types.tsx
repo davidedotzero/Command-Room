@@ -69,6 +69,7 @@ export interface EditLog {
     toStatusID: number | null;
     fromDeadline: Date | null;
     toDeadline: Date | null;
+    markedDone: boolean;
 }
 
 export interface EditLogDetailed extends EditLog {
