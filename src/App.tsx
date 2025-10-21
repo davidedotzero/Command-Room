@@ -7,20 +7,9 @@ import Customers from './pages/Customers'
 import { useAuth } from './contexts/AuthContext'
 import { useGoogleLogin } from '@react-oauth/google'
 import ProjectDetail from './pages/ProjectDetail'
+import { version } from '../package.json'
 
 import "react-datepicker/dist/react-datepicker.css";
-
-// TODO: abstract this to other file
-function LoadingIndicator({ message }: { message: string }) {
-    return (
-        <>
-            <div className="flex flex-col items-center justify-center h-screen">
-                {/* TODO: add spinner svg */}
-                <p className="mt-4 text-lg text-gray-600">{message}</p>
-            </div>
-        </>
-    );
-}
 
 // TODO: abstract this to other file MAYBE
 function LoginPage() {
@@ -101,6 +90,8 @@ function AppContent() {
                     </Routes>
                 </main>
             </div >
+
+            <div className="absolute bottom-0 left-0 m-3 p-2 border border-transparent rounded-md bg-white/30 text-gray-400 hover:bg-white hover:text-gray-600 transition-all">v{version}</div>
 
             {/* render modals here */}
             <div id="modal-root"></div>
