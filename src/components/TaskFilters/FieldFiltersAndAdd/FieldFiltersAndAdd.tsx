@@ -4,6 +4,7 @@ import { useDbConst } from "../../../contexts/DbConstDataContext";
 import { API } from "../../../utils/api";
 import DatePicker from "react-datepicker";
 import { useEffectDatePickerFix } from "../../utils/ReactDatePickerBodgeFixHook";
+import Select from "react-select";
 
 function FieldFiltersAndAdd(
     { teamIDFilterState, searchFilterState, projectIDFilterState, startDateFilterState, endDateFilterState, showOnlyIncompleteCheckedState, createNewTaskButton, tasksLength }:
@@ -64,17 +65,20 @@ function FieldFiltersAndAdd(
                         <label className="text-sm font-medium text-gray-700 mb-1 block">
                             Team / Assignee
                         </label>
-                        <select
-                            onChange={(e) => setTeamIDFilter(Number(e.target.value))}
-                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                        <Select
+                            isClearable
+                            placeholder={"-- ทีมทั้งหมด --"}
+                            onChange={(e) => {
+                                if (!e) {
+                                    setTeamIDFilter(null);
+                                    return;
+                                }
+                                setTeamIDFilter(Number(e.value))
+                            }}
+                            options={TEAMS.map(x => ({ value: x.teamID, label: x.teamName }))}
+                            className="text-sm shadow-sm"
                         >
-                            <option value={""}>-- ทีมทั้งหมด --</option>
-                            {TEAMS.map((opt) => (
-                                <option key={opt.teamID} value={opt.teamID}>
-                                    {opt.teamName}
-                                </option>
-                            ))}
-                        </select>
+                        </Select>
                     </div>
                     {
                         projectIDFilterState && (
@@ -82,17 +86,20 @@ function FieldFiltersAndAdd(
                                 <label className="text-sm font-medium text-gray-700 mb-1 block">
                                     Project
                                 </label>
-                                <select
-                                    onChange={(e) => setProjectIDFilter(e.target.value)}
-                                    className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                                <Select
+                                    isClearable
+                                    placeholder={"-- โปรเจกต์ทั้งหมด --"}
+                                    onChange={(e) => {
+                                        if (!e) {
+                                            setProjectIDFilter(null);
+                                            return;
+                                        }
+                                        setProjectIDFilter(e.value);
+                                    }}
+                                    options={projectList.map(x => ({ value: x.projectID, label: x.projectName }))}
+                                    className="text-sm shadow-sm"
                                 >
-                                    <option value={""}>-- โปรเจกต์ทั้งหมด --</option>
-                                    {projectList.map((opt: Project) => (
-                                        <option key={opt.projectID} value={opt.projectID}>
-                                            {opt.projectName}
-                                        </option>
-                                    ))}
-                                </select>
+                                </Select>
                             </div>
                         )
                     }
@@ -135,7 +142,7 @@ function FieldFiltersAndAdd(
                         />
                     </div>
                     <div className="xs:col-span-1 sm:col-span-1 col-span-2 flex items-center">
-                        <label className="text-sm font-medium text-gray-700">
+                        <label className="text-lg font-medium text-gray-700">
                             <input type="checkbox" className="mr-1" checked={showOnlyIncompleteChecked} onChange={(e) => { setShowOnlyIncompleteChecked(e.target.checked) }} />
                             แสดงเฉพาะ Task ที่ยังไม่เสร็จ
                         </label>
