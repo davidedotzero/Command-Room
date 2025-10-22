@@ -26,6 +26,9 @@ function TableDisplay(
                             <th scope="col" className="px-6 py-3 font-medium text-left">
                                 Task
                             </th>
+                            <th scope="col" className={`px-6 py-3 font-medium text-left ${hideProjNameColumn ? "hidden" : ""}`}>
+                                Project Name
+                            </th>
                             <th scope="col" className="px-6 py-3 font-medium text-left">
                                 Note/Result
                             </th>
@@ -40,9 +43,6 @@ function TableDisplay(
                             </th>
                             <th scope="col" className="px-6 py-3 font-medium text-left">
                                 Status
-                            </th>
-                            <th scope="col" className={`px-6 py-3 font-medium text-left ${hideProjNameColumn ? "hidden" : ""}`}>
-                                Project Name
                             </th>
                         </tr>
                     </thead>
@@ -78,13 +78,20 @@ function TableDisplay(
                                     >
                                         {task.taskName}
                                     </td>
+                                    <td className={`px-6 py-4 font-medium text-gray-900 max-w-xs truncate ${hideProjNameColumn ? "hidden" : ""}`}
+                                        title={task.projectName}
+                                    >
+                                        {task.projectName}
+                                    </td>
                                     <td
                                         className="px-6 py-4 text-gray-600 max-w-sm truncate"
                                         title={task.logPreview} // TODO: maybe title is not need?
                                     >
                                         {task.logPreview}
                                     </td>
-                                    <td className="px-6 py-4">
+                                    <td className="px-6 py-4"
+                                        title={task.teamName}
+                                    >
                                         <TeamLabel text={task.teamName} />
                                     </td>
                                     <td className="px-6 py-4 max-w-xs">
@@ -100,9 +107,6 @@ function TableDisplay(
                                         className={`px-6 py-4 font-semibold ${StatusColor.get(task.taskStatusName) || "text-gray-500"}`}
                                     >
                                         {task.taskStatusName}
-                                    </td>
-                                    <td className={`px-6 py-4 font-medium text-gray-900 max-w-xs truncate ${hideProjNameColumn ? "hidden" : ""}`} >
-                                        {task.projectName}
                                     </td>
                                 </tr>
                             );
