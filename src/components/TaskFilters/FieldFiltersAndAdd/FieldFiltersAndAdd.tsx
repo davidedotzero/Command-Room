@@ -25,6 +25,10 @@ function FieldFiltersAndAdd(
     const [startDateFilter, setStartDateFilter] = startDateFilterState;
     const [endDateFilter, setEndDateFilter] = endDateFilterState;
 
+    // THIS IS VERY BAD AND I WILL HATE MYSELF FOREVER FOR IT. but we need this to handle react-select value props cuz i really dont wanna change projectIDFilter, teamIDFilter to accept both value and label
+    const [projectName, setProjectName] = useState<string | null>();
+    const [teamName, setTeamName] = useState<string | null>();
+
     const [showOnlyIncompleteChecked, setShowOnlyIncompleteChecked] = showOnlyIncompleteCheckedState;
 
     const { TEAMS } = useDbConst();
@@ -45,9 +49,10 @@ function FieldFiltersAndAdd(
     function resetFilters() {
         setTeamIDFilter(null);
         setSearchFilter("");
-        setProjectIDFilter(null);
         setStartDateFilter(null);
         setEndDateFilter(null);
+
+        if (setProjectIDFilter) setProjectIDFilter(null);
     }
 
     return (
@@ -68,12 +73,15 @@ function FieldFiltersAndAdd(
                         <Select
                             isClearable
                             placeholder={"-- ทีมทั้งหมด --"}
+                            value={teamIDFilter === null ? null : { value: teamIDFilter, label: teamName }}
                             onChange={(e) => {
                                 if (!e) {
                                     setTeamIDFilter(null);
+                                    setTeamName(null);
                                     return;
                                 }
                                 setTeamIDFilter(Number(e.value))
+                                setTeamName(e.label)
                             }}
                             options={TEAMS.map(x => ({ value: x.teamID, label: x.teamName }))}
                             className="text-sm shadow-sm"
@@ -89,15 +97,18 @@ function FieldFiltersAndAdd(
                                 <Select
                                     isClearable
                                     placeholder={"-- โปรเจกต์ทั้งหมด --"}
+                                    value={projectIDFilter === null ? null : { value: projectIDFilter, label: projectName }}
                                     onChange={(e) => {
                                         if (!e) {
-                                            setProjectIDFilter(null);
+                                            if (setProjectIDFilter) setProjectIDFilter(null);
+                                            setProjectName(null);
                                             return;
                                         }
-                                        setProjectIDFilter(e.value);
+                                        if (setProjectIDFilter) setProjectIDFilter(e.value);
+                                        setProjectName(e.label);
                                     }}
-                                    options={projectList.map(x => ({ value: x.projectID, label: x.projectName }))}
                                     className="text-sm shadow-sm"
+                                    options={projectList.map(x => ({ value: x.projectID, label: x.projectName }))}
                                 >
                                 </Select>
                             </div>
