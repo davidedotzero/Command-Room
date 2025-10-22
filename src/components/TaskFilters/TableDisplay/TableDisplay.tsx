@@ -17,31 +17,31 @@ function TableDisplay(
     return (
         <>
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-sm table-auto">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
-                            <th scope="col" className="px-6 py-3 font-medium text-left">
+                            <th scope="col" className="px-1 md:px-6 py-3 font-medium text-left max-w-sm md:max-w-md truncate">
                                 Deadline
                             </th>
-                            <th scope="col" className="px-6 py-3 font-medium text-left">
+                            <th scope="col" className="px-1 md:px-6 py-3 font-medium text-left max-w-[50] md:max-w-md truncate">
                                 Task
                             </th>
-                            <th scope="col" className={`px-6 py-3 font-medium text-left ${hideProjNameColumn ? "hidden" : ""}`}>
+                            <th scope="col" className={`px-1 md:px-6 py-3 font-medium text-left max-w-[50] md:max-w-md truncate ${hideProjNameColumn ? "hidden" : ""}`}>
                                 Project Name
                             </th>
-                            <th scope="col" className="px-6 py-3 font-medium text-left">
+                            <th scope="col" className="px-1 md:px-6 py-3 font-medium text-left max-w-md truncate">
                                 Note/Result
                             </th>
-                            <th scope="col" className="px-6 py-3 font-medium text-left">
+                            <th scope="col" className="px-1 md:px-6 py-3 font-medium text-left max-w-sm truncate">
                                 Team
                             </th>
-                            <th scope="col" className="px-6 py-3 font-medium text-left">
+                            <th scope="col" className="px-1 md:px-6 py-3 font-medium text-left max-w-md truncate">
                                 Worker
                             </th>
-                            <th scope="col" className="px-6 py-3 font-medium text-left">
+                            <th scope="col" className="px-1 md:px-6 py-3 font-medium text-left max-w-sm truncate">
                                 Help Assignee
                             </th>
-                            <th scope="col" className="px-6 py-3 font-medium text-left">
+                            <th scope="col" className="px-1 md:px-6 py-3 font-medium text-left max-w-sm truncate">
                                 Status
                             </th>
                         </tr>
@@ -69,42 +69,42 @@ function TableDisplay(
                                         }
                                     }}
                                 >
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td className="px-1 md:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {formatDateYYYY_MM_DD(task.deadline)}
                                     </td>
                                     <td
-                                        className="px-6 py-4 font-medium text-gray-900 max-w-xs truncate"
+                                        className="px-1 md:px-6 py-4 font-medium text-gray-900"
                                         title={task.taskName}
                                     >
                                         {task.taskName}
                                     </td>
-                                    <td className={`px-6 py-4 font-medium text-gray-900 max-w-xs truncate ${hideProjNameColumn ? "hidden" : ""}`}
+                                    <td className={`px-1 md:px-6 py-4 font-medium text-gray-900 ${hideProjNameColumn ? "hidden" : ""}`}
                                         title={task.projectName}
                                     >
                                         {task.projectName}
                                     </td>
                                     <td
-                                        className="px-6 py-4 text-gray-600 max-w-sm truncate"
+                                        className="px-1 md:px-6 py-4 text-gray-600"
                                         title={task.logPreview} // TODO: maybe title is not need?
                                     >
                                         {task.logPreview}
                                     </td>
-                                    <td className="px-6 py-4"
+                                    <td className="px-1 md:px-6 py-4"
                                         title={task.teamName}
                                     >
                                         <TeamLabel text={task.teamName} />
                                     </td>
-                                    <td className="px-6 py-4 max-w-xs">
+                                    <td className="px-1 md:px-6 py-4">
                                         {
                                             task.workers === null ? "-" : task.workers.map(x => { return <AssigneeLabels key={x.userID} text={x.userName} /> })
                                         }
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-700 font-medium">
+                                    <td className="px-1 md:px-6 py-4 whitespace-nowrap text-sm text-purple-700 font-medium">
                                         {task.teamHelpID ? task.teamHelpName : "-"}
                                     </td>
                                     <td
                                         // TODO:  make statuscolor index by statusid?
-                                        className={`px-6 py-4 font-semibold ${StatusColor.get(task.taskStatusName) || "text-gray-500"}`}
+                                        className={`px-1 md:px-6 py-4 font-semibold ${StatusColor.get(task.taskStatusName) || "text-gray-500"}`}
                                     >
                                         {task.taskStatusName}
                                     </td>

@@ -80,13 +80,13 @@ function EditTaskModal(
     }, [selectedDeadline]);
 
     // TODO: loading indicator when file uploading 
-    function handleFileChange(event: ChangeEvent<HTMLInputElement>): void {
-        console.log("file changed");
-        const file = event.target.files[0];
-        if (file) {
-            setSelectedFile(file);
-        }
-    };
+    // function handleFileChange(event: ChangeEvent<HTMLInputElement>): void {
+    //     console.log("file changed");
+    //     const file = event.target.files[0];
+    //     if (file) {
+    //         setSelectedFile(file);
+    //     }
+    // };
 
     // TODO: not using formData anymore it sucks
     const handleSubmit = async (formData: FormData) => {
@@ -150,6 +150,8 @@ function EditTaskModal(
         if (toStatusID === currentTask.taskStatusID) toStatusID = null;
         if (isOnlyDateEqual(toDeadline, new Date(currentTask.deadline))) toDeadline = null;
 
+        let toDeleteUsers: User[] = [];
+        let toAddUsers: User[] = [];
         handleWorkersChange: {
             if (!user?.isAdmin) {
                 break handleWorkersChange;
@@ -160,32 +162,22 @@ function EditTaskModal(
                 break handleWorkersChange;
             }
 
-            let toDelete: User[] = [];
             if (prevSelectedWorkers) {
                 for (let oldWorker of prevSelectedWorkers) {
                     if (!selectedWorkers.find(x => x.userID === oldWorker.userID)) {
-                        toDelete.push(oldWorker);
+                        toDeleteUsers.push(oldWorker);
                     }
                 }
             }
 
-            let toAdd: User[] = [];
             if (selectedWorkers) {
                 for (let newWorker of selectedWorkers) {
                     if (!prevSelectedWorkers.find(x => x.userID === newWorker.userID)) {
-                        toAdd.push(newWorker);
+                        toAddUsers.push(newWorker);
                     }
                 }
             }
 
-            console.log(toDelete);
-            console.log(toAdd);
-
-            // TODO: handle api correctly
-            // TODO: make all of this and below using only 1 api call and a big transaction
-
-            if (toDelete.length > 0) await API.deleteTaskUsers(currentTask.taskID, toDelete);
-            if (toAdd.length > 0) await API.addTaskUsers(currentTask.taskID, toAdd);
         }
 
         // handleFileUpload: {
@@ -221,9 +213,12 @@ function EditTaskModal(
 
         console.log(updateTask);
 
-        // TODO: handle api correctly
+        if (toDeleteUsers.length > 0) await API.deleteTaskUsers(currentTask.taskID, toDeleteUsers);
+        if (toAddUsers.length > 0) await API.addTaskUsers(currentTask.taskID, toAddUsers);
         await API.addEditLog(newLog);
         await API.updateTaskByTaskID(updateTask);
+
+        // await API.updateTask(updateTask, newLog, toAddUsers, toDeleteUsers);
 
         onClose();
         parentUpdateCallback();
@@ -284,13 +279,17 @@ function EditTaskModal(
                                             <Select
                                                 isDisabled={!user?.isAdmin}
                                                 name="FormTeam"
-                                                className={"shadow-sm"}
                                                 required
                                                 isClearable={false}
                                                 isSearchable={true}
                                                 options={TEAMS.map(t => ({ value: t.teamID, label: t.teamName }))}
                                                 value={selectedTeamID}
                                                 onChange={e => setSelectedTeamID(e)}
+                                                className="text-sm shadow-sm"
+                                                classNames={{
+                                                    control: (state) =>
+                                                        state.isFocused ? "!outline-none !ring-orange-500 !border-orange-500 !ring-0" : "!border-gray-300"
+                                                }}
                                             />
                                         </FormField>
                                         <div className="grid grid-cols-8">
@@ -298,7 +297,6 @@ function EditTaskModal(
                                                 <FormField label="Workers">
                                                     <Select
                                                         isDisabled={!user?.isAdmin}
-                                                        className={"shadow-sm"}
                                                         isClearable={false}
                                                         isSearchable={true}
                                                         options={listWorkers!.map(x => ({ value: x, label: x.userName }))}
@@ -322,6 +320,11 @@ function EditTaskModal(
 
                                                             const newListWorker = listWorkers!.filter(x => x.userID !== e.value.userID);
                                                             setListWorkers(newListWorker);
+                                                        }}
+                                                        className="text-sm shadow-sm"
+                                                        classNames={{
+                                                            control: (state) =>
+                                                                state.isFocused ? "!outline-none !ring-orange-500 !border-orange-500 !ring-0" : "!border-gray-300"
                                                         }}
                                                     />
                                                 </FormField>

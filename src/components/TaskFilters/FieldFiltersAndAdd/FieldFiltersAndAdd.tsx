@@ -64,9 +64,9 @@ function FieldFiltersAndAdd(
                     </h3>
                     {createNewTaskButton}
                 </div>
-                <div className="grid xs:grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* // TODO: abstract this to comboBox component or add this via prop children */}
-                    <div className="xs:col-span-1 sm:col-span-1 md:col-span-1">
+                    <div className="col-span-1 md:col-span-1">
                         <label className="text-sm font-medium text-gray-700 mb-1 block">
                             Team / Assignee
                         </label>
@@ -83,14 +83,18 @@ function FieldFiltersAndAdd(
                                 setTeamIDFilter(Number(e.value))
                                 setTeamName(e.label)
                             }}
-                            options={TEAMS.map(x => ({ value: x.teamID, label: x.teamName }))}
                             className="text-sm shadow-sm"
+                            classNames={{
+                                control: (state) =>
+                                    state.isFocused ? "!outline-none !ring-orange-500 !border-orange-500 !ring-0" : "!border-gray-300"
+                            }}
+                            options={TEAMS.map(x => ({ value: x.teamID, label: x.teamName }))}
                         >
                         </Select>
                     </div>
                     {
                         projectIDFilterState && (
-                            <div className="xs:col-span-1 sm:col-span-1 md:col-span-1">
+                            <div className="col-span-1 md:col-span-1">
                                 <label className="text-sm font-medium text-gray-700 mb-1 block">
                                     Project
                                 </label>
@@ -107,14 +111,18 @@ function FieldFiltersAndAdd(
                                         if (setProjectIDFilter) setProjectIDFilter(e.value);
                                         setProjectName(e.label);
                                     }}
-                                    className="text-sm shadow-sm"
+                                    className="text-sm shadow-sm "
+                                    classNames={{
+                                        control: (state) =>
+                                            state.isFocused ? "!outline-none !ring-orange-500 !border-orange-500 !ring-0" : "!border-gray-300"
+                                    }}
                                     options={projectList.map(x => ({ value: x.projectID, label: x.projectName }))}
                                 >
                                 </Select>
                             </div>
                         )
                     }
-                    <div className="xs:col-span-1 sm:col-span-1 md:col-span-1">
+                    <div className="col-span-1 md:col-span-1">
                         <label className="text-sm font-medium text-gray-700 mb-1 block">
                             Start Date
                         </label>
@@ -127,7 +135,7 @@ function FieldFiltersAndAdd(
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                         />
                     </div>
-                    <div className="xs:col-span-1 sm:col-span-1 md:col-span-1">
+                    <div className="col-span-1 md:col-span-1">
                         <label className="text-sm font-medium text-gray-700 mb-1 block">
                             End Date
                         </label>
@@ -140,7 +148,7 @@ function FieldFiltersAndAdd(
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                         />
                     </div>
-                    <div className="xs:col-span-1 sm:col-span-1 md:col-span-2">
+                    <div className="col-span-1 md:col-span-2">
                         <label className="text-sm font-medium text-gray-700 mb-1 block">
                             ค้นหา Task / Note
                         </label>
@@ -152,7 +160,7 @@ function FieldFiltersAndAdd(
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                         />
                     </div>
-                    <div className="xs:col-span-1 sm:col-span-1 col-span-2 flex items-center">
+                    <div className="col-span-1 md:col-span-2 flex items-center">
                         <label className="text-lg font-medium text-gray-700">
                             <input type="checkbox" className="mr-1" checked={showOnlyIncompleteChecked} onChange={(e) => { setShowOnlyIncompleteChecked(e.target.checked) }} />
                             แสดงเฉพาะ Task ที่ยังไม่เสร็จ
