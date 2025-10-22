@@ -85,6 +85,7 @@ export interface FilteringTask extends Task {
     po: PO | null;
     customer: Customer | null;
     projectName: string;
+    recentLogsCount: number;
 }
 
 export interface DetailedCustomer extends Customer {

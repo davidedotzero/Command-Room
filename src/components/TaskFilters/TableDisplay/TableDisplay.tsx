@@ -20,13 +20,13 @@ function TableDisplay(
                 <table className="w-full text-sm table-auto">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
-                            <th scope="col" className="px-1 md:px-6 py-3 font-medium text-left max-w-sm md:max-w-md truncate">
+                            <th scope="col" className="px-1 md:px-6 py-3 font-medium text-left max-w-sm md:max-w-md">
                                 Deadline
                             </th>
-                            <th scope="col" className="px-1 md:px-6 py-3 font-medium text-left max-w-[50] md:max-w-md truncate">
+                            <th scope="col" className="px-1 md:px-6 py-3 font-medium text-left max-w-[50] md:max-w-md">
                                 Task
                             </th>
-                            <th scope="col" className={`px-1 md:px-6 py-3 font-medium text-left max-w-[50] md:max-w-md truncate ${hideProjNameColumn ? "hidden" : ""}`}>
+                            <th scope="col" className={`px-1 md:px-6 py-3 font-medium text-left max-w-[50] md:max-w-md ${hideProjNameColumn ? "hidden" : ""}`}>
                                 Project Name
                             </th>
                             <th scope="col" className="px-1 md:px-6 py-3 font-medium text-left max-w-md truncate">
@@ -41,7 +41,10 @@ function TableDisplay(
                             <th scope="col" className="px-1 md:px-6 py-3 font-medium text-left max-w-sm truncate">
                                 Help Assignee
                             </th>
-                            <th scope="col" className="px-1 md:px-6 py-3 font-medium text-left max-w-sm truncate">
+                            <th scope="col" className="px-1 md:px-6 py-3 font-medium text-left max-w-[10] truncate">
+                                <span className="md:truncate"> {"Recent Update (4hrs)"} </span>
+                            </th>
+                            <th scope="col" className="px-1 md:px-6 py-3 font-medium text-left max-w-sm">
                                 Status
                             </th>
                         </tr>
@@ -81,7 +84,7 @@ function TableDisplay(
                                     <td className={`px-1 md:px-6 py-4 font-medium text-gray-900 ${hideProjNameColumn ? "hidden" : ""}`}
                                         title={task.projectName}
                                     >
-                                        {task.projectName}
+                                        <span className="md:truncate"> {task.projectName} </span>
                                     </td>
                                     <td
                                         className="px-1 md:px-6 py-4 text-gray-600"
@@ -101,6 +104,12 @@ function TableDisplay(
                                     </td>
                                     <td className="px-1 md:px-6 py-4 whitespace-nowrap text-sm text-purple-700 font-medium">
                                         {task.teamHelpID ? task.teamHelpName : "-"}
+                                    </td>
+                                    <td
+                                        className="px-1 md:px-6 py-4 font-medium text-green-600"
+                                        title={task.recentLogsCount.toString()}
+                                    >
+                                        {task.recentLogsCount <= 0 ? "" : task.recentLogsCount}
                                     </td>
                                     <td
                                         // TODO:  make statuscolor index by statusid?
