@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ElementRef, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import { FormButton, FormField, FormFieldSetWrapper } from "../forms/FormItems";
 import Select, { type SelectInstance, type SingleValue } from "react-select";
@@ -18,7 +18,7 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
     if (!isOpen) return null;
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const { TEAMS } = useDbConst();
+    const { DEFAULT_TASK_NAMES, TEAMS } = useDbConst();
 
     const [selectedTask, setSelectedTask] = useState<{ value: DefaultTaskName | string, label: string } | null>(null);
     const [selectedTeam, setSelectedTeam] = useState<{ value: Team, label: string } | null>(null);
@@ -53,6 +53,7 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
     const handleTaskChange = async (e: SingleValue<{ value: DefaultTaskName | string, label: string }>) => {
         console.log(e);
         setSelectedTask(e);
+        // TODO: maybe redo this
         if (!e) {
             setSelectedTeam(null);
             return;
@@ -103,6 +104,12 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
             return;
         }
 
+        if (isTaskExists(selectedTask.label || selectedTask)) {
+            taskNameSelectInputRef?.setCustomValidity("ไม่สามารถใ่ส่ task ซ้ำกันได้");
+            taskNameSelectInputRef?.reportValidity();
+            return;
+        }
+
         if (selectedTeam === null) {
             teamSelectInputRef?.setCustomValidity("Please fill out this field.");
             teamSelectInputRef?.reportValidity();
@@ -123,13 +130,35 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
             deadline: getOnlyDate(selectedDeadline!)
         };
         setProjectTasks([newTask, ...projectTasks]);
+
+        setSelectedTask(null);
+        setSelectedTeam(null);
+        setSelectedDate(null);
     }
 
-    // return createPortal(
-    //     <>
-    //         {alert("ยังไม่เปิดให้ใช่งานตอนนี้")}
-    //     </>,
-    //     document.getElementById("modal-root")!);
+    function handleAddAllDefaultTask() {
+        console.log("asdadadsadad");
+        let newTasks: NewTask[] = [];
+        let i = 0;
+        for (let defaultTask of DEFAULT_TASK_NAMES) {
+            const newTask: NewTask =
+            {
+                id: Date.now() + i,
+                taskName: defaultTask.taskName,
+                team: TEAMS.find(x => x.teamID === defaultTask.teamID) ?? "KUYKUYUKYU",
+                deadline: getOnlyDate(new Date())
+            };
+            newTasks.push(newTask);
+            i++;
+        }
+
+        setProjectTasks([...newTasks, ...projectTasks]);
+    }
+
+    function isTaskExists(taskName: string) {
+        return projectTasks.some(x => x.taskName === taskName);
+    }
+
 
     return createPortal(
         <>
@@ -149,7 +178,7 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
 
                     <div className="flex flex-grow overflow-y-auto">
                         <div className="w-1/3 flex flex-col">
-                            <form className="flex-grow">
+                            <form className="">
                                 <FormFieldSetWrapper>
                                     <div className="border-b grid grid-cols-1 md:grid-cols-12 gap-x-6 gap-y-5 px-8 py-6">
                                         <div className="md:col-span-12">
@@ -216,6 +245,18 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
                                     </div>
                                 </FormFieldSetWrapper>
                             </form >
+                            <div className="flex-grow flex items-center flex-col space-y-2 p-4">
+                                <div>
+                                    <button
+                                        className="ml-3 px-4 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:bg-purple-900"
+                                        onClick={handleAddAllDefaultTask}>เพิ่ม task ทั้งหมดจากรายการเริ่มต้น</button>
+                                </div>
+                                <div>
+                                    <button
+                                        className="ml-3 px-4 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:bg-purple-900"
+                                        onClick={() => { setProjectTasks([]) }}>ลบ task ทั้งหมด</button>
+                                </div>
+                            </div>
 
                             <footer className="flex justify-end p-6 bg-gray-50 border-t rounded-b-xl">
                                 <FormButton type="button" onClick={onClose} className="px-4 py-2 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:bg-purple-900">
@@ -230,7 +271,6 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
                         {/* // right */}
                         <div className="w-2/3 overflow-x-auto border-l p-4">
                             <div className="space-y-2">
-                                <div></div>
                                 {projectTasks.length <= 0 ? (
                                     <div className="w-full flex justify-center items-center italic text-gray-500">
                                         {"ไม่มี Task ใหม่"}
