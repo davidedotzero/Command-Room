@@ -120,18 +120,19 @@ async function putAPI(endpoint: string, body: any): Promise<any> {
             },
             body: JSON.stringify(body),
         });
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const result = await response.json();
-        console.log('Success:', result);
-        // TODO: change there alerts
 
-        // alert('PUT api done successfully!');
+        console.log(response);
+        const result = await response.json();
+
+        if (!response.ok) {
+            ErrorAlertDetailed(result.message, result.detail);
+        } else {
+            SuccessAlert(result.message);
+        }
 
     } catch (error) {
-        console.error('Error:', error);
-        // alert('Failed to run PUT api.');
+        ErrorAlertDetailed("Failed to call PUT api", "" + error);
+        return Response.error();
     }
 }
 
@@ -379,6 +380,17 @@ export const API = {
         taskID: string,
     }) => {
         const response = await putAPI("tasks", updateTask);
+        return response;
+    },
+    updateTask: async (updateTask, newLog, toAddUsers, toDelUsers) => {
+        let body = {
+            updateTask: updateTask,
+            newLog: newLog,
+            toAddUsers: toAddUsers,
+            toDelUsers: toDelUsers
+        };
+
+        const response = await putAPI("tasks", body);
         return response;
     },
 

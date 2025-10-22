@@ -65,6 +65,8 @@ function EditTaskModal(
             }
             setListWorkers(lnws);
         }
+
+        console.log(selectedWorkers);
     }
 
     useEffect(() => {
@@ -177,7 +179,6 @@ function EditTaskModal(
                     }
                 }
             }
-
         }
 
         // handleFileUpload: {
@@ -213,12 +214,12 @@ function EditTaskModal(
 
         console.log(updateTask);
 
-        if (toDeleteUsers.length > 0) await API.deleteTaskUsers(currentTask.taskID, toDeleteUsers);
-        if (toAddUsers.length > 0) await API.addTaskUsers(currentTask.taskID, toAddUsers);
-        await API.addEditLog(newLog);
-        await API.updateTaskByTaskID(updateTask);
+        // if (toDeleteUsers.length > 0) await API.deleteTaskUsers(currentTask.taskID, toDeleteUsers);
+        // if (toAddUsers.length > 0) await API.addTaskUsers(currentTask.taskID, toAddUsers);
+        // await API.addEditLog(newLog);
+        // await API.updateTaskByTaskID(updateTask);
 
-        // await API.updateTask(updateTask, newLog, toAddUsers, toDeleteUsers);
+        await API.updateTask(updateTask, newLog, toAddUsers, toDeleteUsers);
 
         onClose();
         parentUpdateCallback();
