@@ -279,7 +279,7 @@ function LogsView({ taskID }: { taskID: string }) {
                                                         </div>
 
                                                         {/* add user here for now */}
-                                                        {user.userID === "USER-2025-000011" || user.userID === "USER-0000-000001" ?
+                                                        {user.userID === "USER-2025-000011" || user.userID === "USER-0000-000001" || user.userID === "USER-2025-000019" || user.userID === "USER-2025-000001" ?
                                                             <div className="bottom-0 right-0 mr-3 mb-1 absolute flex justify-end">
                                                                 <label className="flex items-center space-x-3 cursor-pointer group">
                                                                     <input type="checkbox" className="sr-only peer" onChange={(e) => handleLogDoneChange(e, x.eLogID)} checked={x.markedDone} />
