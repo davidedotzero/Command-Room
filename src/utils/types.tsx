@@ -69,6 +69,7 @@ export interface EditLog {
     toStatusID: number | null;
     fromDeadline: Date | null;
     toDeadline: Date | null;
+    markedDone: boolean;
 }
 
 export interface EditLogDetailed extends EditLog {
@@ -84,6 +85,7 @@ export interface FilteringTask extends Task {
     po: PO | null;
     customer: Customer | null;
     projectName: string;
+    recentLogsCount: number;
 }
 
 export interface DetailedCustomer extends Customer {

@@ -12,7 +12,16 @@ const statDescriptions = {
     helpMe: "งานที่ทีมกำลังร้องขอความช่วยเหลือ",
 };
 
-function KPISummarySection({ activeStatFilterState, tasks, avgHelpLeadDays, title }: { activeStatFilterState: [string | null, React.Dispatch<React.SetStateAction<string | null>>], tasks: FilteringTask[], avgHelpLeadDays?: number, title: string }) {
+function KPISummarySection(
+    { activeStatFilterState, tasks, avgHelpLeadDays, title, refreshDataCallback }:
+        {
+            activeStatFilterState: [string | null, React.Dispatch<React.SetStateAction<string | null>>],
+            tasks: FilteringTask[],
+            title: string,
+            refreshDataCallback: () => void
+            avgHelpLeadDays?: number,
+        }) {
+
     const [activeStatFilter, setActiveStatFilter] = activeStatFilterState;
 
     const toggleActiveStatFilter = (stat: string) => {
@@ -51,7 +60,7 @@ function KPISummarySection({ activeStatFilterState, tasks, avgHelpLeadDays, titl
                         {title}
                     </h3>
                     <button
-                        // onClick={refreshAllData} TODO: make refresh data work
+                        onClick={refreshDataCallback}
                         className="p-2 text-gray-500 hover:text-orange-600 hover:bg-orange-100 rounded-full transition-colors"
                         aria-label="Refresh data"
                     >

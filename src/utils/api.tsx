@@ -1,6 +1,8 @@
+import Swal from "sweetalert2";
 import { removeLastZchar } from "./functions";
 import { PO_STATUSES, leftJoinOne2One, TASK_USER, USERS, CUSTOMERS, CUSTOMER_TYPES, POs } from "./mockdata";
 import type { DetailedCustomer, DetailedPO, EditLog, FilteringTask, Project, Task, TaskStatus, Team, User, NewTask, EditLogDetailed } from "./types";
+import { ErrorAlertDetailed, SuccessAlert } from "../functions/Swal2/CustomSwalCollection";
 
 //TODO: IMPORTANT!!!!! this file
 
@@ -93,18 +95,19 @@ async function postAPI(endpoint: string, body: any): Promise<any> {
             },
             body: JSON.stringify(body),
         });
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+
         const result = await response.json();
-        console.log('Success:', result);
-        // TODO: change there alerts
 
-        // alert('POST api done successfully!');
+        if (!response.ok) {
+            ErrorAlertDetailed(result.message, result.detail);
+        } else {
+            SuccessAlert(result.message);
+        }
 
+        return response;
     } catch (error) {
-        console.error('Error:', error);
-        // alert('Failed to run POST api.');
+        ErrorAlertDetailed("Failed to call PATCH api", "" + error);
+        return Response.error();
     }
 }
 
@@ -117,22 +120,23 @@ async function putAPI(endpoint: string, body: any): Promise<any> {
             },
             body: JSON.stringify(body),
         });
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const result = await response.json();
-        console.log('Success:', result);
-        // TODO: change there alerts
 
-        // alert('PUT api done successfully!');
+        console.log(response);
+        const result = await response.json();
+
+        if (!response.ok) {
+            ErrorAlertDetailed(result.message, result.detail);
+        } else {
+            SuccessAlert(result.message);
+        }
 
     } catch (error) {
-        console.error('Error:', error);
-        // alert('Failed to run PUT api.');
+        ErrorAlertDetailed("Failed to call PUT api", "" + error);
+        return Response.error();
     }
 }
 
-async function patchAPI(endpoint: string, body: any, param: string = ""): Promise<any> {
+async function patchAPI(endpoint: string, body: any, param: string = ""): Promise<Response> {
     try {
         const response = await fetch(apiURL + endpoint + "/" + param, {
             method: 'PATCH',
@@ -141,18 +145,19 @@ async function patchAPI(endpoint: string, body: any, param: string = ""): Promis
             },
             body: JSON.stringify(body),
         });
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+
         const result = await response.json();
-        console.log('Success:', result);
-        // TODO: change there alerts
 
-        // alert('PATCH api done successfully!');
+        if (!response.ok) {
+            ErrorAlertDetailed(result.message, result.detail);
+        } else {
+            SuccessAlert(result.message);
+        }
 
+        return response;
     } catch (error) {
-        console.error('Error:', error);
-        // alert('Failed to run PATCH api.');
+        ErrorAlertDetailed("Failed to call PATCH api", "" + error);
+        return Response.error();
     }
 }
 
@@ -180,6 +185,7 @@ async function deleteAPI(endpoint: string, body: any): Promise<any> {
         // alert('Failed to run DELETE api.');
     }
 }
+
 
 export const API = {
     // TODO: THIS AUTH METHOD IS SHIT, MUST USE BETTER AUTH LATER KUYKUYUKYUKYUKYKUYKUYKUYKUYKUYKUKYUKYUYKUYKU
@@ -309,11 +315,59 @@ export const API = {
         // TODO: handle response???
         return response;
     },
+
+    updateProjectNameAtId: async (projectID: string, newProjectName: string) => {
+        const response = await patchAPI("projects/name", { newProjectName }, projectID);
+        return response;
+    },
+    deleteProjectById: async (projectID: string, isArchived: boolean = true) => {
+        const response = await patchAPI("projects/archive", { isArchived }, projectID);
+        return response;
+    },
+
+    addProjectAndTasks: async (projectName: string, projectTasks: NewTask[]) => {
+        const body = {
+            projectName: projectName,
+            tasks: projectTasks
+        };
+
+        const response = await postAPI("projects", body);
+        return response;
+    },
+
+    markLogs: async (toMarkLogIDs: Array<string>, toUnmarkLogIDs: Array<string>) => {
+        const body = {
+            markLogs: toMarkLogIDs,
+            unmarkLogs: toUnmarkLogIDs
+        }
+
+        const response = await patchAPI("logs/edit/marks", body);
+        return response;
+    },
+
+
+    addTaskUsers: async (taskID: string, usersToAdd: User[]) => {
+        let body = {
+            taskID: taskID,
+            users: usersToAdd
+        };
+
+        const response = await postAPI("taskusers", body);
+        return response;
+    },
+    deleteTaskUsers: async (taskID: string, usersToDelete: User[]) => {
+        let body = {
+            taskID: taskID,
+            users: usersToDelete
+        };
+
+        const response = await deleteAPI("taskusers", body);
+        return response;
+    },
     addEditLog: async (newLog) => {
         const response = await postAPI("logs/edit", newLog);
         return response;
     },
-
     updateTaskByTaskID: async (updateTask: {
         taskName: string,
         deadline: Date | null,
@@ -328,43 +382,18 @@ export const API = {
         const response = await putAPI("tasks", updateTask);
         return response;
     },
-
-    updateProjectNameAtId: async (projectID: string, newProjectName: string) => {
-        const response = patchAPI("projects/name", { newProjectName }, projectID);
-        return response;
-    },
-    deleteProjectById: async (projectID: string, isArchived: boolean = true) => {
-        const response = patchAPI("projects/archive", { isArchived }, projectID);
-        return response;
-    },
-
-    addTaskUsers: async (taskID: string, usersToAdd: User[]) => {
+    updateTask: async (updateTask, newLog, toAddUsers, toDelUsers) => {
         let body = {
-            taskID: taskID,
-            users: usersToAdd
+            updateTask: updateTask,
+            newLog: newLog,
+            toAddUsers: toAddUsers,
+            toDelUsers: toDelUsers
         };
 
-        const response = postAPI("taskusers", body);
+        const response = await putAPI("tasks", body);
         return response;
     },
-    deleteTaskUsers: async (taskID: string, usersToDelete: User[]) => {
-        let body = {
-            taskID: taskID,
-            users: usersToDelete
-        };
 
-        const response = deleteAPI("taskusers", body);
-        return response;
-    },
-    addProjectAndTasks: async (projectName: string, projectTasks: NewTask[]) => {
-        const body = {
-            projectName: projectName,
-            tasks: projectTasks
-        };
-
-        const response = postAPI("projects", body);
-        return response;
-    },
 
 
     isProjectIDExists: async (projectID: string) => {
@@ -373,6 +402,7 @@ export const API = {
         // return PROJECTS.some(proj => proj.projectID === projectID);
     },
 
+    // ===============================================================================================================
     countCustomersPOs: async () => {
         const poCountGroupByCustomerID = POs.reduce(
             (acc, po) => {

@@ -2,13 +2,15 @@ import { useEffect, useState, type ReactNode } from "react";
 import Select, { type SingleValue } from "react-select";
 
 import { createPortal, useFormStatus } from "react-dom";
-import { FormButton, FormField, FormFieldSetWrapper } from "./forms/FormItems";
+import { FormButton, FormField, FormFieldSetWrapper } from "../forms/FormItems";
 import CreatableSelect from "react-select/creatable";
-import { useDbConst } from "../../contexts/DbConstDataContext";
+import { useDbConst } from "../../../contexts/DbConstDataContext";
 import DatePicker from "react-datepicker";
-import { API } from "../../utils/api";
-import { getOnlyDate } from "../../utils/functions";
-import { useEffectDatePickerFix } from "../utils/ReactDatePickerBodgeFixHook";
+import { API } from "../../../utils/api";
+import { getOnlyDate } from "../../../utils/functions";
+import { useEffectDatePickerFix } from "../../utils/ReactDatePickerBodgeFixHook";
+import DefaultTaskNamesSelect from "../forms/DefaultTaskNamesSelect";
+import type { DefaultTaskName } from "../../../utils/types";
 
 
 // TODO: move this somewhere else better
@@ -35,7 +37,7 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
 
     const { DEFAULT_TASK_NAMES, TEAMS } = useDbConst();
 
-    const [selectedTask, setSelectedTask] = useState<{ value: string, label: string } | null>(null);
+    const [selectedTask, setSelectedTask] = useState<{ value: DefaultTaskName | string, label: string } | null>(null);
     const [selectedTeamID, setSelectedTeamID] = useState<{ value: number, label: string } | null>(null);
     const [selectedDeadline, setSelectedDate] = useState<Date | null>(null);
 
@@ -45,9 +47,6 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
     const handleSubmit = async (formData: FormData) => {
         // IMPORTANT: FormData.get() return string | File so we need to parse it to Number and blabla
 
-        // const taskName: string = formData.get("FormTaskName")!;
-        // const teamID: number = Number(formData.get("FormTeam"));
-        // const deadlineStr = formData.get("FormDeadline");
         const inProgressStatusID = 1; // default to "In Progress"
 
         // console.log("task: " + taskName);
@@ -66,7 +65,7 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
         {
             taskID: newTaskID,
             projectID: currentProjectID,
-            taskName: selectedTask.value,
+            taskName: selectedTask.value.taskName ? selectedTask.value.taskName : selectedTask.value,
             teamID: selectedTeamID.value,
             deadline: getOnlyDate(selectedDeadline),
             taskStatusID: inProgressStatusID,
@@ -91,22 +90,26 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
         parentUpdateCallback();
     }
 
-    const handleTaskChange = async (e: SingleValue<{ value: string, label: string }>) => {
+    const handleTaskChange = async (e: SingleValue<{ value: DefaultTaskName | string, label: string }>) => {
         setSelectedTask(e);
+        console.log(e);
         if (!e) {
             setSelectedTeamID(null);
             return;
         }
 
-        const foundTask = DEFAULT_TASK_NAMES.find(x => x.taskName === e.value);
-
-        if (!foundTask) {
+        if (!e?.value.teamID) {
             setSelectedTeamID(null);
             return;
         }
 
-        // TODO: spaghetti asf
-        setSelectedTeamID({ value: foundTask.teamID, label: TEAMS.find(x => x.teamID === foundTask.teamID)!.teamName })
+        const foundTeam = TEAMS.find(x => x.teamID === e?.value.teamID);
+        if (!foundTeam) {
+            setSelectedTeamID(null);
+            return;
+        }
+
+        setSelectedTeamID({ value: foundTeam.teamID, label: foundTeam.teamName })
     }
 
     // TODO: when pending make controls to grey-ish or better color than this eieiei 
@@ -132,22 +135,11 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
                             <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                                 <div className="md:col-span-2">
                                     <FormField label="Task">
-                                        <CreatableSelect
-                                            name="FormTaskName"
-                                            className={"shadow-sm"}
-                                            required
-                                            isClearable={true}
-                                            isSearchable={true}
-                                            placeholder={"กรอกชื่อ Task ใหม่หรือเลือกรายการจากที่มีอยู่..."}
-                                            options={DEFAULT_TASK_NAMES.map(t => ({ value: t.taskName, label: t.taskName }))}
-                                            value={selectedTask}
-                                            onChange={e => handleTaskChange(e)}
-                                        />
+                                        <DefaultTaskNamesSelect selectedTaskState={selectedTask} onChangeCallback={handleTaskChange} />
                                     </FormField>
                                 </div>
                                 <FormField label="Team">
                                     <Select
-                                        name="FormTeam"
                                         className={"shadow-sm"}
                                         required
                                         isClearable={false}
@@ -160,7 +152,6 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
                                 </FormField>
                                 <FormField label="Deadline">
                                     <DatePicker
-                                        name="FormDeadline"
                                         className={"w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"}
                                         required
                                         filterDate={(date) => { return date.getDay() !== 0 }}

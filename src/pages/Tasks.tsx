@@ -22,7 +22,7 @@ function Tasks() {
     const [activeStatFilter, setActiveStatFilter] = useState<string | null>(null);
     const [teamIDFilter, setTeamIDFilter] = useState<number | null>(null);
     const [searchFilter, setSearchFilter] = useState<string>("");
-    const [projectFilter, setProjectFilter] = useState<string | null>("");
+    const [projectFilter, setProjectFilter] = useState<string | null>(null);
     const [startDateFilter, setStartDateFilter] = useState<Date | null>(null);
     const [endDateFilter, setEndDateFilter] = useState<Date | null>(null);
     const [showOnlyIncompleteChecked, setShowOnlyIncompleteChecked] = useState<boolean>(true);
@@ -53,7 +53,6 @@ function Tasks() {
         fetchData();
     }, []);
 
-
     const filteredTasks: FilteringTask[] = filterTasks(allTasks, teamIDFilter, searchFilter, startDateFilter, endDateFilter, showOnlyIncompleteChecked, projectFilter);
     const eiei: FilteringTask[] = filteredByKPITasks(filteredTasks, activeStatFilter); // TODO: rename this
 
@@ -78,7 +77,7 @@ function Tasks() {
                 Dashboard & Global Filters
             </h1>
             <div className="space-y-6">
-                <KPISummarySection title={"สรุปสถานะ Task ทั้งหมด"} activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={filteredTasks} avgHelpLeadDays={avgHelpLeadDays} />
+                <KPISummarySection title={"สรุปสถานะ Task ทั้งหมด"} activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={filteredTasks} avgHelpLeadDays={avgHelpLeadDays} refreshDataCallback={fetchData} />
                 <FieldFiltersAndAdd
                     teamIDFilterState={[teamIDFilter, setTeamIDFilter]}
                     searchFilterState={[searchFilter, setSearchFilter]}

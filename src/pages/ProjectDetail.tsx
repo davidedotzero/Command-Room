@@ -7,13 +7,15 @@ import type { Team, FilteringTask } from "../utils/types";
 
 import TaskDetailProductionModal from "../components/modals/TaskDetailProductionModal";
 import TaskDetailDealerModal from "../components/modals/TaskDetailDealerModal";
-import CreateTaskModal from "../components/modals/CreateTaskModal";
+import CreateTaskModal from "../components/modals/tasks/CreateTaskModal.tsx";
 import { API } from "../utils/api";
 import KPISummarySection from "../components/TaskFilters/KPISummarySection/KPISummarySection";
 import FieldFiltersAndAdd from "../components/TaskFilters/FieldFiltersAndAdd/FieldFiltersAndAdd";
 import TableDisplay from "../components/TaskFilters/TableDisplay/TableDisplay";
 import { filterTasks } from "../functions/TaskFilters/filters";
 import { filteredByKPITasks } from "../functions/TaskFilters/KPIfilters";
+import FullscreenSpinner from "../components/Spinners/FullscreenSpinner";
+import LegacyCreateTaskModal from "../components/modals/Legacy/LegacyCreateTaskModal.tsx";
 
 // TODO: fix re-renders on open CreateTaskModal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 function ProjectDetail() {
@@ -86,14 +88,12 @@ function ProjectDetail() {
 
 
     if (isLoading) {
-        return <div>
-            Loading...
-        </div>
+        return <FullscreenSpinner />
     }
 
     return (
         <>
-            <CreateTaskModal isOpen={isCreateTaskModalOpen} onClose={() => { closeCreateTaskModal() }} currentProjectID={currentProjectID} parentUpdateCallback={fetchData} />
+            <LegacyCreateTaskModal isOpen={isCreateTaskModalOpen} onClose={() => { closeCreateTaskModal() }} currentProjectID={currentProjectID} parentUpdateCallback={fetchData} />
             <TaskDetailProductionModal isOpen={isTaskDetailProductionModalOpen} onClose={() => { closeTaskDetailProductionModal() }} taskData={taskRowData} parentUpdateCallback={fetchData} />
             <TaskDetailDealerModal isOpen={isTaskDetailDealerModalOpen} onClose={() => { closeTaskDetailDealerModal() }} taskData={taskRowData} currentProjectName={currentProjectName} parentUpdateCallback={fetchData} />
 
@@ -101,7 +101,7 @@ function ProjectDetail() {
             <h1 className="text-2sm text-gray-800 mb-6"> {currentProjectID}</h1> {/* // TODO: remove this */}
             <div className="space-y-6">
                 {/*  TODO: split to separate components */}
-                <KPISummarySection title={"สรุปสถานะ Task ของโปรเจกต์นี้"} activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={filteredTasks} />
+                <KPISummarySection title={"สรุปสถานะ Task ของโปรเจกต์นี้"} activeStatFilterState={[activeStatFilter, setActiveStatFilter]} tasks={filteredTasks} refreshDataCallback={fetchData} />
                 <FieldFiltersAndAdd
                     teamIDFilterState={[teamIDFilter, setTeamIDFilter]}
                     searchFilterState={[searchFilter, setSearchFilter]}

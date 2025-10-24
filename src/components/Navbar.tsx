@@ -1,24 +1,26 @@
 import { NavLink } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
+import { UserCircleIcon } from "./utils/icons";
 
 function Navbar() {
     const nav_active_class = (isActive: boolean) =>
-        `flex item-center rounded-md transition-colors duration-200 p-3
+        `flex items-center rounded-md transition-colors duration-200 p-3 justify-center
         ${isActive ? 'bg-orange-100 text-orange-600' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'}`;
 
     const { user, logout } = useAuth();
 
     return (
         <>
-            <nav className="flex gap-2 bg-white shadow-sm sticky top-0 w-screen flex-shrink-0 p-3 justify-between">
+            <nav className="flex gap-2 bg-white shadow-sm sticky top-0 w-screen flex-shrink-0 p-3 justify-between overflow-x-auto">
                 <div className="flex flex-row gap-2">
-                    <NavLink to="/tasks" className={({ isActive }) => nav_active_class(isActive)}> {"รายการทั้งหมด"} </NavLink>
+                    <NavLink to="/tasks" className={({ isActive }) => nav_active_class(isActive)} > {"รายการทั้งหมด"} </NavLink>
                     <NavLink to="/projects" className={({ isActive }) => nav_active_class(isActive)}> {"โปรเจกต์"} </NavLink>
-                    <NavLink to="/customers" className={({ isActive }) => nav_active_class(isActive)}> {"ลูกค้า"} </NavLink>
+                    {/* <NavLink to="/customers" className={({ isActive }) => nav_active_class(isActive)}> {"ลูกค้า"} </NavLink> */}
                 </div>
 
                 <div className="flex flex-row gap-2">
                     {/* // TODO: prettier btn and logout confirmation */}
+                    <div className="flex justify-center items-center"><UserCircleIcon /></div>
                     <div className="flex justify-center items-center">{user?.userName}</div>
                     <button className="border border-transparent rounded-md p-3 bg-red-500 text-white shadow-sm transition-colors hover:bg-red-600 focus:outline-none " onClick={() => { logout() }}>Logout</button>
                 </div>
