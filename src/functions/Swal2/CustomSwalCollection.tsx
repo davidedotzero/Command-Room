@@ -29,3 +29,15 @@ export const SuccessAlert = (text: string) => {
         text: text
     });
 }
+
+export const ConfirmAlert = async (text: string) => {
+    return Swal.fire({
+        icon: 'warning',
+        title: "Are you sure?",
+        text: text,
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Confirm"
+    });
+}

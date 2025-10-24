@@ -208,7 +208,7 @@ function LogsView({ taskID }: { taskID: string }) {
     if (!isLoading) {
         if (prevTaskLogs.length <= 0 || prevTaskLogs === null) {
             return (
-                <div className="w-full flex justify-center items-center italic text-gray-500">
+                <div className="w-full flex justify-center items-center italic text-gray-500 mt-4">
                     {"ไม่พบ log ใน task นี้"}
                 </div>
             );

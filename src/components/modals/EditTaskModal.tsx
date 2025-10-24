@@ -48,6 +48,7 @@ function EditTaskModal(
     const [selectedWorkers, setSelectedWorkers] = useState<User[]>(currentTask.workers);
     const [listWorkers, setListWorkers] = useState<User[] | null>(null);
     const [selectedFile, setSelectedFile] = useState(null);
+
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const prevSelectedWorkers = currentTask.workers === null ? [] : currentTask.workers;

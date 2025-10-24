@@ -25,6 +25,10 @@ function DefaultTaskNamesSelect(
                 if (!selectedTaskState && e.target.value)
                     onChangeCallback({ value: e.target.value, label: e.target.value })
             }}
+            classNames={{
+                control: (state) =>
+                    state.isFocused ? "!outline-none !ring-orange-500 !border-orange-500 !ring-0" : "!border-gray-300"
+            }}
         />
     );
 }

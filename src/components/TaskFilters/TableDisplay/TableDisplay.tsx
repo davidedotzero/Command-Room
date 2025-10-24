@@ -84,7 +84,7 @@ function TableDisplay(
                                     <td className={`px-1 md:px-6 py-4 font-medium text-gray-900 ${hideProjNameColumn ? "hidden" : ""}`}
                                         title={task.projectName}
                                     >
-                                        <span className="md:truncate"> {task.projectName} </span>
+                                        {task.projectName}
                                     </td>
                                     <td
                                         className="px-1 md:px-6 py-4 text-gray-600"
