@@ -2,15 +2,15 @@ import { useEffect, useState, type ReactNode } from "react";
 import Select, { type SingleValue } from "react-select";
 
 import { createPortal, useFormStatus } from "react-dom";
-import { FormButton, FormField, FormFieldSetWrapper } from "./forms/FormItems";
+import { FormButton, FormField, FormFieldSetWrapper } from "../forms/FormItems";
 import CreatableSelect from "react-select/creatable";
-import { useDbConst } from "../../contexts/DbConstDataContext";
+import { useDbConst } from "../../../contexts/DbConstDataContext";
 import DatePicker from "react-datepicker";
-import { API } from "../../utils/api";
-import { getOnlyDate } from "../../utils/functions";
-import { useEffectDatePickerFix } from "../utils/ReactDatePickerBodgeFixHook";
-import DefaultTaskNamesSelect from "./forms/DefaultTaskNamesSelect";
-import type { DefaultTaskName } from "../../utils/types";
+import { API } from "../../../utils/api";
+import { getOnlyDate } from "../../../utils/functions";
+import { useEffectDatePickerFix } from "../../utils/ReactDatePickerBodgeFixHook";
+import DefaultTaskNamesSelect from "../forms/DefaultTaskNamesSelect";
+import type { DefaultTaskName } from "../../../utils/types";
 
 
 // TODO: move this somewhere else better
@@ -136,21 +136,6 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
                                 <div className="md:col-span-2">
                                     <FormField label="Task">
                                         <DefaultTaskNamesSelect selectedTaskState={selectedTask} onChangeCallback={handleTaskChange} />
-                                        {/* <CreatableSelect */}
-                                        {/*     className={"shadow-sm"} */}
-                                        {/*     formatCreateLabel={(inputValue: string) => "สร้างชื่อ Task \"" + inputValue + "\" ใหม่"} */}
-                                        {/*     required */}
-                                        {/*     isClearable={true} */}
-                                        {/*     isSearchable={true} */}
-                                        {/*     placeholder={"กรอกชื่อ Task ใหม่หรือเลือกรายการจากที่มีอยู่..."} */}
-                                        {/*     options={DEFAULT_TASK_NAMES.map(t => ({ value: t.taskName, label: t.taskName }))} */}
-                                        {/*     value={selectedTask} */}
-                                        {/*     onChange={e => handleTaskChange(e)} */}
-                                        {/*     onBlur={(e) => { */}
-                                        {/*         if (!selectedTask && e.target.value) */}
-                                        {/*             handleTaskChange({ value: e.target.value, label: e.target.value }) */}
-                                        {/*     }} */}
-                                        {/* /> */}
                                     </FormField>
                                 </div>
                                 <FormField label="Team">
