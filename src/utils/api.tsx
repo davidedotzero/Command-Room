@@ -1,66 +1,29 @@
-import Swal from "sweetalert2";
 import { removeLastZchar } from "./functions";
 import { PO_STATUSES, leftJoinOne2One, TASK_USER, USERS, CUSTOMERS, CUSTOMER_TYPES, POs } from "./mockdata";
 import type { DetailedCustomer, DetailedPO, EditLog, FilteringTask, Project, Task, TaskStatus, Team, User, NewTask, EditLogDetailed } from "./types";
+import axios from "axios";
 import { ErrorAlertDetailed, SuccessAlert } from "../functions/Swal2/CustomSwalCollection";
 
-//TODO: IMPORTANT!!!!! this file
-
-// export async function callAPI<T>(op: string, payload: object): Promise<T> {
-//     if (!SCRIPT_URL) throw new Error("VITE_APP_SCRIPT_URL is not defined in env.");
-//
-//     try {
-//         const response = await fetch(SCRIPT_URL, {
-//             method: "POST",
-//             headers: { "Content-Type": "text/plain;charset=utf-8" },
-//             body: JSON.stringify({ op, payload }),
-//         });
-//
-//         // TODO: potentially error if api return 302??????????
-//         if (!response.ok) {
-//             const errorText = await response.text().catch(() => "N/A");
-//             console.error("HTTP Error Response:", errorText);
-//             throw new Error(
-//                 `HTTP error ${response.status}. โปรดตรวจสอบการเชื่อมต่อหรือสถานะเซิร์ฟเวอร์.`
-//             );
-//         }
-//
-//         // 2. อ่านข้อมูลเป็น Text ก่อน (สำคัญมากสำหรับการ Debug และป้องกัน JSON Error)
-//         const textData = await response.text();
-//
-//         // 3. พยายามแปลงเป็น JSON
-//         try {
-//             const result = JSON.parse(textData);
-//             // ตรวจสอบสถานะจาก Backend (ตามโครงสร้างที่คาดหวังจาก GAS)
-//             if (result.status !== "success") {
-//                 throw new Error(
-//                     result.message || "การดำเนินการล้มเหลว (Backend Error)."
-//                 );
-//             }
-//             // ตรวจสอบว่ามี data หรือไม่ ถ้าไม่มีให้ return เป็น object ว่าง
-//             return (result.data !== undefined ? result.data : {}) as T;
-//         } catch (parseError) {
-//             // ดักจับ "SyntaxError: JSON.parse: unexpected character"
-//             if (parseError instanceof SyntaxError) {
-//                 console.error("Failed to parse JSON. Raw data received:", textData);
-//                 throw new Error(
-//                     "ได้รับข้อมูลที่ไม่ใช่รูปแบบ JSON. โปรดตรวจสอบ Logs หรือสิทธิ์ของ Google Apps Script."
-//                 );
-//             }
-//             throw parseError;
-//         }
-//     } catch (error) {
-//         // จัดการ Network errors
-//         if (error instanceof TypeError && error.message === "Failed to fetch") {
-//             throw new Error(
-//                 "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ (Network Error/CORS)."
-//             );
-//         }
-//         throw error;
-//     }
-// }
-
 const apiURL = import.meta.env.VITE_API_URL;
+
+export const api = axios.create({
+    baseURL: import.meta.env.VITE_API_URL
+});
+
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('command-room-token');
+        console.log("tokennnn");
+        console.log(token);
+
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    }, (error) => {
+        return Promise.reject(error);
+    }
+);
 
 async function getAPI(endpoint: string, param: string = ""): Promise<any> {
     try {

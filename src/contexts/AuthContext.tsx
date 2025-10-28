@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type FC, type ReactNode } from "react";
 import type { User } from "../utils/types";
-import { API } from "../utils/api";
+import { API, api } from "../utils/api";
 
 const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 
@@ -18,12 +18,25 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    useEffect(() => {
-        const storedUser = localStorage.getItem("project-crm-user");
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
+    async function fetchUser() {
+        try {
+            let result = await api.get("user/me");
+            // TODO: check no user found
+            setUser(result.data);
+        } catch(error) {
+            // TODO: better alert
+            console.error("Failed to fetch user: ", error);
+            localStorage.removeItem("command-room-token");
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
+    }
+
+    useEffect(() => {
+        const token = localStorage.getItem("command-room-token");
+        if (token) {
+            fetchUser();
+        }
     }, []);
 
     // TODO: login failed feedback

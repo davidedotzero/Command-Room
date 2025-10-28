@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router'
+import { Navigate, Outlet, Route, Routes, useNavigate, useSearchParams } from 'react-router'
 import './App.css'
 import Navbar from './components/Navbar'
 import Tasks from './pages/Tasks'
@@ -8,8 +8,10 @@ import { useAuth } from './contexts/AuthContext'
 import { useGoogleLogin } from '@react-oauth/google'
 import ProjectDetail from './pages/ProjectDetail'
 import { version } from '../package.json'
+import { api } from './utils/api';
 
 import "react-datepicker/dist/react-datepicker.css";
+import { useEffect } from 'react'
 
 // TODO: abstract this to other file MAYBE
 function LoginPage() {
@@ -19,6 +21,8 @@ function LoginPage() {
     const handleGoogleLogin = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
             try {
+                console.log("tokenResponse: ")
+                console.log(tokenResponse);
                 const googleResponse = await fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
                     headers: {
                         Authorization: `Bearer ${tokenResponse.access_token}`
@@ -45,8 +49,10 @@ function LoginPage() {
 
     return (
         <>
-            {/* // yoinked from p pat XDDDD */}
             <div className="flex items-center justify-center min-h-screen bg-gray-100">
+                <div className="w-100 min-h-100">
+                    <a href="http://localhost:8080/api/auth/google">test sign in</a>
+                </div>
                 <div className="p-8 bg-white rounded-xl shadow-lg text-center w-full max-w-sm">
                     <h1 className="text-2xl font-bold text-gray-800 mb-2">มิวสิค อาร์ม</h1>
                     <p className="text-gray-500 mb-8">Please sign in to continue</p>
@@ -73,21 +79,79 @@ function LoginPage() {
     );
 }
 
+function AuthCallback() {
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+
+    const { login } = useAuth();
+
+    async function lnwza(token: string) {
+        try {
+            if (token) {
+                localStorage.setItem('command-room-token', token);
+
+                let result = await api.get("user/me");
+                if (!result.data) {
+                    throw new Error("No user found. WHO R U");
+                }
+                console.log(result.data);
+                navigate('/tasks');
+            } else {
+                throw new Error("Token not found in URL");
+            }
+        } catch(error) {
+            // TODO: proper error page
+            console.error(error);
+            navigate('/whoru');
+        }
+    }
+
+    useEffect(() => {
+        const token = searchParams.get('token');
+        console.log(token);
+
+        //@ts-expect-error
+        lnwza(token);
+    }, []);
+
+    return <div>Loading...</div>
+}
+
 // TODO: abstract this to other file MAYBE
 function AppContent() {
+    return (
+        <>
+            <Routes>
+                <Route path="/login" element={<LoginPage />}></Route>
+                <Route path="/auth/callback" element={<AuthCallback />}></Route>
+                <Route path="/whoru" element={<div className='m-3 text-7xl text-red-500'>มึงใคร</div>}></Route>
+
+                <Route element={<ProtectedRoutes />}>
+                    <Route path="/" element={<Navigate to="/tasks" />}></Route>
+                    <Route path="/tasks" element={<Tasks />}></Route>
+                    <Route path="/projects" element={<Projects />}></Route>
+                    <Route path="/projects/p/:projectID" element={<ProjectDetail />}></Route>
+                    <Route path="/customers" element={<Customers />}></Route>
+                </Route>
+
+                <Route path="*" element={<div>404 not found ;(</div>}></Route>
+            </Routes>
+        </>
+    );
+}
+
+function ProtectedRoutes() {
+    // if(true) {
+    //     return null;
+    // }
+
     return (
         <>
             {/* TODO: change to bg-gray-50 */}
             <div className="w-full flex flex-col h-screen bg-gray-100 font-sans">
                 <Navbar />
                 <main className="w-full p-4 md:p-8 overflow-y-auto flex-grow">
-                    <Routes>
-                        <Route path="/" element={<Navigate to="/tasks" />}></Route>
-                        <Route path="/tasks" element={<Tasks />}></Route>
-                        <Route path="/projects" element={<Projects />}></Route>
-                        <Route path="/projects/p/:projectID" element={<ProjectDetail />}></Route>
-                        <Route path="/customers" element={<Customers />}></Route>
-                    </Routes>
+                    <Outlet />
                 </main>
             </div >
 
@@ -101,12 +165,7 @@ function AppContent() {
 
 function App() {
     const { user, isLoading } = useAuth();
-
     //TODO: isLoading
-
-    if (!user) {
-        return <LoginPage />
-    }
 
     return <AppContent />
 }

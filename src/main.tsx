@@ -8,7 +8,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import { DbConstProvider } from './contexts/DbConstDataContext.tsx'
 
 const GOOGLE_CLIENT_ID =
-    "1019548241968-chonpm3nid1osgbc1drr5ks3qnkgjt40.apps.googleusercontent.com";
+    "204454748483-qmf22ku4od938tvin5hm0ik2ch83v0ec.apps.googleusercontent.com";
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
