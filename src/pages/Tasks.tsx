@@ -27,9 +27,11 @@ function Tasks() {
     const [endDateFilter, setEndDateFilter] = useState<Date | null>(null);
     const [showOnlyIncompleteChecked, setShowOnlyIncompleteChecked] = useState<boolean>(true);
 
-    const { user } = useAuth();
+    const { user, isLoading: isAuthLoading } = useAuth();
 
     const fetchData = async () => {
+        if (!user) return;
+
         setIsLoading(true);
         let data = null;
         if (user?.isAdmin) {
@@ -51,7 +53,7 @@ function Tasks() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [user, isAuthLoading]);
 
     const filteredTasks: FilteringTask[] = filterTasks(allTasks, teamIDFilter, searchFilter, startDateFilter, endDateFilter, showOnlyIncompleteChecked, projectFilter);
     const eiei: FilteringTask[] = filteredByKPITasks(filteredTasks, activeStatFilter); // TODO: rename this
