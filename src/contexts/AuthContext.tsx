@@ -22,20 +22,19 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const navigate = useNavigate();
 
     async function fetchUser() {
-        let result = await api.get("user/me");
-        if (!result.data) {
+        let data = await API.getUser();
+        if (!data) {
             localStorage.removeItem("command-room-token");
             throw new Error("Failed to fetch user.")
         }
-        setUser(result.data);
+        setUser(data);
     }
 
     useEffect(() => {
-        console.log("hello motherfucker");
+        setIsLoading(true);
         const token = localStorage.getItem("command-room-token");
         try {
             if (token) {
-                console.log("hello motherfucker 22222222");
                 fetchUser();
             } else {
                 navigate("/login");
@@ -50,6 +49,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }, []);
 
     async function login(token: string) {
+        setIsLoading(true);
         try {
             if (!token) {
                 throw new Error("Token not found in URL");
@@ -64,6 +64,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
             console.error(error);
             navigate('/whoru');
         }
+        setIsLoading(false);
     }
 
     // // TODO: login failed feedback
