@@ -23,8 +23,44 @@ api.interceptors.request.use(
     }
 );
 
+async function callAPI(
+    axios_func: <T = any, R = AxiosResponse<T, any, {}>, D = any>(url: string, config?: AxiosRequestConfig<D> | undefined) => Promise<R>,
+    url: string,
+    config?: AxiosRequestConfig | undefined,
+    quiet: boolean = true
+) {
+    try {
+        const response = await axios_func(url, config);
+        // TODO: if status == 401 nav to /login
+
+        const result = response.data;
+        if (!quiet) {
+            if (response.status >= 200 && response.status < 300) {
+                SuccessAlert(result.message);
+            } else { // TODO: might be a problem on redirections status? (>= 300 && < 400)
+                ErrorAlertDetailed(result.message, result.detail);
+            }
+        }
+
+        return response;
+    } catch (error) {
+        if (!quiet) {
+            ErrorAlertDetailed("Failed to call api", "" + error);
+        }
+        return {
+            data: null,
+            status: 0,
+            statusText: "",
+            headers: {},
+            config: {},
+            request: {}
+        } as AxiosResponse; // equivalent of Response.error()
+    }
+}
+
 async function getAPI(endpoint: string, param: string = ""): Promise<any> {
     try {
+        // const res = await api.get(endpoint)
         const res = await fetch(apiURL + endpoint + "/" + param);
 
         if (!res.ok) {
@@ -158,6 +194,10 @@ export const API = {
         }
 
         return response;
+    },
+    getUser: async () => {
+        let result = await callAPI(api.get, "user/me");
+        return result.data;
     },
     getAllTasksDetailed: async (): Promise<FilteringTask[]> => {
         let data: FilteringTask[] = await getAPI("tasks");
