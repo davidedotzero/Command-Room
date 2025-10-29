@@ -1,10 +1,9 @@
 import { createPortal } from "react-dom";
 import { DetailItem, FormButton, FormField, FormFieldSetWrapper } from "./forms/FormItems";
-import { useEffect, useState, type ChangeEvent } from "react";
-import type { EditLog, FilteringTask, Task, TaskStatus, User } from "../../utils/types";
+import { useEffect, useState } from "react";
+import type { FilteringTask, User } from "../../utils/types";
 import { API } from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
-import { EDIT_LOGS, TASKS } from "../../utils/mockdata";
 import { calculateLeadTime, formatDateYYYY_MM_DD, getOnlyDate, isOnlyDateEqual, truncateText } from "../../utils/functions";
 import Select from "react-select";
 import { useDbConst } from "../../contexts/DbConstDataContext";
