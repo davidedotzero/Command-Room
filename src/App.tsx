@@ -81,37 +81,16 @@ function LoginPage() {
 
 function AuthCallback() {
     const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
-
     const { login } = useAuth();
-
-    async function lnwza(token: string) {
-        try {
-            if (token) {
-                localStorage.setItem('command-room-token', token);
-
-                let result = await api.get("user/me");
-                if (!result.data) {
-                    throw new Error("No user found. WHO R U");
-                }
-                console.log(result.data);
-                navigate('/tasks');
-            } else {
-                throw new Error("Token not found in URL");
-            }
-        } catch(error) {
-            // TODO: proper error page
-            console.error(error);
-            navigate('/whoru');
-        }
-    }
 
     useEffect(() => {
         const token = searchParams.get('token');
-        console.log(token);
-
-        //@ts-expect-error
-        lnwza(token);
+        if (!token) {
+            // TODO: proper error page
+            console.error("no token in url?");
+            return;
+        }
+        login(token);
     }, []);
 
     return <div>Loading...</div>

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type FC, type ReactNode } from "react";
 import type { User } from "../utils/types";
 import { API, api } from "../utils/api";
+import { useNavigate } from "react-router";
 
 const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 
@@ -8,7 +9,7 @@ const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 interface AuthContextType {
     user: User | null;
     isLoading: boolean;
-    login: (email: string) => Promise<void>;
+    login: (token: string) => Promise<void>;
     logout: () => void;
 }
 
@@ -18,54 +19,81 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
+    const navigate = useNavigate();
+
     async function fetchUser() {
-        try {
-            let result = await api.get("user/me");
-            // TODO: check no user found
-            setUser(result.data);
-        } catch(error) {
-            // TODO: better alert
-            console.error("Failed to fetch user: ", error);
+        let result = await api.get("user/me");
+        if (!result.data) {
             localStorage.removeItem("command-room-token");
-        } finally {
-            setIsLoading(false);
+            throw new Error("Failed to fetch user.")
         }
+        setUser(result.data);
     }
 
     useEffect(() => {
+        console.log("hello motherfucker");
         const token = localStorage.getItem("command-room-token");
-        if (token) {
-            fetchUser();
-        }
-    }, []);
-
-    // TODO: login failed feedback
-    const login = async (email: string) => {
-        setIsLoading(true);
-
         try {
-            const verifyResult = await API.verifyEmail(email);
-            if (verifyResult) {
-                const userData: User = verifyResult;
-                console.log("wowowowooo");
-                console.log(userData);
-                setUser(userData);
-                localStorage.setItem('project-crm-user', JSON.stringify(userData));
+            if (token) {
+                console.log("hello motherfucker 22222222");
+                fetchUser();
             } else {
-                throw new Error('User not authorized or not found.');
+                navigate("/login");
             }
         } catch (error) {
-            // TODO: show this information in ui
-            console.error("Login failed. User not authorized or not found.", error);
-            logout();
+            // TODO: better alert
+            console.log(error);
+            navigate("/whoru");
         } finally {
             setIsLoading(false);
         }
+    }, []);
+
+    async function login(token: string) {
+        try {
+            if (!token) {
+                throw new Error("Token not found in URL");
+            }
+
+            localStorage.setItem('command-room-token', token);
+            await fetchUser();
+            navigate('/tasks');
+        } catch (error) {
+
+            // TODO: proper error page
+            console.error(error);
+            navigate('/whoru');
+        }
     }
+
+    // // TODO: login failed feedback
+    // const login = async (email: string) => {
+    //     setIsLoading(true);
+    //
+    //     try {
+    //         const verifyResult = await API.verifyEmail(email);
+    //         if (verifyResult) {
+    //             const userData: User = verifyResult;
+    //             console.log("wowowowooo");
+    //             console.log(userData);
+    //             setUser(userData);
+    //             localStorage.setItem('project-crm-user', JSON.stringify(userData));
+    //         } else {
+    //             throw new Error('User not authorized or not found.');
+    //         }
+    //     } catch (error) {
+    //         // TODO: show this information in ui
+    //         console.error("Login failed. User not authorized or not found.", error);
+    //         logout();
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // }
 
     const logout = () => {
         setUser(null);
-        localStorage.removeItem("project-crm-user");
+        localStorage.removeItem("command-room-token");
+        navigate("/login");
     }
 
     const value = { user, isLoading, login, logout };

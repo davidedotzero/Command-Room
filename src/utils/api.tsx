@@ -13,8 +13,6 @@ export const api = axios.create({
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('command-room-token');
-        console.log("tokennnn");
-        console.log(token);
 
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;

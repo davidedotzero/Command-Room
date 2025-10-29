@@ -22,9 +22,9 @@ function Navbar() {
                     {/* // TODO: prettier btn and logout confirmation */}
                     <div className="flex justify-center items-center"><UserCircleIcon /></div>
                     <div className="flex justify-center items-center">{user?.userName}</div>
-                    <button 
+                    <button
                         className="border border-transparent rounded-md p-3 bg-red-500 text-white shadow-sm transition-colors hover:bg-red-600 focus:outline-none "
-                        onClick={() => { localStorage.removeItem('token'); }}
+                        onClick={logout}
                     >
                         Logout
                     </button>
