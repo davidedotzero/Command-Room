@@ -12,7 +12,7 @@ interface DbConstContextType {
     DEFAULT_TASK_NAMES: DefaultTaskName[];
     TEAMS: Team[];
     TASK_STATUSES: TaskStatus[];
-    PO_STATUSES: PoStatus[];
+    // PO_STATUSES: PoStatus[];
 }
 
 const DbConstContext = createContext<DbConstContextType | null>(null);
@@ -23,18 +23,18 @@ export function DbConstProvider({ children }: { children: ReactNode }) {
     const [defaultTaskName, setDefaultTaskName] = useState<DefaultTaskName[]>([]);
     const [team, setTeam] = useState<Team[]>([]);
     const [taskStatus, setTaskStatus] = useState<TaskStatus[]>([]);
-    const [poStatus, setPoStatus] = useState<PoStatus[]>([]);
+    // const [poStatus, setPoStatus] = useState<PoStatus[]>([]);
 
     const fetchData = async () => {
         const defaultTaskNameResponse = await API.getAllDefaultTaskNames();
         const teamResponse = await API.getAllTeams();
         const taskStatusResponse = await API.getAllTaskStatuses();
-        const poStatusResponse = await API.getAllPoStatuses();
+        // const poStatusResponse = await API.getAllPoStatuses();
 
         setDefaultTaskName(defaultTaskNameResponse);
         setTeam(teamResponse);
         setTaskStatus(taskStatusResponse);
-        setPoStatus(poStatusResponse);
+        // setPoStatus(poStatusResponse);
     };
 
     useEffect(() => {
@@ -45,7 +45,12 @@ export function DbConstProvider({ children }: { children: ReactNode }) {
         fetchData();
     }, [user])
 
-    const value: DbConstContextType = { DEFAULT_TASK_NAMES: defaultTaskName, TEAMS: team, TASK_STATUSES: taskStatus, PO_STATUSES: poStatus };
+    const value: DbConstContextType = {
+        DEFAULT_TASK_NAMES: defaultTaskName,
+        TEAMS: team,
+        TASK_STATUSES: taskStatus,
+        // PO_STATUSES: poStatus
+    };
 
     return <DbConstContext.Provider value={value}>{children}</DbConstContext.Provider>
 }

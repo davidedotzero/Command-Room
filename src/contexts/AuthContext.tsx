@@ -3,7 +3,6 @@ import type { User } from "../types/types";
 import { API } from "../utils/api";
 import { useNavigate } from "react-router";
 
-const SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL;
 
 // TODO: abstract to type.tsx file
 interface AuthContextType {
