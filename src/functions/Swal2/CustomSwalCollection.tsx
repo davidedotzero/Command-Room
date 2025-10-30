@@ -4,6 +4,8 @@ export const ErrorAlertDetailed = (text: string, detail: string) => {
     Swal.fire({
         icon: 'error',
         title: "Error!",
+        timer: 3000,
+        timerProgressBar: true,
         html: `
             ${text} <br /><br />
             <button 
@@ -26,7 +28,9 @@ export const SuccessAlert = (text: string) => {
     Swal.fire({
         icon: 'success',
         title: "Success!",
-        text: text
+        text: text,
+        timer: 3000,
+        timerProgressBar: true,
     });
 }
 
