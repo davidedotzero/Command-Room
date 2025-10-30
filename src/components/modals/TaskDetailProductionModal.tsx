@@ -2,7 +2,7 @@ import { createPortal } from "react-dom";
 import EditTaskModal from "./EditTaskModal";
 import { useState } from "react";
 import TaskDetailsView from "./task_detail/TaskDetailsView";
-import type { FilteringTask } from "../../utils/types";
+import type { FilteringTask } from "../../types/types";
 import LogsView from "./task_detail/LogsView";
 
 function TaskDetailProductionModal({ isOpen, onClose, taskData, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: FilteringTask | null, parentUpdateCallback: () => {} }) {

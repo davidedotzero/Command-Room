@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { API } from "../utils/api";
-import type { DetailedCustomer, DetailedPO } from "../utils/types";
+import type { DetailedCustomer, DetailedPO } from "../types/types";
 import { formatDateYYYY_MM_DD } from "../utils/functions";
 
 // TODO: only dealers team can see this page

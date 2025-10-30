@@ -1,7 +1,5 @@
 import { removeLastZchar } from "./functions";
-
-import type { DetailedCustomer, DetailedPO, EditLog, FilteringTask, Project, Task, TaskStatus, Team, User, NewTask, EditLogDetailed } from "./types";
-import axios, { type AxiosRequestConfig, type AxiosResponse } from "axios";
+import type { FilteringTask, Task, TaskStatus, Team, NewTask, EditLogDetailed } from "../types/types";
 import { ErrorAlertDetailed, SuccessAlert } from "../functions/Swal2/CustomSwalCollection";
 
 const apiURL = import.meta.env.VITE_API_URL;

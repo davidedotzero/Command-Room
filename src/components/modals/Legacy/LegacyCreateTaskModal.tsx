@@ -10,7 +10,7 @@ import { API } from "../../../utils/api";
 import { getOnlyDate } from "../../../utils/functions";
 import { useEffectDatePickerFix } from "../../utils/ReactDatePickerBodgeFixHook";
 import DefaultTaskNamesSelect from "../forms/DefaultTaskNamesSelect";
-import type { DefaultTaskName } from "../../../utils/types";
+import type { DefaultTaskName } from "../../../types/types";
 
 
 // TODO: move this somewhere else better

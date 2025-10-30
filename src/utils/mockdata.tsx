@@ -1,6 +1,6 @@
 // TODO: DELETE MOCKUP DATA
 
-import type { Customer, CustomerType, DefaultTaskName, EditLog, PO, PoStatus, Project, Task, TaskStatus, TaskUser, Team, User } from "./types";
+import type { Customer, CustomerType, DefaultTaskName, EditLog, PO, PoStatus, Project, Task, TaskStatus, TaskUser, Team, User } from "../types/types";
 
 
 export let TEAMS: Team[] = [

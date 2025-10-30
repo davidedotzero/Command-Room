@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { FilteringTask } from "../../../utils/types";
+import type { FilteringTask } from "../../../types/types";
 import StatDisplayCard from "./StatDisplayCard";
 import { RefreshIcon } from "../../utils/icons";
 import { getOnlyDate } from "../../../utils/functions";

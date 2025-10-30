@@ -6,7 +6,7 @@ import DatePicker from "react-datepicker";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
 import { useEffectDatePickerFix } from "../../utils/ReactDatePickerBodgeFixHook";
 import { getOnlyDate } from "../../../utils/functions";
-import type { DefaultTaskName, Team, NewTask } from "../../../utils/types";
+import type { DefaultTaskName, Team, NewTask } from "../../../types/types";
 import DefaultTaskNamesSelect from "../forms/DefaultTaskNamesSelect";
 import TeamLabel from "../../utils/TeamLabels";
 import { API } from "../../../utils/api";

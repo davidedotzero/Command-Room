@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { API } from "../utils/api";
-import type { DefaultTaskName, PoStatus, TaskStatus, Team } from "../utils/types";
+import type { DefaultTaskName, PoStatus, TaskStatus, Team } from "../types/types";
+import { useAuth } from "./AuthContext";
 
 // =============================== IMPORTANT!!! ===============================
 // this is only for fetching data that are considered "constants" from database

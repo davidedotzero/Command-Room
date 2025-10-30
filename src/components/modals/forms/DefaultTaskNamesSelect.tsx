@@ -1,6 +1,6 @@
 import CreatableSelect from "react-select/creatable";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
-import type { DefaultTaskName } from "../../../utils/types";
+import type { DefaultTaskName } from "../../../types/types";
 import type { SingleValue } from "react-select";
 
 function DefaultTaskNamesSelect(

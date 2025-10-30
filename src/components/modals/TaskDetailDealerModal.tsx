@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import EditTaskModal from "./EditTaskModal";
 import { DetailItem } from "./forms/FormItems";
 import TaskDetailsView from "./task_detail/TaskDetailsView";
-import type { FilteringTask } from "../../utils/types";
+import type { FilteringTask } from "../../types/types";
 import { API } from "../../utils/api";
 
 

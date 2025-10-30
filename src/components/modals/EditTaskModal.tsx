@@ -1,7 +1,7 @@
 import { createPortal } from "react-dom";
 import { DetailItem, FormButton, FormField, FormFieldSetWrapper } from "./forms/FormItems";
 import { useEffect, useState } from "react";
-import type { FilteringTask, User } from "../../utils/types";
+import type { FilteringTask, User } from "../../types/types";
 import { API } from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
 import { calculateLeadTime, formatDateYYYY_MM_DD, getOnlyDate, isOnlyDateEqual, truncateText } from "../../utils/functions";

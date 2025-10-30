@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactElement } from "react";
-import type { Project, Team } from "../../../utils/types";
+import type { Project, Team } from "../../../types/types";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
 import { API } from "../../../utils/api";
 import DatePicker from "react-datepicker";

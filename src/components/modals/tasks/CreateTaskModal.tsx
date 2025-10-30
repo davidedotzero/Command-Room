@@ -5,7 +5,7 @@ import { FormField, FormFieldSetWrapper } from "../forms/FormItems";
 import DefaultTaskNamesSelect from "../forms/DefaultTaskNamesSelect";
 import Select, { type SelectInstance, type SingleValue } from "react-select";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
-import type { DefaultTaskName, NewTask, Team } from "../../../utils/types";
+import type { DefaultTaskName, NewTask, Team } from "../../../types/types";
 import DatePicker from "react-datepicker";
 import { getOnlyDate } from "../../../utils/functions";
 import TeamLabel from "../../utils/TeamLabels";

@@ -3,7 +3,7 @@ import { DetailItem } from "../forms/FormItems";
 import { API } from "../../../utils/api";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
 import { formatDateYYYY_MM_DD } from "../../../utils/functions";
-import type { EditLog, EditLogDetailed } from "../../../utils/types";
+import type { EditLog, EditLogDetailed } from "../../../types/types";
 import { CopyIcon } from "../../utils/icons";
 import InlineSpinner from "../../Spinners/InlineSpinner";
 import Swal from "sweetalert2";

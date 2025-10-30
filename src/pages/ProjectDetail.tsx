@@ -3,7 +3,7 @@ import { useParams } from "react-router";
 
 import { PlusIcon } from "../components/utils/icons";
 
-import type { Team, FilteringTask } from "../utils/types";
+import type { Team, FilteringTask } from "../types/types.tsx";
 
 import TaskDetailProductionModal from "../components/modals/TaskDetailProductionModal";
 import TaskDetailDealerModal from "../components/modals/TaskDetailDealerModal";

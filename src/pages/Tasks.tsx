@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import TaskDetailProductionModal from "../components/modals/TaskDetailProductionModal";
 import TaskDetailDealerModal from "../components/modals/TaskDetailDealerModal";
-import type { FilteringTask, Team } from "../utils/types";
+import type { FilteringTask, Team } from "../types/types";
 import { filterTasks } from "../functions/TaskFilters/filters";
 import { API } from "../utils/api";
 import KPISummarySection from "../components/TaskFilters/KPISummarySection/KPISummarySection";
