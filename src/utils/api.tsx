@@ -1,8 +1,7 @@
+import axios from "axios";
 import { removeLastZchar } from "./functions";
 import type { FilteringTask, Task, TaskStatus, Team, NewTask, EditLogDetailed } from "../types/types";
 import { ErrorAlertDetailed, SuccessAlert } from "../functions/Swal2/CustomSwalCollection";
-
-const apiURL = import.meta.env.VITE_API_URL;
 
 export const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL
@@ -21,186 +20,113 @@ api.interceptors.request.use(
     }
 );
 
-async function callAPI(
-    axios_func: <T = any, R = AxiosResponse<T, any, {}>, D = any>(url: string, config?: AxiosRequestConfig<D> | undefined) => Promise<R>,
-    url: string,
-    config?: AxiosRequestConfig | undefined,
-    quiet: boolean = true
-) {
-    try {
-        const response = await axios_func(url, config);
-        // TODO: if status == 401 nav to /login
-
-        const result = response.data;
-        if (!quiet) {
-            if (response.status >= 200 && response.status < 300) {
-                SuccessAlert(result.message);
-            } else { // TODO: might be a problem on redirections status? (>= 300 && < 400)
-                ErrorAlertDetailed(result.message, result.detail);
+api.interceptors.response.use(
+    (response) => {
+        if (response.config.alert) {
+            SuccessAlert(response.data.message);
+        }
+        return response;
+    },
+    (error) => {
+        const alert: boolean = Boolean(error.response.config.alert || error.config.alert)
+        if (!error.response) {
+            if (alert) {
+                ErrorAlertDetailed("Failed to call api", "" + error);
             }
+            return Promise.reject(error);
         }
 
-        return response;
-    } catch (error) {
-        if (!quiet) {
-            ErrorAlertDetailed("Failed to call api", "" + error);
+        if (error.response.status === 401) {
+            console.warn('401 Unauthorized: Redirecting to login page.');
+
+            window.location.href = '/login';
+            localStorage.removeItem('command-room-token');
+            return Promise.reject(error);
         }
-        return {
-            data: null,
-            status: 0,
-            statusText: "",
-            headers: {},
-            config: {},
-            request: {}
-        } as AxiosResponse; // equivalent of Response.error()
+
+        if (alert) {
+            ErrorAlertDetailed(error.response.data.message, error.response.data.detail);
+        }
+        return Promise.reject(error);
     }
-}
-
-async function getAPI(endpoint: string, param: string = ""): Promise<any> {
-    try {
-        // const res = await api.get(endpoint)
-        const res = await fetch(apiURL + endpoint + "/" + param);
-
-        if (!res.ok) {
-            throw new Error(`HTTP error! Status: ${res.status}`);
-        }
-
-        let data = null;
-        const contentType = res.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-            data = await res.json();
-        } else if (contentType && contentType.includes('multipart/form-data')) {
-            data = await res.formData();
-        } else {
-            data = await res.text();
-        }
-
-        return data;
-    } catch (error) {
-        console.error("Error: ", error);
-    }
-}
-
-async function postAPI(endpoint: string, body: any): Promise<any> {
-    try {
-        const response = await fetch(apiURL + endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            ErrorAlertDetailed(result.message, result.detail);
-        } else {
-            SuccessAlert(result.message);
-        }
-
-        return response;
-    } catch (error) {
-        ErrorAlertDetailed("Failed to call PATCH api", "" + error);
-        return Response.error();
-    }
-}
-
-async function putAPI(endpoint: string, body: any): Promise<any> {
-    try {
-        const response = await fetch(apiURL + endpoint, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-        });
-
-        console.log(response);
-        const result = await response.json();
-
-        if (!response.ok) {
-            ErrorAlertDetailed(result.message, result.detail);
-        } else {
-            SuccessAlert(result.message);
-        }
-
-    } catch (error) {
-        ErrorAlertDetailed("Failed to call PUT api", "" + error);
-        return Response.error();
-    }
-}
-
-async function patchAPI(endpoint: string, body: any, param: string = ""): Promise<Response> {
-    try {
-        const response = await fetch(apiURL + endpoint + "/" + param, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            ErrorAlertDetailed(result.message, result.detail);
-        } else {
-            SuccessAlert(result.message);
-        }
-
-        return response;
-    } catch (error) {
-        ErrorAlertDetailed("Failed to call PATCH api", "" + error);
-        return Response.error();
-    }
-}
-
-async function deleteAPI(endpoint: string, body: any): Promise<any> {
-    try {
-        const response = await fetch(apiURL + endpoint, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-        });
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const result = await response.json();
-        console.log('Success:', result);
-        // TODO: change there alerts
-
-        // alert('DELETE api done successfully!');
-
-    } catch (error) {
-        console.error('Error:', error);
-
-        // alert('Failed to run DELETE api.');
-    }
-}
-
+);
 
 export const API = {
-    // TODO: THIS AUTH METHOD IS SHIT, MUST USE BETTER AUTH LATER KUYKUYUKYUKYUKYKUYKUYKUYKUYKUYKUKYUKYUYKUYKU
-    verifyEmail: async (email: string) => {
-        let response = await getAPI("verifyEmail", email);
-        if (!response || response.length <= 0) {
-            console.log("meung krai ni");
-            return null;
-        }
-
-        return response;
-    },
     getUser: async () => {
-        let result = await callAPI(api.get, "user/me");
+        let result = await api.get("/user/me");
         return result.data;
     },
-    getAllTasksDetailed: async (): Promise<FilteringTask[]> => {
-        let data: FilteringTask[] = await getAPI("tasks");
 
-        // TODO: check responses
+    getAllTasksDetailed: async (): Promise<FilteringTask[]> => {
+        let response = await api.get("/tasks");
+        let data = response.data;
+
+        // need to parse date here cuz backend cant send Date obj to us sadge
+        data = data.map(row => {
+            return {
+                ...row,
+                deadline: new Date(row.deadline),
+                createdAt: new Date(row.createdAt),
+                updatedAt: row.updatedAt !== null ? new Date(row.updatedAt) : null
+            };
+        });
+
+        return data;
+    },
+
+    getAllTeams: async (): Promise<Team[]> => {
+        const response = await api.get("/const/teams");
+        return response.data;
+    },
+
+    getAllTaskStatuses: async (): Promise<TaskStatus[]> => {
+        const response = await api.get("/const/taskStatuses");
+        return response.data;
+    },
+
+    getAllProjects: async () => {
+        const response = await api.get("/projects")
+        return response.data;
+    },
+
+    getAllDefaultTaskNames: async () => {
+        const response = await api.get("/const/defaultTaskNames");
+        return response.data;
+    },
+
+    getWorkers: async () => {
+        const response = await api.get("/getWorkers");
+        return response.data;
+    },
+
+    getAllActiveProjectsDetailed: async () => {
+        const response = await api.get("/projects/active");
+        return response.data;
+    },
+
+    getProjectNameById: async (projectID: string) => {
+        const response = await api.get(`/projects/name/${projectID}`);
+        return response.data.projectName;
+    },
+
+    getLogsByTaskIdDesc: async (taskID: string) => {
+        const response = await api.get(`/logs/edit/${taskID}`);
+        const data: EditLogDetailed[] = response.data;
+
+        let resultData = data.map(row => {
+            return {
+                ...row,
+                date: row.date === null ? null : new Date(removeLastZchar(row.date)), // super low iq fix for UTC timestamp sent from db
+                fromDeadline: row.fromDeadline !== null ? new Date(row.fromDeadline) : null,
+                toDeadline: row.toDeadline !== null ? new Date(row.toDeadline) : null
+            };
+        });
+        return resultData;
+    },
+
+    getTasksByProjectIdDetailed: async (projectID: string): Promise<FilteringTask[]> => {
+        const response = await api.get(`/tasks/pid/${projectID}`);
+        let data: FilteringTask[] = response.data;
 
         // need to parse date here cuz backend cant send Date obj to us sadge
         data = data.map(row => {
@@ -214,73 +140,13 @@ export const API = {
 
         return data;
     },
-    getAllTeams: async (): Promise<Team[]> => {
-        const data = await getAPI("const/teams");
-        return data;
-    },
-    getAllTaskStatuses: async (): Promise<TaskStatus[]> => {
-        const data = await getAPI("const/taskStatuses");
-        return data;
-    },
-    getAllPoStatuses: async () => {
-        return [...PO_STATUSES]
-    },
-    getAllProjects: async () => {
-        const data = await getAPI("projects")
-        return data;
-    },
-    getAllDefaultTaskNames: async () => {
-        const data = await getAPI("const/defaultTaskNames");
-        return data;
-    },
-    getWorkers: async () => {
-        const data = await getAPI("getWorkers");
-        return data;
-    },
 
-
-    getAllActiveProjectsDetailed: async () => {
-        const data = await getAPI("projects/active");
-        return data;
-    },
-    getProjectNameById: async (projectID: string) => {
-        // // TODO: handle when name not found maybe in backend?
-        const data = await getAPI("projects/name", projectID);
-        return data.projectName;
-    },
-    getLogsByTaskIdDesc: async (taskID: string) => {
-        let data: EditLogDetailed[] = await getAPI("logs/edit", taskID);
-        let resultData = data.map(row => {
-            return {
-                ...row,
-                date: row.date === null ? null : new Date(removeLastZchar(row.date)), // super low iq fix for UTC timestamp sent from db
-                fromDeadline: row.fromDeadline !== null ? new Date(row.fromDeadline) : null,
-                toDeadline: row.toDeadline !== null ? new Date(row.toDeadline) : null
-            };
-        });
-        return resultData;
-    },
-    getTasksByProjectIdDetailed: async (projectID: string): Promise<FilteringTask[]> => {
-        let res: FilteringTask[] = await getAPI("tasks/pid", projectID);
-
-        // need to parse date here cuz backend cant send Date obj to us sadge
-        res = res.map(row => {
-            return {
-                ...row,
-                deadline: new Date(row.deadline),
-                createdAt: new Date(row.createdAt),
-                updatedAt: row.updatedAt !== null ? new Date(row.updatedAt) : null
-            };
-        })
-
-        return res;
-    },
     getTasksByUserIdDetailed: async (userID: string): Promise<FilteringTask[]> => {
-        let res: FilteringTask[] = await getAPI("tasks/uid", userID);
-        console.log(res);
+        const response = await api.get(`/tasks/uid/${userID}`);
+        let data: FilteringTask[] = response.data;
 
         // need to parse date here cuz backend cant send Date obj to us sadge
-        res = res.map(row => {
+        data = data.map(row => {
             return {
                 ...row,
                 deadline: new Date(row.deadline),
@@ -289,173 +155,131 @@ export const API = {
             };
         })
 
-        return res;
-    },
-
-    getNewTaskID: async () => {
-        const data = await getAPI("gen_ids/task");
         return data;
     },
 
+    // TODO: this should be handled in the database instead but it works so im not gonna touch it xdddd
+    getNewTaskID: async () => {
+        const response = await api.get("/gen_ids/task");
+        return response.data;
+    },
 
     getAvgHelpLeadDaysBeforeDeadline: async () => {
-        const data = await getAPI("getAvgHelpLeadDaysBeforeDeadline");
-        return data.avgHelpLeadDay;
-    },
-    getWorkersByTaskId: async (taskID: string) => {
-        const userIDsOfTask = TASK_USER.filter(x => x.taskID === taskID);
-        const users = leftJoinOne2One(userIDsOfTask, USERS, "userID", "userID", "workers");
-        const result: User[] = users.map((x: any) => x.workers)
-        return result;
+        const response = await api.get("/kpi/avg-help-lead-days");
+        return response.data.avgHelpLeadDay;
     },
 
     addTask: async (newTask: Task) => {
-        const response = await postAPI("tasks", newTask);
-        // TODO: handle response???
+        const response = await api.post("/tasks", { ...newTask }, { alert: true })
         return response;
     },
 
-    updateProjectNameAtId: async (projectID: string, newProjectName: string) => {
-        const response = await patchAPI("projects/name", { newProjectName }, projectID);
+    updateProjectNameById: async (projectID: string, newProjectName: string) => {
+        const response = await api.patch(`/projects/name/${projectID}`, { newProjectName: newProjectName }, { alert: true });
         return response;
     },
+
     deleteProjectById: async (projectID: string, isArchived: boolean = true) => {
-        const response = await patchAPI("projects/archive", { isArchived }, projectID);
+        const response = await api.patch(`/projects/archive/${projectID}`, { isArchived: isArchived }, { alert: true });
         return response;
     },
 
     addProjectAndTasks: async (projectName: string, projectTasks: NewTask[]) => {
-        const body = {
-            projectName: projectName,
-            tasks: projectTasks
-        };
-
-        const response = await postAPI("projects", body);
+        const response = await api.post(
+            "/projects",
+            {
+                projectName: projectName,
+                tasks: projectTasks
+            },
+            { alert: true }
+        );
         return response;
     },
 
     markLogs: async (toMarkLogIDs: Array<string>, toUnmarkLogIDs: Array<string>) => {
-        const body = {
-            markLogs: toMarkLogIDs,
-            unmarkLogs: toUnmarkLogIDs
-        }
-
-        const response = await patchAPI("logs/edit/marks", body);
+        const response = await api.patch(
+            "/logs/edit/marks",
+            {
+                markLogs: toMarkLogIDs,
+                unmarkLogs: toUnmarkLogIDs
+            },
+            { alert: true }
+        );
         return response;
     },
 
-
-    addTaskUsers: async (taskID: string, usersToAdd: User[]) => {
-        let body = {
-            taskID: taskID,
-            users: usersToAdd
-        };
-
-        const response = await postAPI("taskusers", body);
-        return response;
-    },
-    deleteTaskUsers: async (taskID: string, usersToDelete: User[]) => {
-        let body = {
-            taskID: taskID,
-            users: usersToDelete
-        };
-
-        const response = await deleteAPI("taskusers", body);
-        return response;
-    },
-    addEditLog: async (newLog) => {
-        const response = await postAPI("logs/edit", newLog);
-        return response;
-    },
-    updateTaskByTaskID: async (updateTask: {
-        taskName: string,
-        deadline: Date | null,
-        taskStatusID: number | null,
-        teamHelpID: number | null,
-        helpReqAt: Date | null,
-        helpReqReason: string | null
-        logPreview: string,
-        teamID: number,
-        taskID: string,
-    }) => {
-        const response = await putAPI("tasks", updateTask);
-        return response;
-    },
     updateTask: async (updateTask, newLog, toAddUsers, toDelUsers) => {
-        let body = {
-            updateTask: updateTask,
-            newLog: newLog,
-            toAddUsers: toAddUsers,
-            toDelUsers: toDelUsers
-        };
-
-        const response = await putAPI("tasks", body);
+        const response = await api.put(
+            "/tasks",
+            {
+                updateTask: updateTask,
+                newLog: newLog,
+                toAddUsers: toAddUsers,
+                toDelUsers: toDelUsers
+            },
+            { alert: true }
+        );
         return response;
-    },
-
-
-
-    isProjectIDExists: async (projectID: string) => {
-        const data = await getAPI("isProjectIDExists", projectID);
-        return Boolean(data.isValid);
-        // return PROJECTS.some(proj => proj.projectID === projectID);
     },
 
     // ===============================================================================================================
-    countCustomersPOs: async () => {
-        const poCountGroupByCustomerID = POs.reduce(
-            (acc, po) => {
-                const key = po.customerID;
-                acc[key] = (acc[key] || 0) + 1;
-                return acc;
-            }, {}
-        );
+    // countCustomersPOs: async () => {
+    //     const poCountGroupByCustomerID = POs.reduce(
+    //         (acc, po) => {
+    //             const key = po.customerID;
+    //             acc[key] = (acc[key] || 0) + 1;
+    //             return acc;
+    //         }, {}
+    //     );
+    //
+    //     return poCountGroupByCustomerID;
+    // },
+    // countInCompleteCustomersPOs: async () => {
+    //     throw new Error("NOT IMPLEMENTED");
+    //
+    //     const poCountGroupByCustomerID = POs.reduce(
+    //         (acc, po) => {
+    //             if (po.poStatusID)
+    //                 // const key = po.customerID;
+    //                 acc[key] = (acc[key] || 0) + 1;
+    //             return acc;
+    //         }, {}
+    //     );
+    //
+    //     return poCountGroupByCustomerID;
+    // },
 
-        return poCountGroupByCustomerID;
-    },
-    countInCompleteCustomersPOs: async () => {
-        throw new Error("NOT IMPLEMENTED");
-
-        const poCountGroupByCustomerID = POs.reduce(
-            (acc, po) => {
-                if (po.poStatusID)
-                    // const key = po.customerID;
-                    acc[key] = (acc[key] || 0) + 1;
-                return acc;
-            }, {}
-        );
-
-        return poCountGroupByCustomerID;
-    },
-
-    getAllCustomers: async () => {
-        return [...CUSTOMERS];
-    },
-    getAllCustomersDetailed: async (): Promise<DetailedCustomer[]> => {
-        const customers = [...CUSTOMERS];
-
-        let customersJoinCustomerType = leftJoinOne2One(customers, CUSTOMER_TYPES, "customerTypeID", "customerTypeID", "customerType");
-
-        return customersJoinCustomerType;
-    },
-    getAllPOs: async () => {
-        return [...POs];
-    },
-    getAllPOsDetailed: async (): Promise<DetailedPO[]> => {
-        const pos = [...POs];
-
-        const posJoinCustomer = leftJoinOne2One(pos, CUSTOMERS, "customerID", "customerID", "customer");
-        const posJoinPoStatus = leftJoinOne2One(posJoinCustomer, PO_STATUSES, "poStatusID", "poStatusID", "poStatus");
-
-        return posJoinPoStatus;
-    },
-    getPOandCustomerDetailByTaskID: async (taskID: string) => { // TODO: type this shit
-        const po = POs.filter(x => x.taskID === taskID);
-
-        const poJoinCustomer = leftJoinOne2One(po, CUSTOMERS, "customerID", "customerID", "customer");
-        // WARNING: assume that this will have 1 only object cuz im bodging this sheeshhhhhhhhhhhhh
-        console.log("kuy");
-        console.log(poJoinCustomer);
-        return poJoinCustomer[0];
-    },
+    // getAllPoStatuses: async () => {
+    //     return [...PO_STATUSES]
+    // },
+    // getAllCustomers: async () => {
+    //     return [...CUSTOMERS];
+    // },
+    // getAllCustomersDetailed: async (): Promise<DetailedCustomer[]> => {
+    //     const customers = [...CUSTOMERS];
+    //
+    //     let customersJoinCustomerType = leftJoinOne2One(customers, CUSTOMER_TYPES, "customerTypeID", "customerTypeID", "customerType");
+    //
+    //     return customersJoinCustomerType;
+    // },
+    // getAllPOs: async () => {
+    //     return [...POs];
+    // },
+    // getAllPOsDetailed: async (): Promise<DetailedPO[]> => {
+    //     const pos = [...POs];
+    //
+    //     const posJoinCustomer = leftJoinOne2One(pos, CUSTOMERS, "customerID", "customerID", "customer");
+    //     const posJoinPoStatus = leftJoinOne2One(posJoinCustomer, PO_STATUSES, "poStatusID", "poStatusID", "poStatus");
+    //
+    //     return posJoinPoStatus;
+    // },
+    // getPOandCustomerDetailByTaskID: async (taskID: string) => { // TODO: type this shit
+    //     const po = POs.filter(x => x.taskID === taskID);
+    //
+    //     const poJoinCustomer = leftJoinOne2One(po, CUSTOMERS, "customerID", "customerID", "customer");
+    //     // WARNING: assume that this will have 1 only object cuz im bodging this sheeshhhhhhhhhhhhh
+    //     console.log("kuy");
+    //     console.log(poJoinCustomer);
+    //     return poJoinCustomer[0];
+    // },
 }

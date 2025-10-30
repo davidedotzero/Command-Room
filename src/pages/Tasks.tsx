@@ -10,6 +10,7 @@ import TableDisplay from "../components/TaskFilters/TableDisplay/TableDisplay";
 import { useAuth } from "../contexts/AuthContext";
 import { filteredByKPITasks } from "../functions/TaskFilters/KPIfilters";
 import FullscreenSpinner from "../components/Spinners/FullscreenSpinner";
+import { ErrorAlertDetailed } from "../functions/Swal2/CustomSwalCollection";
 
 function Tasks() {
     const [allTasks, setAllTasks] = useState<FilteringTask[]>([]); // TODO: rename this

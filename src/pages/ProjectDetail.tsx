@@ -26,7 +26,6 @@ function ProjectDetail() {
     }
 
     const currentProjectID: string = param.projectID; // TODO: should i pass this as props or urlParams?
-    const [isCurrentProjectIDValid, setIsCurrentProjectIDValid] = useState<boolean>(false);
     const [currentProjectName, setCurrentProjectName] = useState<string>("");
 
     const [tasksByProjectIDDetailed, setTasksByProjectIDDetailed] = useState<FilteringTask[]>([]); // TODO: rename this
@@ -34,6 +33,7 @@ function ProjectDetail() {
     const [taskRowData, setTaskRowData] = useState<FilteringTask | null>(null); // for sending task detail of selected row to task modals
 
     const [isLoading, setIsLoading] = useState(true);
+    const [validID, setValidID] = useState(true);
 
     const [activeStatFilter, setActiveStatFilter] = useState<string | null>(null);
     const [teamIDFilter, setTeamIDFilter] = useState<number | null>(null);
@@ -44,17 +44,24 @@ function ProjectDetail() {
 
     const fetchData = async () => {
         setIsLoading(true);
-        const data = await API.getTasksByProjectIdDetailed(currentProjectID);
-        const projectName = await API.getProjectNameById(currentProjectID);
-        const teams = await API.getAllTeams();
-        const idvalid = await API.isProjectIDExists(currentProjectID);
 
-        setTasksByProjectIDDetailed(data);
-        setIsCurrentProjectIDValid(idvalid);
-        setCurrentProjectName(projectName);
-        setLnw_team(teams);
+        try {
+            const [projectName, data, teams] = await Promise.all([
+                API.getProjectNameById(currentProjectID),
+                API.getTasksByProjectIdDetailed(currentProjectID),
+                API.getAllTeams(),
+            ])
 
-        setIsLoading(false);
+            setTasksByProjectIDDetailed(data);
+            setCurrentProjectName(projectName);
+            setLnw_team(teams);
+
+            setValidID(true);
+        } catch (error) {
+            setValidID(false);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     useEffect(() => {
@@ -91,6 +98,13 @@ function ProjectDetail() {
         return <FullscreenSpinner />
     }
 
+    if (!validID) {
+        return (
+            // TODO: better message
+            <h1 className="text-9xl text-red-500">NOPE</h1>
+        )
+    }
+
     return (
         <>
             <LegacyCreateTaskModal isOpen={isCreateTaskModalOpen} onClose={() => { closeCreateTaskModal() }} currentProjectID={currentProjectID} parentUpdateCallback={fetchData} />
@@ -110,7 +124,7 @@ function ProjectDetail() {
                     showOnlyIncompleteCheckedState={[showOnlyIncompleteChecked, setShowOnlyIncompleteChecked]}
                     tasksLength={eiei.length}
                     createNewTaskButton={
-                        isCurrentProjectIDValid ? (
+                        (
                             <button
                                 onClick={openCreateTaskModal}
                                 className="flex items-center px-4 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
@@ -118,10 +132,6 @@ function ProjectDetail() {
                                 <PlusIcon className="w-4 h-4" />
                                 <span className="ml-2">เพิ่ม Task</span>
                             </button>
-                        ) : (
-                            <div className="text-sm text-gray-500 italic">
-                                (เลือกโปรเจกต์เพื่อเพิ่ม Task)
-                            </div>
                         )
                     } />
                 <TableDisplay hideProjNameColumn={true} filteredAndSortedTasks={eiei} setTaskRowData={setTaskRowData} openTaskDetailDealerModal={openTaskDetailDealerModal} openTaskDetailProductionModal={openTaskDetailProductionModal} />

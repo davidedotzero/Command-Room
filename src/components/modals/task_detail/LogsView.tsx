@@ -176,7 +176,7 @@ function LogsView({ taskID }: { taskID: string }) {
 
         // TODO: handle api properly
         const response = await API.markLogs(toMark.map(x => x.eLogID), toUnmark.map(x => x.eLogID));
-        if (response.ok) {
+        if (response.status >= 200 && response.status < 300) {
             setPrevTaskLogs(taskLogs);
         } else {
             setTaskLogs(prevTaskLogs);

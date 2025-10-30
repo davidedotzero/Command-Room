@@ -13,13 +13,13 @@ const GOOGLE_CLIENT_ID =
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <BrowserRouter>
-            <DbConstProvider>
-                <AuthProvider>
+            <AuthProvider>
+                <DbConstProvider>
                     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
                         <App />
                     </GoogleOAuthProvider>
-                </AuthProvider>
-            </DbConstProvider>
+                </DbConstProvider>
+            </AuthProvider>
         </BrowserRouter>
     </StrictMode>,
 )

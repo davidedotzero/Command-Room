@@ -18,6 +18,8 @@ interface DbConstContextType {
 const DbConstContext = createContext<DbConstContextType | null>(null);
 
 export function DbConstProvider({ children }: { children: ReactNode }) {
+    const { user } = useAuth();
+
     const [defaultTaskName, setDefaultTaskName] = useState<DefaultTaskName[]>([]);
     const [team, setTeam] = useState<Team[]>([]);
     const [taskStatus, setTaskStatus] = useState<TaskStatus[]>([]);
@@ -36,8 +38,12 @@ export function DbConstProvider({ children }: { children: ReactNode }) {
     };
 
     useEffect(() => {
+        if (!user) {
+            return;
+        }
+
         fetchData();
-    }, [])
+    }, [user])
 
     const value: DbConstContextType = { DEFAULT_TASK_NAMES: defaultTaskName, TEAMS: team, TASK_STATUSES: taskStatus, PO_STATUSES: poStatus };
 

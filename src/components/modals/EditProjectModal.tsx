@@ -28,7 +28,7 @@ function EditProjectModal(
         // TODO: dont send api if nothing has changed
 
         // TODO: better api error handling
-        const res = await API.updateProjectNameAtId(selectedProjectID, projectName);
+        const res = await API.updateProjectNameById(selectedProjectID, projectName);
 
         onClose();
         parentUpdateCallback();

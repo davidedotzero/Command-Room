@@ -22,7 +22,7 @@ function LoginPage() {
                     <h1 className="text-2xl font-bold text-gray-800 mb-2">มิวสิค อาร์ม</h1>
                     <p className="text-gray-500 mb-8">Please sign in to continue</p>
 
-                    <a href={import.meta.env.VITE_API_URL + "auth/google"}>
+                    <a href={import.meta.env.VITE_API_URL + "/auth/google"}>
                         <button
                             className="w-full flex items-center justify-center px-4 py-3 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
                         >
