@@ -10,6 +10,7 @@ import { version } from '../package.json'
 
 import "react-datepicker/dist/react-datepicker.css";
 import { useEffect } from 'react'
+import UserDashboard from './pages/UserDashboard'
 
 // TODO: abstract this to other file MAYBE
 function LoginPage() {
@@ -69,13 +70,15 @@ function AppContent() {
             <Routes>
                 <Route path="/login" element={<LoginPage />}></Route>
                 <Route path="/auth/callback" element={<AuthCallback />}></Route>
-                <Route path="/whoru" element={<div className='m-3 text-7xl text-red-500'>มึงใคร</div>}></Route>
+                <Route path="/whoru" element={<div className='m-3 text-7xl text-red-500'>ผู้ ใ ด๋ นิ</div>}></Route>
 
                 <Route element={<ProtectedRoutes />}>
                     <Route path="/" element={<Navigate to="/tasks" />}></Route>
                     <Route path="/tasks" element={<Tasks />}></Route>
                     <Route path="/projects" element={<Projects />}></Route>
                     <Route path="/projects/p/:projectID" element={<ProjectDetail />}></Route>
+                    <Route path="/dashboard/u/:userID" element={<UserDashboard />}></Route>
+                    {/* <Route path="/dashboard/all"></Route> */}
                     <Route path="/customers" element={<Customers />}></Route>
                 </Route>
 
