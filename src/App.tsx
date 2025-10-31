@@ -86,9 +86,12 @@ function AppContent() {
 }
 
 function ProtectedRoutes() {
-    // if(true) {
-    //     return null;
-    // }
+    const { user } = useAuth();
+    const token = localStorage.getItem("command-room-token");
+
+    if (!user || !token) {
+        return null;
+    }
 
     return (
         <>

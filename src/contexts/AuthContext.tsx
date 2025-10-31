@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type FC, type ReactNode
 import type { User } from "../types/types";
 import { API } from "../utils/api";
 import { useNavigate } from "react-router";
+import { ConfirmAlert } from "../functions/Swal2/CustomSwalCollection";
 
 
 // TODO: abstract to type.tsx file
@@ -66,31 +67,12 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         setIsLoading(false);
     }
 
-    // // TODO: login failed feedback
-    // const login = async (email: string) => {
-    //     setIsLoading(true);
-    //
-    //     try {
-    //         const verifyResult = await API.verifyEmail(email);
-    //         if (verifyResult) {
-    //             const userData: User = verifyResult;
-    //             console.log("wowowowooo");
-    //             console.log(userData);
-    //             setUser(userData);
-    //             localStorage.setItem('project-crm-user', JSON.stringify(userData));
-    //         } else {
-    //             throw new Error('User not authorized or not found.');
-    //         }
-    //     } catch (error) {
-    //         // TODO: show this information in ui
-    //         console.error("Login failed. User not authorized or not found.", error);
-    //         logout();
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // }
+    const logout = async () => {
+        if (!(await ConfirmAlert("จะไปแล้วเหรอม 🥺")).isConfirmed) {
+            return;
+        }
 
-    const logout = () => {
+        console.log("a?");
         setUser(null);
         localStorage.removeItem("command-room-token");
         navigate("/login");

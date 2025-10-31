@@ -66,7 +66,7 @@ export const API = {
             return {
                 ...row,
                 deadline: new Date(row.deadline),
-                createdAt: new Date(row.createdAt),
+                createdAt: row.createdAt !== null ? new Date(row.createdAt) : null,
                 updatedAt: row.updatedAt !== null ? new Date(row.updatedAt) : null
             };
         });
@@ -133,7 +133,7 @@ export const API = {
             return {
                 ...row,
                 deadline: new Date(row.deadline),
-                createdAt: new Date(row.createdAt),
+                createdAt: row.createdAt !== null ? new Date(row.createdAt) : null,
                 updatedAt: row.updatedAt !== null ? new Date(row.updatedAt) : null
             };
         })
@@ -150,7 +150,7 @@ export const API = {
             return {
                 ...row,
                 deadline: new Date(row.deadline),
-                createdAt: new Date(row.createdAt),
+                createdAt: row.createdAt !== null ? new Date(row.createdAt) : null,
                 updatedAt: row.updatedAt !== null ? new Date(row.updatedAt) : null
             };
         })
