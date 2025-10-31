@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
-import { FormButton, FormField, FormFieldSetWrapper } from "../forms/FormItems";
+import { CharCountInput, FormButton, FormField, FormFieldSetWrapper } from "../forms/FormItems";
 import Select, { type SelectInstance, type SingleValue } from "react-select";
 import DatePicker from "react-datepicker";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
@@ -164,7 +164,6 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
         return projectTasks.some(x => x.taskName === taskName);
     }
 
-
     return createPortal(
         <>
             <div className="fixed inset-0 z-50 bg-white/70 bg-opacity-50 flex items-center justify-center">
@@ -189,13 +188,13 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
                                     <div className="border-b grid grid-cols-1 md:grid-cols-12 gap-x-6 gap-y-5 px-8 py-6">
                                         <div className="md:col-span-12">
                                             <FormField label="Project Name">
-                                                <input
-                                                    type="text"
-                                                    className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm disabled:bg-gray-100 disabled:text-gray-500"
+                                                <CharCountInput
+                                                    inputClassName="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm disabled:bg-gray-100 disabled:text-gray-500"
+                                                    maxLength={500}
                                                     placeholder={"กรอกชื่อโปรเจกต์ใหม่"}
-                                                    value={projectName}
-                                                    onChange={e => setProjectName(e.target.value)}
-                                                    ref={projectNameInput}
+                                                    valueState={projectName}
+                                                    onChangeCallback={(e) => setProjectName(e.target.value)}
+                                                    inputRef={projectNameInput}
                                                     required
                                                 />
                                             </FormField>
@@ -210,7 +209,7 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
                                         <div className="md:col-span-12">
                                             <FormField label="Team">
                                                 <Select
-                                                    className={"shadow-sm"}
+                                                    className={"text-sm shadow-sm"}
                                                     required
                                                     isClearable={false}
                                                     isSearchable={true}

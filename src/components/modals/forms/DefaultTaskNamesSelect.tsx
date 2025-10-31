@@ -11,7 +11,7 @@ function DefaultTaskNamesSelect(
 
     return (
         <CreatableSelect
-            className={"shadow-sm"}
+            className={"text-sm shadow-sm"}
             formatCreateLabel={(inputValue: string) => "สร้างชื่อ Task \"" + inputValue + "\" ใหม่"}
             required
             isClearable={true}

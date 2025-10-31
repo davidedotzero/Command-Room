@@ -1,5 +1,5 @@
 import { StatusColor } from "../../../utils/constants";
-import { calculateLeadTime, formatDateYYYY_MM_DD } from "../../../utils/functions";
+import { calculateLeadTime, formatDateYYYY_MM_DD, formatDateYYYY_MM_DD_HH_MM_SS } from "../../../utils/functions";
 import { DetailItem } from "../forms/FormItems";
 import type { FilteringTask } from "../../../types/types";
 import AssigneeLabels from "../../utils/AssigneeLabels";
@@ -17,11 +17,14 @@ function TaskDetailsView({ task }: { task: FilteringTask }) {
                 {/* === Section: รายละเอียดหลัก === */}
                 <div className="pb-6 border-b">
                     <div className="md:col-span-2 mb-6">
-                        <DetailItem label="Task">
+                        <DetailItem label="">
                             <p className="text-xl font-bold text-gray-800">{currentTask.taskName || "-"}</p>
-                            <strong>ของ Project:</strong>
-                            <p>{currentTask.projectName}</p>
+                            <span className="font-bold">Project - </span>{currentTask.projectName}
                         </DetailItem>
+                    </div>
+                    <div className="md:col-span-2 mb-6">
+                        <span className="text-sm text-gray-500">{"สร้างเมื่อ: "}</span>
+                        <span className="text-sm text-grey-900">{currentTask.createdAt == null ? "N/A" : formatDateYYYY_MM_DD_HH_MM_SS(currentTask.createdAt)}</span>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                         <DetailItem label="Team">
@@ -35,7 +38,7 @@ function TaskDetailsView({ task }: { task: FilteringTask }) {
                         </DetailItem>
 
                         <DetailItem label="Deadline">
-                            <p className="text-base">
+                            <p className="text-base text-gray-900">
                                 {formatDateYYYY_MM_DD(new Date(currentTask.deadline))}
                             </p>
                         </DetailItem>

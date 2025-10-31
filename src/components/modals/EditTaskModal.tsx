@@ -1,6 +1,6 @@
 import { createPortal } from "react-dom";
-import { DetailItem, FormButton, FormField, FormFieldSetWrapper } from "./forms/FormItems";
-import { useEffect, useState } from "react";
+import { CharCountInput, DetailItem, FormButton, FormField, FormFieldSetWrapper } from "./forms/FormItems";
+import { useEffect, useState, type ChangeEvent } from "react";
 import type { FilteringTask, User } from "../../types/types";
 import { API } from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
@@ -10,6 +10,7 @@ import { useDbConst } from "../../contexts/DbConstDataContext";
 import DatePicker from "react-datepicker";
 import AssigneeLabels from "../utils/AssigneeLabels";
 import equal from "fast-deep-equal";
+import { ModalFooter, ModalHeader, ModalSmallContainer } from "./ModalComponents";
 
 function EditTaskModal(
     { isOpen, onClose, taskData, parentUpdateCallback, customerAndPoData }:
@@ -235,249 +236,226 @@ function EditTaskModal(
 
     // TODO: move this to a better place
     const baseInputClass =
-        "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm disabled:bg-gray-100 disabled:text-gray-500";
+        "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm disabled:bg-gray-100 disabled:text-gray-500";
 
 
     // TODO: highlight field if its not been edited or its default value
     return createPortal(
         <>
-            <div className="fixed inset-0 z-50 bg-white/50 bg-opacity-50 flex items-center justify-center">
-                <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
-                    <header className="flex justify-between items-center p-6 border-b sticky top-0 bg-white z-10">
-                        <h2 className="text-xl font-bold text-gray-800">
-                            {"แก้ไข Task"}
-                        </h2>
-                        <button
-                            onClick={onClose}
-                            disabled={isLoading}
-                            className="text-gray-400 hover:text-gray-600 disabled:opacity-30 text-2xl"
-                        >
-                            &times;
-                        </button>
-                    </header>
+            <ModalSmallContainer>
+                <ModalHeader text={"แก้ไข Task"} onCloseCallback={onClose} isLoading={isLoading} />
 
-                    {/* // TODO: separate this sheesh to components */}
-                    {/* // TODO: fix overflow when resizing textarea */}
-                    <form action={handleSubmit} className="flex flex-col flex-1 min-h-0">
-                        <div className="overflow-y-auto">
-                            <FormFieldSetWrapper>
-                                <div className="p-8">
-                                    {/* === Section: รายละเอียดหลัก === */}
-                                    <div className="pb-6 border-b">
-                                        {/* <div className="overflow-y-auto flex-1"> */}
-                                        <FormField label="Task">
-                                            <input
-                                                disabled={!user?.isAdmin}
-                                                name="FormTaskName"
-                                                type="text"
-                                                required
-                                                className={baseInputClass}
-                                                value={taskName}
-                                                onChange={(e) => setTaskName(e.target.value)}
-                                            />
-                                        </FormField>
-                                        <FormField label="Team">
-                                            <Select
-                                                isDisabled={!user?.isAdmin}
-                                                name="FormTeam"
-                                                required
-                                                isClearable={false}
-                                                isSearchable={true}
-                                                options={TEAMS.map(t => ({ value: t.teamID, label: t.teamName }))}
-                                                value={selectedTeamID}
-                                                onChange={e => setSelectedTeamID(e)}
-                                                className="text-sm shadow-sm"
-                                                classNames={{
-                                                    control: (state) =>
-                                                        state.isFocused ? "!outline-none !ring-orange-500 !border-orange-500 !ring-0" : "!border-gray-300"
-                                                }}
-                                            />
-                                        </FormField>
-                                        <div className="grid grid-cols-8">
-                                            <div className="col-span-2">
-                                                <FormField label="Workers">
-                                                    <Select
-                                                        isDisabled={!user?.isAdmin}
-                                                        isClearable={false}
-                                                        isSearchable={true}
-                                                        options={listWorkers!.map(x => ({ value: x, label: x.userName }))}
-                                                        placeholder="เพิ่มผู้ปฏิบัติ"
-                                                        value={null}
-                                                        onChange={e => {
-                                                            if (!e) {
-                                                                return;
-                                                            }
+                {/* // TODO: separate this sheesh to components */}
+                <form action={handleSubmit} className="flex flex-col flex-1 min-h-0">
+                    <div className="overflow-y-auto flex-grow">
+                        <FormFieldSetWrapper>
+                            <div className="pl-8 pr-8 pb-8 pt-4 ">
+                                {/* === Section: รายละเอียดหลัก === */}
+                                <div className="pb-6 border-b">
+                                    <FormField label="Task">
+                                        <CharCountInput inputClassName={baseInputClass} maxLength={500} valueState={taskName} onChangeCallback={(e) => setTaskName(e.target.value)} disabled={!user?.isAdmin} required={true} />
+                                    </FormField>
+                                    <FormField label="Team">
+                                        <Select
+                                            isDisabled={!user?.isAdmin}
+                                            name="FormTeam"
+                                            required
+                                            isClearable={false}
+                                            isSearchable={true}
+                                            options={TEAMS.map(t => ({ value: t.teamID, label: t.teamName }))}
+                                            value={selectedTeamID}
+                                            onChange={e => setSelectedTeamID(e)}
+                                            className="text-sm shadow-sm"
+                                            classNames={{
+                                                control: (state) =>
+                                                    state.isFocused ? "!outline-none !ring-orange-500 !border-orange-500 !ring-0" : "!border-gray-300"
+                                            }}
+                                        />
+                                    </FormField>
+                                    <div className="grid grid-cols-8">
+                                        <div className="col-span-2">
+                                            <FormField label="Workers">
+                                                <Select
+                                                    isDisabled={!user?.isAdmin}
+                                                    isClearable={false}
+                                                    isSearchable={true}
+                                                    options={listWorkers!.map(x => ({ value: x, label: x.userName }))}
+                                                    placeholder="เพิ่มผู้ปฏิบัติ"
+                                                    value={null}
+                                                    onChange={e => {
+                                                        if (!e) {
+                                                            return;
+                                                        }
 
-                                                            let newSelectedWorkers: User[] = [];
-                                                            if (selectedWorkers === null) {
-                                                                newSelectedWorkers = newSelectedWorkers.concat(e.value);
-                                                            } else {
-                                                                newSelectedWorkers = selectedWorkers.concat(
-                                                                    e.value
-                                                                );
-                                                            }
+                                                        let newSelectedWorkers: User[] = [];
+                                                        if (selectedWorkers === null) {
+                                                            newSelectedWorkers = newSelectedWorkers.concat(e.value);
+                                                        } else {
+                                                            newSelectedWorkers = selectedWorkers.concat(
+                                                                e.value
+                                                            );
+                                                        }
 
-                                                            setSelectedWorkers(newSelectedWorkers);
+                                                        setSelectedWorkers(newSelectedWorkers);
 
-                                                            const newListWorker = listWorkers!.filter(x => x.userID !== e.value.userID);
-                                                            setListWorkers(newListWorker);
-                                                        }}
-                                                        className="text-sm shadow-sm"
-                                                        classNames={{
-                                                            control: (state) =>
-                                                                state.isFocused ? "!outline-none !ring-orange-500 !border-orange-500 !ring-0" : "!border-gray-300"
-                                                        }}
-                                                    />
-                                                </FormField>
-                                            </div>
-                                            <div className="col-span-1 flex justify-center items-center text-gray-500">
-                                                {/* // TODO: arrow or plus icon here */}
-                                                {"=>"}
-                                            </div>
-                                            {/* // TODO: overflow scrollbar when add so many worker */}
-                                            <div className={`border border-gray-300 rounded-md col-span-5 mt-6 shadow-sm p-1 ${!user?.isAdmin && "bg-gray-100"}`}>
-                                                {
-                                                    selectedWorkers === null ? "" :
-                                                        selectedWorkers.map(x => {
-                                                            return <AssigneeLabels
-                                                                key={x.userID} text={x.userName} closeButton={user?.isAdmin}
-                                                                closeButtonCallback={
-                                                                    () => {
-                                                                        const newSelectedWorkers = selectedWorkers.filter(sw => sw.userID !== x.userID);
-                                                                        setSelectedWorkers(newSelectedWorkers);
-
-                                                                        let newListWorker = listWorkers!.concat(x);
-                                                                        newListWorker.sort((a, b) => a.userName.localeCompare(b.userName));
-                                                                        setListWorkers(newListWorker);
-                                                                    }
-                                                                }
-                                                            />
-                                                        })
-                                                }
-                                            </div>
+                                                        const newListWorker = listWorkers!.filter(x => x.userID !== e.value.userID);
+                                                        setListWorkers(newListWorker);
+                                                    }}
+                                                    className="text-sm shadow-sm"
+                                                    classNames={{
+                                                        control: (state) =>
+                                                            state.isFocused ? "!outline-none !ring-orange-500 !border-orange-500 !ring-0" : "!border-gray-300"
+                                                    }}
+                                                />
+                                            </FormField>
                                         </div>
-                                        <FormField label="Deadline">
-                                            <DatePicker
-                                                name="FormDeadline"
-                                                className={"shadow-sm " + baseInputClass}
-                                                required
-                                                filterDate={(date) => { return date.getDay() !== 0 }}
-                                                selected={selectedDeadline}
-                                                onChange={e => setSelectedDeadline(e!)}
-                                            />
-                                        </FormField>
-                                        <FormField label="Status">
-                                            <select
-                                                name="FormTaskStatus"
-                                                value={selectedStatus}
-                                                onChange={(e) => setSelectedStatus(Number(e.target.value))}
-                                                className={baseInputClass}
-                                                defaultValue={currentTask.taskStatusID}
-                                            >
-                                                {TASK_STATUSES.map((opt) => (
-                                                    <option key={opt.taskStatusID} value={opt.taskStatusID}>
-                                                        {opt.taskStatusName}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </FormField>
-                                        {/* </div> */}
+                                        <div className="col-span-1 flex justify-center items-center text-gray-500">
+                                            {/* // TODO: arrow or plus icon here */}
+                                            {"=>"}
+                                        </div>
+                                        {/* // TODO: overflow scrollbar when add so many worker */}
+                                        <div className={`border border-gray-300 rounded-md col-span-5 mt-6 shadow-sm p-1 ${!user?.isAdmin && "bg-gray-100"}`}>
+                                            {
+                                                selectedWorkers === null ? "" :
+                                                    selectedWorkers.map(x => {
+                                                        return <AssigneeLabels
+                                                            key={x.userID} text={x.userName} closeButton={user?.isAdmin}
+                                                            closeButtonCallback={
+                                                                () => {
+                                                                    const newSelectedWorkers = selectedWorkers.filter(sw => sw.userID !== x.userID);
+                                                                    setSelectedWorkers(newSelectedWorkers);
 
-                                        {/* Help me */}
-                                        {/* // TODO: change this to enum maybe */}
-                                        {selectedStatus === 3 && (
-                                            <div className="mt-3 p-5 bg-purple-50 border-l-4 border-purple-400 rounded-r-lg">
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-                                                    <DetailItem label="วันที่ร้องขอ">
-                                                        <p className="font-semibold">
-                                                            {formatDateYYYY_MM_DD(currentTask.helpReqAt ? new Date(currentTask.helpReqAt) : new Date())}
-                                                        </p>
-                                                    </DetailItem>
-                                                    <DetailItem label="ขอความช่วยเหลือล่วงหน้า">
-                                                        <p className="font-bold text-purple-800">{helpLeadDays} วัน</p>
-                                                    </DetailItem>
-                                                    <div className="md:col-span-3">
-                                                        <FormField label="ผู้ช่วยเหลือ (Help Assignee)">
-                                                            {
-                                                                currentTask.taskStatusID === 3 && currentTask.teamHelpID && currentTask.helpReqAt ? (
-                                                                    // editing help me task. user may not change help assignee again until this helpme is done
-                                                                    <p className="font-semibold">{TEAMS.find(x => x.teamID === currentTask.teamHelpID)?.teamName || "-"}</p>
-                                                                ) : (
-                                                                    <Select
-                                                                        // TODO: defaultValue based from what task i clicked
-                                                                        name="FormTeamHelp"
-                                                                        required
-                                                                        className={"shadow-sm"}
-                                                                        isClearable={false}
-                                                                        isSearchable={true}
-                                                                        placeholder={"เลือกทีมที่ต้องการให้ช่วยเหลือ..."}
-                                                                        // TODO: make this from api call
-                                                                        options={TEAMS.map((team) => ({ value: team.teamID, label: team.teamName }))}
-                                                                    />
-                                                                )
+                                                                    let newListWorker = listWorkers!.concat(x);
+                                                                    newListWorker.sort((a, b) => a.userName.localeCompare(b.userName));
+                                                                    setListWorkers(newListWorker);
+                                                                }
                                                             }
-                                                        </FormField>
-                                                    </div>
+                                                        />
+                                                    })
+                                            }
+                                        </div>
+                                    </div>
+                                    <FormField label="Deadline">
+                                        <DatePicker
+                                            name="FormDeadline"
+                                            className={"text-sm shadow-sm " + baseInputClass}
+                                            required
+                                            filterDate={(date) => { return date.getDay() !== 0 }}
+                                            selected={selectedDeadline}
+                                            onChange={e => setSelectedDeadline(e!)}
+                                        />
+                                    </FormField>
+                                    <FormField label="Status">
+                                        <select
+                                            name="FormTaskStatus"
+                                            value={selectedStatus}
+                                            onChange={(e) => setSelectedStatus(Number(e.target.value))}
+                                            className={baseInputClass}
+                                            defaultValue={currentTask.taskStatusID}
+                                        >
+                                            {TASK_STATUSES.map((opt) => (
+                                                <option key={opt.taskStatusID} value={opt.taskStatusID}>
+                                                    {opt.taskStatusName}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </FormField>
+                                    {/* </div> */}
+
+                                    {/* Help me */}
+                                    {/* // TODO: change this to enum maybe */}
+                                    {selectedStatus === 3 && (
+                                        <div className="mt-3 p-5 bg-purple-50 border-l-4 border-purple-400 rounded-r-lg">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+                                                <DetailItem label="วันที่ร้องขอ">
+                                                    <p className="font-semibold">
+                                                        {formatDateYYYY_MM_DD(currentTask.helpReqAt ? new Date(currentTask.helpReqAt) : new Date())}
+                                                    </p>
+                                                </DetailItem>
+                                                <DetailItem label="ขอความช่วยเหลือล่วงหน้า">
+                                                    <p className="font-bold text-purple-800">{helpLeadDays} วัน</p>
+                                                </DetailItem>
+                                                <div className="md:col-span-3">
+                                                    <FormField label="ผู้ช่วยเหลือ (Help Assignee)">
+                                                        {
+                                                            currentTask.taskStatusID === 3 && currentTask.teamHelpID && currentTask.helpReqAt ? (
+                                                                // editing help me task. user may not change help assignee again until this helpme is done
+                                                                <p className="font-semibold">{TEAMS.find(x => x.teamID === currentTask.teamHelpID)?.teamName || "-"}</p>
+                                                            ) : (
+                                                                <Select
+                                                                    // TODO: defaultValue based from what task i clicked
+                                                                    name="FormTeamHelp"
+                                                                    required
+                                                                    className={"shadow-sm"}
+                                                                    isClearable={false}
+                                                                    isSearchable={true}
+                                                                    placeholder={"เลือกทีมที่ต้องการให้ช่วยเหลือ..."}
+                                                                    // TODO: make this from api call
+                                                                    options={TEAMS.map((team) => ({ value: team.teamID, label: team.teamName }))}
+                                                                />
+                                                            )
+                                                        }
+                                                    </FormField>
                                                 </div>
                                             </div>
-                                        )}
-
-                                        {/* // TODO: fix this bodge */}
-                                        {/* // TODO: make this have a checkbox to turn on or smth */}
-                                        {/* // TODO: make loading indicator when uploading file */}
-                                        {
-                                            // only dealer
-                                            // currentTask.teamID === 2 && (
-                                            // <div className="md:col-span-2 mt-4">
-                                            // <FormField label={"แนบไฟล์ PO"}>
-                                            // <input type="file" onChange={handleFileChange} className={baseInputClass} />
-                                            // </FormField>
-                                            // </div>
-                                            // )
-                                        }
-
-                                        <div className="md:col-span-2 mt-4">
-                                            <div className={`p-4 pt-2 rounded-lg border transition-colors duration-200 bg-yellow-50 border-yellow-400 shadow-md`}>
-                                                <FormField label={"รายละเอียดการอัปเดต (จำเป็นต้องกรอก*)'"}>
-                                                    <textarea
-                                                        required
-                                                        name="FormLogReason"
-                                                        // onChange={(e) => setUpdateReason(e.target.value)}
-                                                        className={`${baseInputClass} transition-colors duration-200 border-yellow-500 focus:ring-yellow-500 focus:border-yellow-500`}
-                                                        rows={4}
-                                                        placeholder={"กรุณาระบุรายละเอียด / เหตุผล"}
-                                                    />
-                                                </FormField>
-                                                <p className={`text-sm mt-2 transition-colors duration-200 text-yellow-700 font-medium `}>
-                                                    * ข้อมูลนี้จะถูกบันทึกลงใน Notes / Result โดยอัตโนมัติเมื่อกดบันทึก
-                                                </p>
-                                            </div>
                                         </div>
+                                    )}
 
+                                    {/* // TODO: fix this bodge */}
+                                    {/* // TODO: make this have a checkbox to turn on or smth */}
+                                    {/* // TODO: make loading indicator when uploading file */}
+                                    {
+                                        // only dealer
+                                        // currentTask.teamID === 2 && (
+                                        // <div className="md:col-span-2 mt-4">
+                                        // <FormField label={"แนบไฟล์ PO"}>
+                                        // <input type="file" onChange={handleFileChange} className={baseInputClass} />
+                                        // </FormField>
+                                        // </div>
+                                        // )
+                                    }
+
+                                    <div className="md:col-span-2 mt-4">
+                                        <div className={`p-4 pt-2 rounded-lg border transition-colors duration-200 bg-yellow-50 border-yellow-400 shadow-md`}>
+                                            <FormField label={"รายละเอียดการอัปเดต (จำเป็นต้องกรอก*)'"}>
+                                                <textarea
+                                                    required
+                                                    name="FormLogReason"
+                                                    // onChange={(e) => setUpdateReason(e.target.value)}
+                                                    className={`${baseInputClass} bg-white transition-colors duration-200 border-yellow-500 focus:ring-yellow-500 focus:border-yellow-500`}
+                                                    rows={4}
+                                                    placeholder={"กรุณาระบุรายละเอียด / เหตุผล"}
+                                                    maxLength={10000}
+                                                />
+                                            </FormField>
+                                            <p className={`text-sm mt-2 transition-colors duration-200 text-yellow-700 font-medium `}>
+                                                * ข้อมูลนี้จะถูกบันทึกลงใน Notes / Result โดยอัตโนมัติเมื่อกดบันทึก
+                                            </p>
+                                        </div>
                                     </div>
+
                                 </div>
-                            </FormFieldSetWrapper>
-                        </div>
+                            </div>
+                        </FormFieldSetWrapper>
+                    </div>
 
-                        <footer className="flex justify-end items-center p-6 border-t bg-gray-50 rounded-b-xl">
-                            <FormButton
-                                type="button"
-                                onClick={onClose}
-                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none disabled:opacity-50"
-                            >
-                                ยกเลิก
-                            </FormButton>
-                            <FormButton
-                                type="submit"
-                                className="ml-3 px-6 py-2 text-sm font-medium text-white bg-orange-500 border border-transparent rounded-md shadow-sm hover:bg-orange-600 focus:outline-none disabled:bg-gray-400 disabled:cursor-not-allowed" disabledText="กำลังบันทึก..."
-                            >
-                                {'บันทึก'}
-                            </FormButton>
-                        </footer>
-                    </form>
-                </div >
-            </div >
-
+                    <footer className="flex justify-end items-center p-6 border-t bg-gray-50 rounded-b-xl">
+                        <FormButton
+                            type="button"
+                            onClick={onClose}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none disabled:opacity-50"
+                        >
+                            ยกเลิก
+                        </FormButton>
+                        <FormButton
+                            type="submit"
+                            className="ml-3 px-6 py-2 text-sm font-medium text-white bg-orange-500 border border-transparent rounded-md shadow-sm hover:bg-orange-600 focus:outline-none disabled:bg-gray-400 disabled:cursor-not-allowed" disabledText="กำลังบันทึก..."
+                        >
+                            {'บันทึก'}
+                        </FormButton>
+                    </footer>
+                </form>
+            </ModalSmallContainer>
         </>,
         document.getElementById("modal-root")!
     );

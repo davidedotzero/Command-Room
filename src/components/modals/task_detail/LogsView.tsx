@@ -12,7 +12,7 @@ import { useEffectDatePickerFix } from "../../utils/ReactDatePickerBodgeFixHook"
 import { useAuth } from "../../../contexts/AuthContext";
 import equal from "fast-deep-equal";
 
-function LogsView({ taskID }: { taskID: string }) {
+function LogsView({ taskID, taskRecentUpdate }: { taskID: string, taskRecentUpdate: number }) {
     const { TASK_STATUSES } = useDbConst();
 
     // const [taskLogs, setTaskLogs] = useState("Loading...");
@@ -249,8 +249,10 @@ function LogsView({ taskID }: { taskID: string }) {
                 {
                     <>
                         <div className="p-4">
-                            <DetailItem label="Notes / Result (Log)">
-                                <div className="space-y-2">
+                            <DetailItem label={`Notes / Result (Log) `}>
+                                <span className="text-sm text-gray-600 mr-3">{`จำนวน log ทั้งหมด: ${filteredLogs.length}`}</span>
+                                <span className="text-sm text-gray-600 mr-3">{`จำนวน log อัปเดตล่าสุด (4h): ${taskRecentUpdate}`}</span>
+                                <div className="space-y-2 mt-2">
                                     {
                                         filteredLogs.map(x => {
                                             let displayLog = "";
@@ -278,7 +280,7 @@ function LogsView({ taskID }: { taskID: string }) {
                                                             </button>
                                                         </div>
 
-                                                        {/* add user here for now */}
+                                                        {/* // TODO: fix this hard coded bs */}
                                                         {user.userID === "USER-2025-000011" || user.userID === "USER-0000-000001" || user.userID === "USER-2025-000019" || user.userID === "USER-2025-000001" ?
                                                             <div className="bottom-0 right-0 mr-3 mb-1 absolute flex justify-end">
                                                                 <label className="flex items-center space-x-3 cursor-pointer group">

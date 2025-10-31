@@ -1,7 +1,8 @@
 import { createPortal } from "react-dom";
-import { FormButton, FormField } from "./forms/FormItems";
+import { CharCountInput, FormButton, FormField } from "./forms/FormItems";
 import { useState, type ChangeEvent } from "react";
 import { API } from "../../utils/api";
+import { ModalHeader } from "./ModalComponents";
 
 function EditProjectModal(
     { isOpen, onClose, selectedProjectID, selectedProjectName, parentUpdateCallback }:
@@ -34,37 +35,20 @@ function EditProjectModal(
         parentUpdateCallback();
     }
 
-
-    const baseInputClass = "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm ";
     return createPortal(
         <>
             <div className="fixed inset-0 z-50 bg-white/70 bg-opacity-50 flex items-center justify-center">
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl">
-                    {/* // TODO: separate this sheesh to components */}
-                    <div className="border-b p-6 flex">
-                        <div className="flex flex-col flex-1">
-                            <h1 className="text-2xl font-semibold">แก้ไขโปรเจกต์</h1>
-                            <p>{selectedProjectName}</p>
-                            <p>{selectedProjectID}</p>
-                        </div>
-                        <div className="flex justify-center items-start">
-                            <button
-                                onClick={onClose}
-                                // disabled={isLoading}
-                                className="text-gray-400 hover:text-gray-600 disabled:opacity-30 text-2xl"
-                            >
-                                &times;
-                            </button>
-                        </div>
-                    </div>
+                    <ModalHeader text={"แก้ไขโปรเจกต์"} onCloseCallback={onClose} isLoading={false} />
+
                     <div className="border-b p-6 flex">
                         <div className="flex-1 w-full">
                             <FormField label="ชื่อโปรเจกต์">
-                                <input
-                                    type="text"
-                                    className="min-w-full mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm active:border-orange-300"
-                                    value={projectName}
-                                    onChange={e => handleTextChange(e)}
+                                <CharCountInput
+                                    maxLength={500}
+                                    valueState={projectName}
+                                    onChangeCallback={handleTextChange}
+                                    inputClassName="min-w-full mt-1 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                                 />
                             </FormField >
                         </div>

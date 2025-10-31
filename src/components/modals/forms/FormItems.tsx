@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ChangeEvent, type ReactNode, type Ref } from "react";
 import { useFormStatus } from "react-dom";
 
 // TODO: abstact this sheesh???????????????
@@ -59,3 +59,118 @@ export const FormButton: React.FC<FormButtonProps> = (({ type, className, childr
         </button>
     );
 });
+
+export function CharCountInput(
+    {
+        maxLength,
+        valueState,
+        onChangeCallback,
+        inputClassName,
+        placeholder,
+        disabled,
+        required,
+        inputRef
+    }: {
+        maxLength: number,
+        valueState: string,
+        onChangeCallback: (e: ChangeEvent<HTMLInputElement>) => void,
+        inputClassName?: string,
+        placeholder?: string,
+        disabled?: boolean,
+        required?: boolean,
+        inputRef?: Ref<HTMLInputElement>
+    }
+) {
+    const [isFocused, setIsFocused] = useState(false);
+
+    const currentLength = valueState.length;
+    const isNearLimit = currentLength > maxLength * 0.9;
+
+    const counterColorClass = isNearLimit
+        ? 'text-red-500'
+        : 'text-gray-400';
+
+    const focusRingClass = isFocused ? "outline-none ring-orange-500 border-orange-500 " : ""
+
+    return (
+        <div className="w-full">
+            <div className={`flex justify-between items-center w-full ${focusRingClass} ${inputClassName} ${disabled ? "bg-gray-100 text-gray-500" : "bg-white"}`}>
+                <input
+                    type="text"
+                    maxLength={maxLength}
+                    placeholder={placeholder}
+                    value={valueState}
+                    onChange={onChangeCallback}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                    disabled={disabled}
+                    required={required}
+                    className="w-full flex-grow border-none outline-none focus:outline-none focus:ring-0 p-0 bg-transparent"
+                    ref={inputRef}
+                />
+
+                <div
+                    className={`flex-shrink-0 pl-3 text-sm ${counterColorClass}`}
+                >
+                    {currentLength}/{maxLength}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// export function CharCountTextArea(
+//     {
+//         maxLength,
+//         valueState,
+//         onChangeCallback,
+//         inputClassName,
+//         placeholder,
+//         disabled,
+//         required
+//     }: {
+//         maxLength: number,
+//         valueState: string,
+//         onChangeCallback: (e: ChangeEvent<HTMLInputElement>) => void,
+//         inputClassName?: string,
+//         placeholder?: string
+//         disabled?: boolean
+//         required?: boolean
+//     }
+// ) {
+//     const [isFocused, setIsFocused] = useState(false);
+//
+//     const currentLength = valueState.length;
+//     const isNearLimit = currentLength > maxLength * 0.9;
+//
+//     const counterColorClass = isNearLimit
+//         ? 'text-red-500'
+//         : 'text-gray-400';
+//
+//     const focusRingClass = isFocused ? "outline-none ring-orange-500 border-orange-500 " : ""
+//
+//     return (
+//         <div className="w-full">
+//             <div className={`relative w-full ${focusRingClass} ${inputClassName} ${disabled ? "bg-gray-100 text-gray-500" : "bg-white"}`}>
+//                 <input
+//                     type="text"
+//                     maxLength={maxLength}
+//                     placeholder={placeholder}
+//                     value={valueState}
+//                     onChange={onChangeCallback}
+//                     onFocus={() => setIsFocused(true)}
+//                     onBlur={() => setIsFocused(false)}
+//                     disabled={disabled}
+//                     required={required}
+//                     className="w-full flex-grow border-none outline-none focus:outline-none focus:ring-0 p-0 bg-transparent"
+//                 />
+//
+//                 <div
+//                     className={`flex-shrink-0 pl-3 text-sm ${counterColorClass}`}
+//                 >
+//                     {currentLength}/{maxLength}
+//                 </div>
+//             </div>
+//         </div>
+//     );
+// }
