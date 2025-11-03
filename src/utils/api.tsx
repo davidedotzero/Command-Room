@@ -57,6 +57,11 @@ export const API = {
         return result.data;
     },
 
+    getUserById: async (userID: string) => {
+        let result = await api.get(`/user/${userID}`);
+        return result.data;
+    },
+
     getAllTasksDetailed: async (): Promise<FilteringTask[]> => {
         let response = await api.get("/tasks");
         let data = response.data;

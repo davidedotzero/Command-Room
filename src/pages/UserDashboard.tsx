@@ -1,5 +1,8 @@
 import { useParams } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
+import { useEffect, useState } from "react";
+import { API } from "../utils/api";
+import type { User } from "../types/types";
 
 function UserDashboard() {
     let param = useParams();
@@ -11,6 +14,18 @@ function UserDashboard() {
     const currentUserID: string = param.userID;
     const { user } = useAuth();
 
+    const [userData, setUserData] = useState<User>();
+
+    async function fetchData() {
+        const userData = await API.getUserById(currentUserID);
+
+        setUserData(userData);
+    }
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
     if (!user?.isAdmin && (currentUserID !== user?.userID)) {
         return (
             <>
@@ -21,6 +36,11 @@ function UserDashboard() {
 
     return (
         <>
+            {/* {userData?.userID}<br /> */}
+            {/* {userData?.userName}<br /> */}
+            {/* {userData?.teamID}<br /> */}
+            {/* {"user update log count: "}<br /> */}
+            {/* {"user done before deadline: "}<br /> */}
             <marquee direction="right" scrollamount="500"><p className="text-9xl">ยังไม่เสร็จจ้าาาา</p></marquee>
         </>
     )
