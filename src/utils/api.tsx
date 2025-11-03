@@ -52,6 +52,15 @@ api.interceptors.response.use(
 );
 
 export const API = {
+    test_private_noti_gu: async () => {
+        let result = await api.post("/noti/testGU");
+        console.log(result);
+    },
+    test_private_noti_ppat: async () => {
+        let result = await api.post("/noti/testPPAT");
+        console.log(result);
+    },
+
     getUser: async () => {
         let result = await api.get("/user/me");
         return result.data;

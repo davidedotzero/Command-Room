@@ -11,6 +11,7 @@ import { version } from '../package.json'
 import "react-datepicker/dist/react-datepicker.css";
 import { useEffect } from 'react'
 import UserDashboard from './pages/UserDashboard'
+import { usePusher } from './contexts/PusherContext'
 
 // TODO: abstract this to other file MAYBE
 function LoginPage() {
@@ -63,31 +64,6 @@ function AuthCallback() {
     return <div>Loading...</div>
 }
 
-// TODO: abstract this to other file MAYBE
-function AppContent() {
-    return (
-        <>
-            <Routes>
-                <Route path="/login" element={<LoginPage />}></Route>
-                <Route path="/auth/callback" element={<AuthCallback />}></Route>
-                <Route path="/whoru" element={<div className='m-3 text-7xl text-red-500'>ผู้ ใ ด๋ นิ</div>}></Route>
-
-                <Route element={<ProtectedRoutes />}>
-                    <Route path="/" element={<Navigate to="/tasks" />}></Route>
-                    <Route path="/tasks" element={<Tasks />}></Route>
-                    <Route path="/projects" element={<Projects />}></Route>
-                    <Route path="/projects/p/:projectID" element={<ProjectDetail />}></Route>
-                    <Route path="/dashboard/u/:userID" element={<UserDashboard />}></Route>
-                    {/* <Route path="/dashboard/all"></Route> */}
-                    <Route path="/customers" element={<Customers />}></Route>
-                </Route>
-
-                <Route path="*" element={<div>404 not found ;(</div>}></Route>
-            </Routes>
-        </>
-    );
-}
-
 function ProtectedRoutes() {
     const { user } = useAuth();
     const token = localStorage.getItem("command-room-token");
@@ -110,6 +86,106 @@ function ProtectedRoutes() {
 
             {/* render modals here */}
             <div id="modal-root"></div>
+        </>
+    );
+}
+
+function NotificationHandler() {
+    const pusher = usePusher();
+    const { user } = useAuth();
+
+    useEffect(() => {
+        if (!(pusher && user)) {
+            return;
+        }
+
+        const test_channel = pusher.channel("test-channel");
+        const private_test_channel = pusher.channel("private-kuy-channel-" + user.userID);
+
+        if (!test_channel) {
+            console.error("Pusher Channel with a name " + "test-channel" + " does not exist.");
+            return;
+        }
+        if (!private_test_channel) {
+            console.error("Pusher Channel with a name " + "private-kuy-channel-" + user.userID + " does not exist.");
+            return;
+        }
+
+        test_channel.bind("test-event", function(data) {
+            alert(JSON.stringify(data));
+        });
+
+        private_test_channel.bind("juanjuanjuan", function(data) {
+            alert("kuy private " + JSON.stringify(data));
+        });
+
+        // const notify_all_channel = pusher.channel("notify-all");
+        // const private_user_channel = pusher.channel("private-user-" + user.userID);
+        // const private_team_channel = pusher.channel("private-team-" + user.teamID);
+        //
+        // if (!notify_all_channel) {
+        //     console.error("Pusher Channel with a name " + "notify-all" + " does not exist.");
+        //     return;
+        // }
+        // if (!private_user_channel) {
+        //     console.error("Pusher Channel with a name " + "private-user" + " does not exist.");
+        //     return;
+        // }
+        // if (!private_team_channel) {
+        //     console.error("Pusher Channel with a name " + "private-team" + " does not exist.");
+        //     return;
+        // }
+        //
+        // notify_all_channel.bind("notify-all-event", function(data: unknown) {
+        //     alert("ALL: " + JSON.stringify(data));
+        // });
+        // private_user_channel.bind("private-user-event", function(data: unknown) {
+        //     alert("USER: " + JSON.stringify(data));
+        // });
+        // private_team_channel.bind("private-team-event", function(data: unknown) {
+        //     alert("TEAM: " + JSON.stringify(data));
+        // });
+
+        return () => {
+            if (test_channel) {
+                test_channel.unbind('test-event');
+            }
+            if (private_test_channel) {
+                private_test_channel.unbind('juanjuanjuan');
+            }
+
+            // if (notify_all_channel) notify_all_channel.unbind_all();
+            // if (private_user_channel) private_user_channel.unbind_all();
+            // if (private_team_channel) private_team_channel.unbind_all();
+        };
+
+    }, [pusher, user]);
+
+    return null;
+}
+
+// TODO: abstract this to other file MAYBE
+function AppContent() {
+    return (
+        <>
+            <NotificationHandler />
+            <Routes>
+                <Route path="/login" element={<LoginPage />}></Route>
+                <Route path="/auth/callback" element={<AuthCallback />}></Route>
+                <Route path="/whoru" element={<div className='m-3 text-7xl text-red-500'>ผู้ ใ ด๋ นิ</div>}></Route>
+
+                <Route element={<ProtectedRoutes />}>
+                    <Route path="/" element={<Navigate to="/tasks" />}></Route>
+                    <Route path="/tasks" element={<Tasks />}></Route>
+                    <Route path="/projects" element={<Projects />}></Route>
+                    <Route path="/projects/p/:projectID" element={<ProjectDetail />}></Route>
+                    <Route path="/dashboard/u/:userID" element={<UserDashboard />}></Route>
+                    {/* <Route path="/dashboard/all"></Route> */}
+                    <Route path="/customers" element={<Customers />}></Route>
+                </Route>
+
+                <Route path="*" element={<div>404 not found ;(</div>}></Route>
+            </Routes>
         </>
     );
 }

@@ -72,7 +72,6 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
             return;
         }
 
-        console.log("a?");
         setUser(null);
         localStorage.removeItem("command-room-token");
         navigate("/login");

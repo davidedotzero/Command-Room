@@ -1,6 +1,7 @@
 import { NavLink } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 import { UserCircleIcon } from "./utils/icons";
+import { API } from "../utils/api";
 
 function Navbar() {
     const nav_active_class = (isActive: boolean) =>
@@ -32,6 +33,41 @@ function Navbar() {
                         Logout
                     </button>
 
+                </div>
+
+                <div className="hidden">
+                    <button
+                        className="border"
+                        onClick={async () => {
+                            console.log("gu yeaaaa");
+                            let juan = await API.test_private_noti_gu();
+                            console.log(juan);
+                        }}
+                    >
+                        noti gu
+                    </button>
+
+                    <button
+                        className="border"
+                        onClick={async () => {
+                            console.log("ppat yeaaaa");
+                            let juan = await API.test_private_noti_ppat();
+                            console.log(juan);
+                        }}
+                    >
+                        noti ppat
+                    </button>
+
+                    <button
+                        className="border"
+                        onClick={async () => {
+                            console.log("ppat yeaaaa");
+                            let juan = await API.test_all_noti();
+                            console.log(juan);
+                        }}
+                    >
+                        noti all
+                    </button>
                 </div>
 
                 {/* // WARNING: dev button */}
