@@ -62,7 +62,7 @@ function Navbar() {
                         className="border"
                         onClick={async () => {
                             console.log("ppat yeaaaa");
-                            let juan = await API.test_all_noti();
+                            let juan = await API.notify_all(user?.userID!, 1, "yedhee", null);
                             console.log(juan);
                         }}
                     >

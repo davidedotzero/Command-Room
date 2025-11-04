@@ -29,7 +29,6 @@ function ProjectDetail() {
     const [currentProjectName, setCurrentProjectName] = useState<string>("");
 
     const [tasksByProjectIDDetailed, setTasksByProjectIDDetailed] = useState<FilteringTask[]>([]); // TODO: rename this
-    const [lnw_team, setLnw_team] = useState<Team[]>([]); // TODO: rename this
     const [taskRowData, setTaskRowData] = useState<FilteringTask | null>(null); // for sending task detail of selected row to task modals
 
     const [isLoading, setIsLoading] = useState(true);
@@ -46,15 +45,13 @@ function ProjectDetail() {
         setIsLoading(true);
 
         try {
-            const [projectName, data, teams] = await Promise.all([
+            const [projectName, data] = await Promise.all([
                 API.getProjectNameById(currentProjectID),
                 API.getTasksByProjectIdDetailed(currentProjectID),
-                API.getAllTeams(),
             ])
 
             setTasksByProjectIDDetailed(data);
             setCurrentProjectName(projectName);
-            setLnw_team(teams);
 
             setValidID(true);
         } catch (error) {

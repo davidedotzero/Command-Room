@@ -41,7 +41,7 @@ function UserDashboard() {
             {/* {userData?.teamID}<br /> */}
             {/* {"user update log count: "}<br /> */}
             {/* {"user done before deadline: "}<br /> */}
-            <marquee direction="right" scrollamount="500"><p className="text-9xl">ยังไม่เสร็จจ้าาาา</p></marquee>
+            <marquee direction="right" scrollamount="100"><p className="text-9xl">ยังไม่เสร็จจ้าาาา</p></marquee>
         </>
     )
 }
