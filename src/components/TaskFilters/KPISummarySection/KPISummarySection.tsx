@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { FilteringTask } from "../../../types/types";
 import StatDisplayCard from "./StatDisplayCard";
-import { RefreshIcon } from "../../utils/icons";
+import { RefreshIcon } from "../../miscs/icons";
 import { getOnlyDate } from "../../../utils/functions";
 
 const statDescriptions = {

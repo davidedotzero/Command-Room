@@ -2,13 +2,13 @@ import { createPortal } from "react-dom";
 import { CharCountInput, DetailItem, FormButton, FormField, FormFieldSetWrapper } from "./forms/FormItems";
 import { useEffect, useState, type ChangeEvent } from "react";
 import type { FilteringTask, User } from "../../types/types";
-import { API } from "../../utils/api";
+import { API } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 import { calculateLeadTime, formatDateYYYY_MM_DD, getOnlyDate, isOnlyDateEqual, truncateText } from "../../utils/functions";
 import Select from "react-select";
 import { useDbConst } from "../../contexts/DbConstDataContext";
 import DatePicker from "react-datepicker";
-import AssigneeLabels from "../utils/AssigneeLabels";
+import AssigneeLabels from "../miscs/AssigneeLabels";
 import equal from "fast-deep-equal";
 import { ModalFooter, ModalHeader, ModalSmallContainer } from "./ModalComponents";
 

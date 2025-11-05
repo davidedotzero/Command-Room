@@ -8,8 +8,8 @@ import { useDbConst } from "../../../contexts/DbConstDataContext";
 import type { DefaultTaskName, NewTask, Team } from "../../../types/types";
 import DatePicker from "react-datepicker";
 import { getOnlyDate } from "../../../utils/functions";
-import TeamLabel from "../../utils/TeamLabels";
-import { DeleteIcon } from "../../utils/icons";
+import TeamLabel from "../../miscs/TeamLabels";
+import { DeleteIcon } from "../../miscs/icons";
 
 function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallback, children }: { isOpen: boolean, onClose: () => void, currentProjectID: string, parentUpdateCallback: () => {}, children?: ReactNode }) {
     if (!isOpen) return null;

@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
-import { DeleteIcon, EditIcon } from "../components/utils/icons";
+import { DeleteIcon, EditIcon } from "../components/miscs/icons";
 import type { Project } from "../types/types";
-import { API } from "../utils/api";
+import { API } from "../services/api";
 import CreateProjectModal from "../components/modals/projects/CreateProjectModal";
 import EditProjectModal from "../components/modals/EditProjectModal";
 import ConfirmModal from "../components/modals/ConfirmModal";

@@ -4,15 +4,14 @@ import { CharCountInput, FormButton, FormField, FormFieldSetWrapper } from "../f
 import Select, { type SelectInstance, type SingleValue } from "react-select";
 import DatePicker from "react-datepicker";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
-import { useEffectDatePickerFix } from "../../utils/ReactDatePickerBodgeFixHook";
 import { getOnlyDate } from "../../../utils/functions";
 import type { DefaultTaskName, Team, NewTask } from "../../../types/types";
 import DefaultTaskNamesSelect from "../forms/DefaultTaskNamesSelect";
-import TeamLabel from "../../utils/TeamLabels";
-import { API } from "../../../utils/api";
-import { DeleteIcon } from "../../utils/icons";
-import { ConfirmAlert } from "../../../functions/Swal2/CustomSwalCollection";
-// import { CalendarIcon } from "../../utils/icons";
+import TeamLabel from "../../miscs/TeamLabels";
+import { API } from "../../../services/api";
+import { DeleteIcon } from "../../miscs/icons";
+import { ConfirmAlert } from "../../../components/Swal2/CustomSwalCollection";
+import { useEffectDatePickerFix } from "../../../hooks/ReactDatePickerBodgeFixHook";
 
 
 function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, parentUpdateCallback: () => void }) {

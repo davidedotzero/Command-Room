@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import type { FilteringTask } from "../../types/types";
-import { getOnlyDate } from "../../utils/functions";
+import type { FilteringTask } from "../../../types/types";
+import { getOnlyDate } from "../../../utils/functions";
 
 export function filterTasks(
     tasksDetailed: FilteringTask[],

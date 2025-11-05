@@ -6,11 +6,11 @@ import { FormButton, FormField, FormFieldSetWrapper } from "../forms/FormItems";
 import CreatableSelect from "react-select/creatable";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
 import DatePicker from "react-datepicker";
-import { API } from "../../../utils/api";
+import { API } from "../../../services/api";
 import { getOnlyDate } from "../../../utils/functions";
-import { useEffectDatePickerFix } from "../../utils/ReactDatePickerBodgeFixHook";
 import DefaultTaskNamesSelect from "../forms/DefaultTaskNamesSelect";
 import type { DefaultTaskName } from "../../../types/types";
+import { useEffectDatePickerFix } from "../../../hooks/ReactDatePickerBodgeFixHook";
 
 
 // TODO: move this somewhere else better

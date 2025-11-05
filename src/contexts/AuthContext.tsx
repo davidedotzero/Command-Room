@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useState, type FC, type ReactNode } from "react";
 import type { User } from "../types/types";
-import { API } from "../utils/api";
+import { API } from "../services/api";
 import { useNavigate } from "react-router";
-import { ConfirmAlert } from "../functions/Swal2/CustomSwalCollection";
+import { ConfirmAlert } from "../components/Swal2/CustomSwalCollection";
 
 
 // TODO: abstract to type.tsx file

@@ -1,7 +1,7 @@
 import axios from "axios";
-import { removeLastZchar } from "./functions";
 import type { FilteringTask, Task, TaskStatus, Team, NewTask, EditLogDetailed } from "../types/types";
-import { ErrorAlertDetailed, SuccessAlert } from "../functions/Swal2/CustomSwalCollection";
+import { ErrorAlertDetailed, SuccessAlert } from "../components/Swal2/CustomSwalCollection";
+import { removeLastZchar } from "../utils/functions";
 
 export const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL

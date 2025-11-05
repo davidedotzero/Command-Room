@@ -2,19 +2,17 @@ import { useEffect, useState } from "react";
 import TaskDetailProductionModal from "../components/modals/TaskDetailProductionModal";
 import TaskDetailDealerModal from "../components/modals/TaskDetailDealerModal";
 import type { FilteringTask, Team } from "../types/types";
-import { filterTasks } from "../functions/TaskFilters/filters";
-import { API } from "../utils/api";
+import { API } from "../services/api";
 import KPISummarySection from "../components/TaskFilters/KPISummarySection/KPISummarySection";
 import FieldFiltersAndAdd from "../components/TaskFilters/FieldFiltersAndAdd/FieldFiltersAndAdd";
 import TableDisplay from "../components/TaskFilters/TableDisplay/TableDisplay";
 import { useAuth } from "../contexts/AuthContext";
-import { filteredByKPITasks } from "../functions/TaskFilters/KPIfilters";
 import FullscreenSpinner from "../components/Spinners/FullscreenSpinner";
-import { ErrorAlertDetailed } from "../functions/Swal2/CustomSwalCollection";
+import { filterTasks } from "../components/TaskFilters/functions/filters";
+import { filteredByKPITasks } from "../components/TaskFilters/functions/KPIfilters";
 
 function Tasks() {
     const [allTasks, setAllTasks] = useState<FilteringTask[]>([]); // TODO: rename this
-    const [lnw_team, setLnw_team] = useState<Team[]>([]); // TODO: rename this
     const [avgHelpLeadDays, setAvgHelpLeadDays] = useState<number>(0);
     const [taskRowData, setTaskRowData] = useState<FilteringTask | null>(null); // for sending task detail of selected row to task modals
 
@@ -33,6 +31,7 @@ function Tasks() {
     const fetchData = async () => {
         if (!user) return;
 
+        // TODO: promise.all this
         setIsLoading(true);
         let data = null;
         if (user?.isAdmin) {
@@ -46,7 +45,6 @@ function Tasks() {
         const avgHelp = await API.getAvgHelpLeadDaysBeforeDeadline();
 
         setAllTasks(data);
-        setLnw_team(teams);
         setAvgHelpLeadDays(Number(avgHelp));
 
         setIsLoading(false);

@@ -1,10 +1,10 @@
 import { useEffect, useState, type ReactElement } from "react";
 import type { Project, Team } from "../../../types/types";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
-import { API } from "../../../utils/api";
+import { API } from "../../../services/api";
 import DatePicker from "react-datepicker";
-import { useEffectDatePickerFix } from "../../utils/ReactDatePickerBodgeFixHook";
 import Select from "react-select";
+import { useEffectDatePickerFix } from "../../../hooks/ReactDatePickerBodgeFixHook";
 
 function FieldFiltersAndAdd(
     { teamIDFilterState, searchFilterState, projectIDFilterState, startDateFilterState, endDateFilterState, showOnlyIncompleteCheckedState, createNewTaskButton, tasksLength }:

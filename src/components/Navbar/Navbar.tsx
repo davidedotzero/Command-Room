@@ -1,7 +1,7 @@
 import { NavLink } from "react-router";
 import { useAuth } from "../../contexts/AuthContext";
-import { BellIcon, UserCircleIcon } from "../utils/icons";
-import { API } from "../../utils/api";
+import { BellIcon, UserCircleIcon } from "../miscs/icons";
+import { API } from "../../services/api";
 
 function Navbar() {
     const nav_active_class = (isActive: boolean) =>

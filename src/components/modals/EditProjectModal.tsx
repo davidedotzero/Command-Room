@@ -1,7 +1,7 @@
 import { createPortal } from "react-dom";
 import { CharCountInput, FormButton, FormField } from "./forms/FormItems";
 import { useState, type ChangeEvent } from "react";
-import { API } from "../../utils/api";
+import { API } from "../../services/api";
 import { ModalHeader } from "./ModalComponents";
 
 function EditProjectModal(

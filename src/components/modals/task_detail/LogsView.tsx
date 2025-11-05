@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { DetailItem } from "../forms/FormItems";
-import { API } from "../../../utils/api";
+import { API } from "../../../services/api";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
 import { formatDateYYYY_MM_DD } from "../../../utils/functions";
 import type { EditLog, EditLogDetailed } from "../../../types/types";
-import { CopyIcon } from "../../utils/icons";
+import { CopyIcon } from "../../miscs/icons";
 import InlineSpinner from "../../Spinners/InlineSpinner";
 import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
-import { useEffectDatePickerFix } from "../../utils/ReactDatePickerBodgeFixHook";
 import { useAuth } from "../../../contexts/AuthContext";
 import equal from "fast-deep-equal";
+import { useEffectDatePickerFix } from "../../../hooks/ReactDatePickerBodgeFixHook";
 
 function LogsView({ taskID, taskRecentUpdate }: { taskID: string, taskRecentUpdate: number }) {
     const { TASK_STATUSES } = useDbConst();

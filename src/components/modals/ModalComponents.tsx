@@ -1,5 +1,5 @@
 import { type ReactNode } from "react";
-import { XIcon } from "../utils/icons";
+import { XIcon } from "../miscs/icons";
 
 export function ModalContainer({ children }: { children: ReactNode }) {
     return (

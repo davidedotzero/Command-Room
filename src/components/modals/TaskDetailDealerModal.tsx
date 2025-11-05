@@ -6,7 +6,7 @@ import EditTaskModal from "./EditTaskModal";
 import { DetailItem } from "./forms/FormItems";
 import TaskDetailsView from "./task_detail/TaskDetailsView";
 import type { FilteringTask } from "../../types/types";
-import { API } from "../../utils/api";
+import { API } from "../../services/api";
 
 
 function TaskDetailDealerModal({ isOpen, onClose, taskData, currentProjectName, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: FilteringTask | null, currentProjectName: string, parentUpdateCallback: () => {} }) {

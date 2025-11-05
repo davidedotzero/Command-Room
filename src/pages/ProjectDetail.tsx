@@ -1,21 +1,21 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import { PlusIcon } from "../components/utils/icons";
+import { PlusIcon } from "../components/miscs/icons.tsx";
 
 import type { Team, FilteringTask } from "../types/types.tsx";
 
 import TaskDetailProductionModal from "../components/modals/TaskDetailProductionModal";
 import TaskDetailDealerModal from "../components/modals/TaskDetailDealerModal";
 import CreateTaskModal from "../components/modals/tasks/CreateTaskModal.tsx";
-import { API } from "../utils/api";
+import { API } from "../services/api";
 import KPISummarySection from "../components/TaskFilters/KPISummarySection/KPISummarySection";
 import FieldFiltersAndAdd from "../components/TaskFilters/FieldFiltersAndAdd/FieldFiltersAndAdd";
 import TableDisplay from "../components/TaskFilters/TableDisplay/TableDisplay";
-import { filterTasks } from "../functions/TaskFilters/filters";
-import { filteredByKPITasks } from "../functions/TaskFilters/KPIfilters";
 import FullscreenSpinner from "../components/Spinners/FullscreenSpinner";
 import LegacyCreateTaskModal from "../components/modals/Legacy/LegacyCreateTaskModal.tsx";
+import { filterTasks } from "../components/TaskFilters/functions/filters.tsx";
+import { filteredByKPITasks } from "../components/TaskFilters/functions/KPIfilters.tsx";
 
 // TODO: fix re-renders on open CreateTaskModal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 function ProjectDetail() {

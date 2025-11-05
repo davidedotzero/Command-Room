@@ -2,8 +2,8 @@ import { StatusColor } from "../../../utils/constants";
 import { calculateLeadTime, formatDateYYYY_MM_DD, formatDateYYYY_MM_DD_HH_MM_SS } from "../../../utils/functions";
 import { DetailItem } from "../forms/FormItems";
 import type { FilteringTask } from "../../../types/types";
-import AssigneeLabels from "../../utils/AssigneeLabels";
-import TeamLabel from "../../utils/TeamLabels";
+import AssigneeLabels from "../../miscs/AssigneeLabels";
+import TeamLabel from "../../miscs/TeamLabels";
 
 // TODO: types for selectedTask
 function TaskDetailsView({ task }: { task: FilteringTask }) {

@@ -1,7 +1,7 @@
 import { useParams } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect, useState } from "react";
-import { API } from "../utils/api";
+import { API } from "../services/api";
 import type { User } from "../types/types";
 
 function UserDashboard() {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { API } from "../utils/api";
+import { API } from "../services/api";
 import type { DetailedCustomer, DetailedPO } from "../types/types";
 import { formatDateYYYY_MM_DD } from "../utils/functions";
 

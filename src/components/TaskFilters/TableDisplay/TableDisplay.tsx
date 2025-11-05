@@ -1,8 +1,8 @@
 import { StatusColor } from "../../../utils/constants";
 import { formatDateYYYY_MM_DD } from "../../../utils/functions";
 import type { FilteringTask } from "../../../types/types";
-import AssigneeLabels from "../../utils/AssigneeLabels";
-import TeamLabel from "../../utils/TeamLabels";
+import AssigneeLabels from "../../miscs/AssigneeLabels";
+import TeamLabel from "../../miscs/TeamLabels";
 
 function TableDisplay(
     { filteredAndSortedTasks, setTaskRowData, openTaskDetailDealerModal, openTaskDetailProductionModal, hideProjNameColumn }:
