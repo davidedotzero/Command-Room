@@ -99,26 +99,6 @@ function NotificationHandler() {
             return;
         }
 
-        const test_channel = pusher.channel("test-channel");
-        const private_test_channel = pusher.channel("private-kuy-channel-" + user.userID);
-
-        if (!test_channel) {
-            console.error("Pusher Channel with a name " + "test-channel" + " does not exist.");
-            return;
-        }
-        if (!private_test_channel) {
-            console.error("Pusher Channel with a name " + "private-kuy-channel-" + user.userID + " does not exist.");
-            return;
-        }
-
-        test_channel.bind("test-event", function(data) {
-            alert(JSON.stringify(data));
-        });
-
-        private_test_channel.bind("juanjuanjuan", function(data) {
-            alert("kuy private " + JSON.stringify(data));
-        });
-
         const notify_all_channel = pusher.channel("notify-all");
         const private_user_channel = pusher.channel("private-user-" + user.userID);
         const private_team_channel = pusher.channel("private-team-" + user.teamID);
@@ -147,13 +127,6 @@ function NotificationHandler() {
         });
 
         return () => {
-            if (test_channel) {
-                test_channel.unbind('test-event');
-            }
-            if (private_test_channel) {
-                private_test_channel.unbind('juanjuanjuan');
-            }
-
             if (notify_all_channel) notify_all_channel.unbind_all();
             if (private_user_channel) private_user_channel.unbind_all();
             if (private_team_channel) private_team_channel.unbind_all();

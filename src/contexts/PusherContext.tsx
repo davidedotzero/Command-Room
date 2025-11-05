@@ -23,9 +23,6 @@ export const PusherProvider = ({ children }: { children: ReactNode }) => {
             }
         });
 
-        pusherInstance.subscribe("test-channel");
-        pusherInstance.subscribe("private-kuy-channel-" + user.userID);
-
         pusherInstance.subscribe("notify-all");
         pusherInstance.subscribe("private-user-" + user.userID);
         pusherInstance.subscribe("private-team-" + user.teamID);

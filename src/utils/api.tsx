@@ -53,23 +53,13 @@ api.interceptors.response.use(
 );
 
 export const API = {
-    // TODO: remove these two bitches
-    test_private_noti_gu: async () => {
-        let result = await api.post("/noti/testGU");
-        console.log(result);
-    },
-    test_private_noti_ppat: async () => {
-        let result = await api.post("/noti/testPPAT");
-        console.log(result);
-    },
-
     notify_all: async (senderID: string | null, notificationTypeID: number, message: string, linkTargetID: string | null) => {
         let result = await api.post("/noti/all", { senderID: senderID, notificationTypeID: notificationTypeID, message: message, linkTargetID: linkTargetID });
         return result;
     },
 
-    notify_teams: async (teamIds: string[]) => {
-        let result = await api.post("/noti/teams", { teamIds: teamIds });
+    notify_team: async (senderID: string | null, notificationTypeID: number, message: string, linkTargetID: string | null, teamID: number) => {
+        let result = await api.post("/noti/teams", { senderID: senderID, notificationTypeID: notificationTypeID, message: message, linkTargetID: linkTargetID, teamID: teamID });
         return result;
     },
 
