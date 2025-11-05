@@ -86,6 +86,7 @@ function ProtectedRoutes() {
 
             {/* render modals here */}
             <div id="modal-root"></div>
+            <div id="noti-popup-root"></div>
         </>
     );
 }

@@ -1,7 +1,8 @@
 import { NavLink } from "react-router";
 import { useAuth } from "../../contexts/AuthContext";
-import { BellIcon, UserCircleIcon } from "../miscs/icons";
+import { UserCircleIcon } from "../miscs/icons";
 import { API } from "../../services/api";
+import NotificationButton from "./NotificationButton";
 
 function Navbar() {
     const nav_active_class = (isActive: boolean) =>
@@ -12,7 +13,7 @@ function Navbar() {
 
     return (
         <>
-            <nav className="flex gap-2 bg-white shadow-sm sticky top-0 w-screen flex-shrink-0 p-3 justify-between overflow-x-auto">
+            <nav className="flex gap-2 bg-white shadow-sm sticky top-0 w-screen flex-shrink-0 p-3 justify-between overflow-x-auto z-40">
                 <div className="flex flex-row gap-2">
                     <NavLink to="/tasks" className={({ isActive }) => nav_active_class(isActive)} > {"รายการทั้งหมด"} </NavLink>
                     <NavLink to="/projects" className={({ isActive }) => nav_active_class(isActive)}> {"โปรเจกต์"} </NavLink>
@@ -20,12 +21,7 @@ function Navbar() {
                 </div>
 
                 <div className="flex flex-row gap-2">
-                    <button >
-                        <div
-                            className={`flex items-center justify-center rounded-full p-3 text-gray-600 hover:bg-gray-100 transition-colors duration-200 hover:text-gray-800`}>
-                            <BellIcon />
-                        </div>
-                    </button>
+                    <NotificationButton />
                     <NavLink to={`/dashboard/u/${user?.userID}`} className={({ isActive }) => nav_active_class(isActive)}>
                         <div className="flex flex-row gap-2">
                             <div className="flex justify-center items-center"><UserCircleIcon /></div>
