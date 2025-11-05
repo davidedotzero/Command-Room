@@ -1,6 +1,6 @@
 import { Navigate, Outlet, Route, Routes, useSearchParams } from 'react-router'
 import './App.css'
-import Navbar from './components/Navbar'
+import Navbar from './components/Navbar/Navbar'
 import Tasks from './pages/Tasks'
 import Projects from './pages/Projects'
 import Customers from './pages/Customers'

@@ -1,7 +1,7 @@
 import { NavLink } from "react-router";
-import { useAuth } from "../contexts/AuthContext";
-import { UserCircleIcon } from "./utils/icons";
-import { API } from "../utils/api";
+import { useAuth } from "../../contexts/AuthContext";
+import { BellIcon, UserCircleIcon } from "../utils/icons";
+import { API } from "../../utils/api";
 
 function Navbar() {
     const nav_active_class = (isActive: boolean) =>
@@ -20,6 +20,12 @@ function Navbar() {
                 </div>
 
                 <div className="flex flex-row gap-2">
+                    <button >
+                        <div
+                            className={`flex items-center justify-center rounded-full p-3 text-gray-600 hover:bg-gray-100 transition-colors duration-200 hover:text-gray-800`}>
+                            <BellIcon />
+                        </div>
+                    </button>
                     <NavLink to={`/dashboard/u/${user?.userID}`} className={({ isActive }) => nav_active_class(isActive)}>
                         <div className="flex flex-row gap-2">
                             <div className="flex justify-center items-center"><UserCircleIcon /></div>
@@ -35,40 +41,6 @@ function Navbar() {
 
                 </div>
 
-                <div className="hidden">
-                    <button
-                        className="border"
-                        onClick={async () => {
-                            console.log("gu yeaaaa");
-                            let juan = await API.test_private_noti_gu();
-                            console.log(juan);
-                        }}
-                    >
-                        noti gu
-                    </button>
-
-                    <button
-                        className="border"
-                        onClick={async () => {
-                            console.log("ppat yeaaaa");
-                            let juan = await API.test_private_noti_ppat();
-                            console.log(juan);
-                        }}
-                    >
-                        noti ppat
-                    </button>
-
-                    <button
-                        className="border"
-                        onClick={async () => {
-                            console.log("ppat yeaaaa");
-                            let juan = await API.notify_all(user?.userID!, 1, "yedhee", null);
-                            console.log(juan);
-                        }}
-                    >
-                        noti all
-                    </button>
-                </div>
 
                 {/* // WARNING: dev button */}
                 <div className="hidden">
@@ -96,6 +68,42 @@ function Navbar() {
                     )
                 }
             </div>
+
+
+            {/* <div className="hidden"> */}
+            <button
+                className="border hover:bg-red-400"
+                onClick={async () => {
+                    console.log("gu yeaaaa");
+                    let juan = await API.notify_team(user?.userID!, 1, "team noti naja 1", null, 1);
+                    console.log(juan);
+                }}
+            >
+                noti team 1
+            </button>
+
+            <button
+                className="border hover:bg-red-400"
+                onClick={async () => {
+                    console.log("gu yeaaaa");
+                    let juan = await API.notify_team(user?.userID!, 1, "team noti naja 2", null, 2);
+                    console.log(juan);
+                }}
+            >
+                noti team 2
+            </button>
+
+            <button
+                className="border hover:bg-red-400"
+                onClick={async () => {
+                    console.log("all yeaaa");
+                    let juan = await API.notify_all(user?.userID!, 1, "omkuy", null);
+                    console.log(juan);
+                }}
+            >
+                noti all
+            </button>
+            {/* </div> */}
         </>
     );
 }
