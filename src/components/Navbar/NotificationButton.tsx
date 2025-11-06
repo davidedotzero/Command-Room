@@ -3,18 +3,35 @@ import { BellIcon } from "../miscs/icons";
 import NotificationPopup from "./NotificationPopup";
 import { API } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
+import { usePusher } from "../../contexts/PusherContext";
 
 function NotificationButton() {
     const { user } = useAuth();
+    const pusher = usePusher();
 
     const bellButtonRef = useRef(null);
 
     const [isOpen, setIsOpen] = useState(false);
     const [unseenCount, setUnseenCount] = useState(0);
 
+    const handleClose = useCallback(() => { setIsOpen(false) }, [setIsOpen]);
+
+    useEffect(() => {
+        if (!(pusher && user)) {
+            return;
+        }
+
+        console.log("hello!");
+        const private_user_channel = pusher.channel("private-user-" + user.userID);
+        private_user_channel.bind("private-user-unseenCount-event", function(data: unknown) {
+            setUnseenCount(data.unseenCount);
+        });
+    }, [pusher, user])
+
     useEffect(() => {
         fetchData();
-    }, [unseenCount]);
+        console.log("hello! 2");
+    }, []);
 
     async function fetchData() {
         const data = await API.getUserNotiUnseenCount(user?.userID!);
@@ -22,16 +39,20 @@ function NotificationButton() {
     }
 
     async function openPopup() {
-        setIsOpen(!isOpen);
+        setIsOpen(isOpen => !isOpen);
         if (unseenCount > 0) {
             await API.setUserNotiSeenAll(user?.userID!);
         }
         setUnseenCount(0);
     }
 
+    if (!(pusher && user)) {
+        return null;
+    }
+
     return (
         <>
-            <NotificationPopup isOpen={isOpen} onCloseCallback={useCallback(() => { setIsOpen(false) }, [setIsOpen])} ignoreRef={bellButtonRef} />
+            <NotificationPopup isOpen={isOpen} onCloseCallback={handleClose} ignoreRef={bellButtonRef} />
             <button
                 onClick={openPopup}
                 className={`relative group`}
