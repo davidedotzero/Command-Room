@@ -11,7 +11,7 @@ import TeamLabel from "../../miscs/TeamLabels";
 import { API } from "../../../services/api";
 import { DeleteIcon } from "../../miscs/icons";
 import { ConfirmAlert } from "../../../components/Swal2/CustomSwalCollection";
-import { useEffectDatePickerFix } from "../../../hooks/ReactDatePickerBodgeFixHook";
+import { useDatePickerFix } from "../../../hooks/useDatePickerFix";
 
 
 function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, parentUpdateCallback: () => void }) {
@@ -32,7 +32,7 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
     const teamSelect = useRef<SelectInstance<{ value: Team, label: string }>>(null);
     const deadlinePicker = useRef<DatePicker>(null);
 
-    useEffectDatePickerFix();
+    useDatePickerFix();
 
     const handleSubmit = async () => {
         if (!(projectName.trim())) {

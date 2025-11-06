@@ -12,6 +12,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useEffect } from 'react'
 import UserDashboard from './pages/UserDashboard'
 import { usePusher } from './contexts/PusherContext'
+import { InfoToast, NotificationToast } from './components/Swal2/CustomSwalCollection'
 
 // TODO: abstract this to other file MAYBE
 function LoginPage() {
@@ -118,13 +119,13 @@ function NotificationHandler() {
         }
 
         notify_all_channel.bind("notify-all-event", function(data: unknown) {
-            alert("ALL: " + JSON.stringify(data));
+            NotificationToast(data.message);
         });
         private_user_channel.bind("private-user-event", function(data: unknown) {
-            alert("USER: " + JSON.stringify(data));
+            NotificationToast(data.message);
         });
         private_team_channel.bind("private-team-event", function(data: unknown) {
-            alert("TEAM: " + JSON.stringify(data));
+            NotificationToast(data.message);
         });
 
         return () => {

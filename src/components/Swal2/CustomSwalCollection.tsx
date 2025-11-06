@@ -45,3 +45,72 @@ export const ConfirmAlert = async (text: string) => {
         confirmButtonText: "Confirm"
     });
 }
+
+export const InfoToast = (text: string) => {
+    Swal.fire({
+        text: text,
+        position: "bottom-end",
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        customClass: {
+            popup: '!rounded-md !border !border-blue-500 !bg-blue-200 !text-blue-900'
+        },
+        showClass: {
+            popup: 'none'
+        },
+        hideClass: {
+            popup: 'swal2-hide'
+        },
+        didOpen: (toast) => {
+            toast.addEventListener('click', Swal.close);
+        }
+    });
+}
+
+export const ErrorToast = (text: string) => {
+    Swal.fire({
+        text: text,
+        position: "bottom-end",
+        toast: true,
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        customClass: {
+            popup: '!rounded-md !border !border-red-500 !bg-red-200 !text-red-900'
+        },
+        showClass: {
+            popup: 'none'
+        },
+        hideClass: {
+            popup: 'swal2-hide'
+        },
+        didOpen: (toast) => {
+            toast.addEventListener('click', Swal.close);
+        }
+    });
+}
+
+export const NotificationToast = (text: string) => {
+    Swal.fire({
+        text: text,
+        position: "bottom-end",
+        toast: true,
+        timer: 120000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        customClass: {
+            popup: '!rounded-md !border !border-yellow-500 !bg-yellow-200 !text-yellow-900 !hover:cursor-pointer'
+        },
+        showClass: {
+            popup: 'none'
+        },
+        hideClass: {
+            popup: 'swal2-hide'
+        },
+        didOpen: (toast) => {
+            toast.addEventListener('click', Swal.close);
+        }
+    });
+}

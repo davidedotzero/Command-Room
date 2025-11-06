@@ -17,18 +17,20 @@ function EditTaskModal(
         { isOpen: boolean, onClose: () => void, taskData: FilteringTask, parentUpdateCallback: () => {}, customerAndPoData?: any }) { // TODO: assign type to customerData
     if (!isOpen) return null;
     // Close Modal on ESC key
-    useEffect(() => {
-        const handleKeyDown = (event) => {
-            if (event.key === "Escape") onClose();
-        }
-
-        if (isOpen)
-            document.addEventListener("keydown", handleKeyDown);
-
-        return () => {
-            document.removeEventListener("keydown", handleKeyDown);
-        }
-    }, [isOpen, onClose]);
+    // useEffect(() => {
+    //     const handleKeyDown = (event) => {
+    //         if (event.key === "Escape") {
+    //             onClose();
+    //         }
+    //     }
+    //
+    //     if (isOpen)
+    //         document.addEventListener("keydown", handleKeyDown);
+    //
+    //     return () => {
+    //         document.removeEventListener("keydown", handleKeyDown);
+    //     }
+    // }, [isOpen, onClose]);
 
 
     // because we pass it in as a json from TaskDetailXXXModal

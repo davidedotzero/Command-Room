@@ -53,6 +53,16 @@ api.interceptors.response.use(
 );
 
 export const API = {
+    setUserNotiSeenAll: async (userID: string) => {
+        let result = await api.patch(`/noti/mark-seen/${userID}`);
+        return result;
+    },
+
+    getUserNotiUnseenCount: async (userID: string) => {
+        let result = await api.get(`/noti/unseen-count/${userID}`);
+        return result.data;
+    },
+
     notify_all: async (senderID: string | null, notificationTypeID: number, message: string, linkTargetID: string | null) => {
         let result = await api.post("/noti/all", { senderID: senderID, notificationTypeID: notificationTypeID, message: message, linkTargetID: linkTargetID });
         return result;

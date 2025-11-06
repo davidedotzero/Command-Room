@@ -4,7 +4,7 @@ import { useDbConst } from "../../../contexts/DbConstDataContext";
 import { API } from "../../../services/api";
 import DatePicker from "react-datepicker";
 import Select from "react-select";
-import { useEffectDatePickerFix } from "../../../hooks/ReactDatePickerBodgeFixHook";
+import { useDatePickerFix } from "../../../hooks/useDatePickerFix";
 
 function FieldFiltersAndAdd(
     { teamIDFilterState, searchFilterState, projectIDFilterState, startDateFilterState, endDateFilterState, showOnlyIncompleteCheckedState, createNewTaskButton, tasksLength }:
@@ -34,7 +34,7 @@ function FieldFiltersAndAdd(
     const { TEAMS } = useDbConst();
     const [projectList, setProjectList] = useState<Project[]>([]);
 
-    useEffectDatePickerFix();
+    useDatePickerFix();
 
     const fetchData = async () => {
         // TODO: dont fetch archived project

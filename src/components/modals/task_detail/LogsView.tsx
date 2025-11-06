@@ -10,7 +10,8 @@ import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
 import { useAuth } from "../../../contexts/AuthContext";
 import equal from "fast-deep-equal";
-import { useEffectDatePickerFix } from "../../../hooks/ReactDatePickerBodgeFixHook";
+import { useDatePickerFix } from "../../../hooks/useDatePickerFix";
+import { ErrorToast, InfoToast } from "../../Swal2/CustomSwalCollection";
 
 function LogsView({ taskID, taskRecentUpdate }: { taskID: string, taskRecentUpdate: number }) {
     const { TASK_STATUSES } = useDbConst();
@@ -26,7 +27,7 @@ function LogsView({ taskID, taskRecentUpdate }: { taskID: string, taskRecentUpda
     const [showSaveLogBtn, setShowSaveLogBtn] = useState<boolean>(false);
     const [showSpinner, setShowSpinner] = useState<boolean>(false);
 
-    useEffectDatePickerFix([isLoading]);
+    useDatePickerFix([isLoading]);
     const { user } = useAuth();
 
     useEffect(() => {
@@ -92,47 +93,9 @@ function LogsView({ taskID, taskRecentUpdate }: { taskID: string, taskRecentUpda
 
         try {
             await navigator.clipboard.writeText(copyingLog.reason);
-            Swal.fire({
-                text: "คัดลอกลงคลิปบอร์ดแล้ว",
-                position: "bottom-end",
-                toast: true,
-                timer: 3000,
-                timerProgressBar: true,
-                showConfirmButton: false,
-                customClass: {
-                    popup: '!rounded-md !border !border-blue-500 !bg-blue-200 !text-blue-900'
-                },
-                showClass: {
-                    popup: 'none'
-                },
-                hideClass: {
-                    popup: 'swal2-hide'
-                },
-                didOpen: (toast) => {
-                    toast.addEventListener('click', Swal.close);
-                }
-            });
+            InfoToast("คัดลอกลงคลิปบอร์ดแล้ว");
         } catch (err) {
-            Swal.fire({
-                text: "คัดลอกลงคลิปบอร์ดผิดพลาด",
-                position: "bottom-end",
-                toast: true,
-                timer: 3000,
-                timerProgressBar: true,
-                showConfirmButton: false,
-                customClass: {
-                    popup: '!rounded-md !border !border-red-500 !bg-red-200 !text-red-900'
-                },
-                showClass: {
-                    popup: 'none'
-                },
-                hideClass: {
-                    popup: 'swal2-hide'
-                },
-                didOpen: (toast) => {
-                    toast.addEventListener('click', Swal.close);
-                }
-            });
+            ErrorToast("คัดลอกลงคลิปบอร์ดผิดพลาด");
         }
     }
 

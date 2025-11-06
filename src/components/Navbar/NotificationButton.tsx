@@ -1,19 +1,44 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BellIcon } from "../miscs/icons";
 import NotificationPopup from "./NotificationPopup";
+import { API } from "../../services/api";
+import { useAuth } from "../../contexts/AuthContext";
 
 function NotificationButton() {
+    const { user } = useAuth();
+
+    const bellButtonRef = useRef(null);
+
     const [isOpen, setIsOpen] = useState(false);
-    let unseenCount = 10;
+    const [unseenCount, setUnseenCount] = useState(0);
+
+    useEffect(() => {
+        fetchData();
+    }, [unseenCount]);
+
+    async function fetchData() {
+        const data = await API.getUserNotiUnseenCount(user?.userID!);
+        setUnseenCount(data.unseenCount);
+    }
+
+    async function openPopup() {
+        setIsOpen(!isOpen);
+        if (unseenCount > 0) {
+            await API.setUserNotiSeenAll(user?.userID!);
+        }
+        setUnseenCount(0);
+    }
+
     return (
         <>
-            <NotificationPopup isOpen={isOpen} />
+            <NotificationPopup isOpen={isOpen} onCloseCallback={useCallback(() => { setIsOpen(false) }, [setIsOpen])} ignoreRef={bellButtonRef} />
             <button
-                onClick={() => { setIsOpen(!isOpen); console.log(isOpen); }}
+                onClick={openPopup}
                 className={`relative group`}
+                ref={bellButtonRef}
             >
                 <div
-                    className={`flex items-center justify-center rounded-full p-4 text-gray-600 transition-colors duration-200 group-hover:bg-gray-100 group-hover:text-gray-800`}
+                    className={`flex items-center justify-center rounded-full p-4 text-gray-600 transition-colors duration-200 group-hover:bg-orange-100 group-hover:text-orange-600 group-hover:cursor-pointer`}
                 >
                     <BellIcon />
                 </div>

@@ -10,7 +10,7 @@ import { API } from "../../../services/api";
 import { getOnlyDate } from "../../../utils/functions";
 import DefaultTaskNamesSelect from "../forms/DefaultTaskNamesSelect";
 import type { DefaultTaskName } from "../../../types/types";
-import { useEffectDatePickerFix } from "../../../hooks/ReactDatePickerBodgeFixHook";
+import { useDatePickerFix } from "../../../hooks/useDatePickerFix";
 
 
 // TODO: move this somewhere else better
@@ -33,7 +33,7 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
         }
     }, [isOpen, onClose]);
 
-    useEffectDatePickerFix();
+    useDatePickerFix();
 
     const { DEFAULT_TASK_NAMES, TEAMS } = useDbConst();
 

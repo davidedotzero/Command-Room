@@ -70,7 +70,6 @@ function Navbar() {
             <button
                 className="border hover:bg-red-400"
                 onClick={async () => {
-                    console.log("gu yeaaaa");
                     let juan = await API.notify_team(user?.userID!, 1, "team noti naja 1", null, 1);
                     console.log(juan);
                 }}
@@ -81,7 +80,6 @@ function Navbar() {
             <button
                 className="border hover:bg-red-400"
                 onClick={async () => {
-                    console.log("gu yeaaaa");
                     let juan = await API.notify_team(user?.userID!, 1, "team noti naja 2", null, 2);
                     console.log(juan);
                 }}
@@ -92,9 +90,8 @@ function Navbar() {
             <button
                 className="border hover:bg-red-400"
                 onClick={async () => {
-                    console.log("all yeaaa");
-                    let juan = await API.notify_all(user?.userID!, 1, "omkuy", null);
-                    console.log(juan);
+                    API.notify_all(user?.userID!, 1, "omkuy", null);
+                    // console.log(juan);
                 }}
             >
                 noti all
