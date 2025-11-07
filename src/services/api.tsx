@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { FilteringTask, Task, TaskStatus, Team, NewTask, EditLogDetailed } from "../types/types";
+import type { FilteringTask, Task, TaskStatus, Team, NewTask, EditLogDetailed, NotificationDetailed } from "../types/types";
 import { ErrorAlertDetailed, SuccessAlert } from "../components/Swal2/CustomSwalCollection";
 import { removeLastZchar } from "../utils/functions";
 
@@ -53,6 +53,32 @@ api.interceptors.response.use(
 );
 
 export const API = {
+    getUserEarlierNotis: async (userID: string, pageNumber: number) => {
+        let result = await api.get(`/noti/user/${userID}/page/${pageNumber}`);
+        // TODO: type {hasMorePage, notifications} later
+        let data = {
+            ...result.data,
+            notifications: result.data.notifications.map((row: NotificationDetailed) => {
+                return {
+                    ...row,
+                    createdAt: row.createdAt === null ? null : new Date(removeLastZchar(row.createdAt)), // super low iq fix for UTC timestamp sent from db
+                }
+            })
+        }
+        return data;
+    },
+
+    getUserNotis: async (userID: string): Promise<NotificationDetailed[]> => {
+        let result = await api.get(`/noti/user/${userID}`);
+        let data: NotificationDetailed[] = result.data.map((row: NotificationDetailed) => {
+            return {
+                ...row,
+                createdAt: row.createdAt === null ? null : new Date(removeLastZchar(row.createdAt)), // super low iq fix for UTC timestamp sent from db
+            };
+        });
+        return data;
+    },
+
     setUserNotiSeenAll: async (userID: string) => {
         let result = await api.patch(`/noti/mark-seen/${userID}`);
         return result;

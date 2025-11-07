@@ -91,6 +91,7 @@ function Navbar() {
                 className="border hover:bg-red-400"
                 onClick={async () => {
                     API.notify_all(user?.userID!, 1, "omkuy", null);
+                    await API.getUserNotis(user!.userID);
                     // console.log(juan);
                 }}
             >

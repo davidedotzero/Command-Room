@@ -40,10 +40,11 @@ function NotificationButton() {
 
     async function openPopup() {
         setIsOpen(isOpen => !isOpen);
-        if (unseenCount > 0) {
-            await API.setUserNotiSeenAll(user?.userID!);
-        }
-        setUnseenCount(0);
+        // TODO: uncomment this later
+        // if (unseenCount > 0) {
+        //     await API.setUserNotiSeenAll(user?.userID!);
+        // }
+        // setUnseenCount(0);
     }
 
     if (!(pusher && user)) {

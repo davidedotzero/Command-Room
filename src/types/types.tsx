@@ -149,6 +149,21 @@ export interface AttachmentType {
     attachmentTypeName: number;
 }
 
+export interface NotificationDetailed {
+    notificationID: number;
+    seen: boolean;
+    visited: boolean;
+    senderID: string;
+    senderName: string;
+    senderEmail: string;
+    senderTeamID: number;
+    senderTeamName: string;
+    notificationTypeID: number;
+    message: string;
+    linkTargetID: string | null;
+    createdAt: Date;
+}
+
 // format PREFIX-YYYYMMDD-XXXXXX
 // PROJ-20251001-000001
 // TASK-20251001-000001

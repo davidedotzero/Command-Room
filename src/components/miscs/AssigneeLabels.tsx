@@ -11,7 +11,7 @@ function AssigneeLabels({ text, closeButton, closeButtonCallback }: { text: stri
             <div className="inline-block gap-1 px-2 py-0.5 m-0.5 text-xs font-medium bg-green-100 rounded-full">
                 <div className="flex flex-row">
                     <span className="flex text-green-800 mr-0.5" >
-                        {"#" + text}
+                        {"" + text}
                     </span>
                     <div
                         onClick={closeButtonCallback}
