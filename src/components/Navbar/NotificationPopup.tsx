@@ -2,16 +2,19 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from "react"
 import { createPortal } from "react-dom";
 import { API } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
-import { formatDateYYYY_MM_DD_HH_MM_SS, isOnlyDateEqual } from "../../utils/functions";
+import { formatDateYYYY_MM_DD_HH_MM_SS, isOnlyDateEqual, removeLastZchar, testDelay } from "../../utils/functions";
 import AssigneeLabels from "../miscs/AssigneeLabels";
 import TeamLabel from "../miscs/TeamLabels";
 import type { NotificationDetailed } from "../../types/types";
 import NotificationCard from "./NotificationCard";
+import { usePusher } from "../../contexts/PusherContext";
+import InlineSpinner from "../Spinners/InlineSpinner";
 
 function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boolean, onCloseCallback: () => void, ignoreRef: RefObject<HTMLElement | null> }) {
     // useOutsideClick(popupRef, onCloseCallback, ignoreRef);
 
     const popupRef = useRef<HTMLDivElement | null>(null);
+    const pusher = usePusher();
     const { user } = useAuth();
 
     const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +22,7 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
     const [earlierNotifications, setEarlierNotifications] = useState<NotificationDetailed[]>([]);
     const [page, setPage] = useState(1);
     const [hasMorePage, setHasMorePage] = useState(true);
+    const [isInfiniteScrollEnabled, setIsInfiniteScrollEnabled] = useState(false);
 
     const observer = useRef<IntersectionObserver | null>(null);
 
@@ -28,20 +32,27 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
         if (observer.current) observer.current.disconnect();
 
         observer.current = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
-            if (entries[0].isIntersecting && hasMorePage) {
+            if (entries[0].isIntersecting && hasMorePage && isInfiniteScrollEnabled) {
                 console.log("juan");
-                setPage(prevPage => prevPage += 1);
+                setPage(prevPage => prevPage + 1);
             }
         });
 
         if (node) observer.current.observe(node);
-    }, [isLoading, hasMorePage]);
+    }, [isLoading, hasMorePage, isInfiniteScrollEnabled]);
 
-    // initial popup load
+    // initial popup load + clean up
     useEffect(() => {
         if (isOpen) {
             fetchData();
         }
+
+        return (() => {
+            console.log("popup closing");
+            setPage(1);
+            setHasMorePage(true);
+            setIsInfiniteScrollEnabled(false);
+        });
     }, [isOpen])
 
     // infinite noti scroll
@@ -49,6 +60,28 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
         if (page === 1) return;
         fetchMoreNotis();
     }, [page]);
+
+    useEffect(() => {
+        if (!pusher || !user || !isOpen) {
+            return;
+        }
+
+        const private_user_channel = pusher.channel("private-user-" + user.userID);
+        private_user_channel.bind("private-user-notiCard-event", function(data: unknown) {
+            setTodayNotifications(prev => {
+                return [{
+                    ...data,
+                    createdAt: data.createdAt === null ? null : new Date(removeLastZchar(data.createdAt)), // super low iq fix for UTC timestamp sent from db
+                }, ...prev]
+            });
+        });
+
+        return () => {
+            console.log("Unbinding from Pusher channel: " + "private-user-" + user.userID);
+            private_user_channel.unbind("private-user-notiCard-event");
+        }
+    }, [pusher, user, isOpen])
+
 
     // clicking outside popup
     useEffect(() => {
@@ -90,11 +123,13 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
 
         setTodayNotifications(today);
         setEarlierNotifications(earlier);
-        // setNotifications(data);
+
+        if (earlier.length < 10) { // 10 = PAGE_SIZE
+            setHasMorePage(false);
+        }
     }
 
     async function fetchMoreNotis() {
-
         setIsLoading(true);
         try {
             const data = await API.getUserEarlierNotis(user!.userID, page);
@@ -111,7 +146,28 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
         }
     }
 
+    function enableInfiniteScroll() {
+        setIsInfiniteScrollEnabled(true);
+        setPage(2);
+    }
+
     if (!isOpen) return null;
+
+    if (todayNotifications.length === 0 && earlierNotifications.length === 0) {
+        return (
+            <>
+                <div
+                    ref={popupRef}
+                    className="fixed top-17 right-6 w-120 min-h-[20vh] max-h-[90vh] z-50 p-3 bg-gray-100 border border-gray-200 rounded-md shadow-lg overflow-y-auto flex justify-center items-center"
+                >
+                    <div className="w-full flex justify-center items-center italic text-gray-500 mt-4">
+                        {"คุณไม่มีการแจ้งเตือนอะไรเลย 👁️👄👁️"}
+                    </div>
+                </div>
+            </>
+        );
+    }
+
     return createPortal
         (
             <>
@@ -119,28 +175,49 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
                     ref={popupRef}
                     className="fixed top-17 right-6 w-120 min-h-[20vh] max-h-[90vh] z-50 p-3 bg-gray-100 border border-gray-200 rounded-md shadow-lg overflow-y-auto"
                 >
-                    <div className="mt-3 mb-3 text-2xl font-bold">วันนี้</div>
+
+                    {todayNotifications.length > 0 && <div className="mt-3 mb-3 text-2xl font-bold">วันนี้</div>}
                     {
                         todayNotifications.map(x => {
                             return (
-                                <NotificationCard visited={x.visited} senderName={x.senderName} senderTeamName={x.senderTeamName} message={x.message} createdAt={x.createdAt} />
-                            );
-                        })
-                    }
-                    <div className="mt-3 mb-3 text-2xl font-bold">ก่อนหน้านี้</div>
-                    {
-                        earlierNotifications.map(x => {
-                            return (
-                                <NotificationCard visited={x.visited} senderName={x.senderName} senderTeamName={x.senderTeamName} message={x.message} createdAt={x.createdAt} />
+                                <NotificationCard visited={x.visited} senderName={x.senderName} senderTeamName={x.senderTeamName} message={x.message} createdAt={x.createdAt} notiID={x.notificationID} />
                             );
                         })
                     }
 
-                    <div id="observer" ref={loaderRef}></div>
-                    <button className="bg-orange-500 text-white text-sm p-3 shadow-sm w-full mt-3 mb-3 rounded-md hover:bg-orange-600 transition-color">
-                        ดูการแจ้งเตือนที่ผ่านมา
-                    </button>
-                </div>
+                    {earlierNotifications.length > 0 && <div className="mt-3 mb-3 text-2xl font-bold">ก่อนหน้านี้</div>}
+                    {
+                        earlierNotifications.map(x => {
+                            return (
+                                <NotificationCard visited={x.visited} senderName={x.senderName} senderTeamName={x.senderTeamName} message={x.message} createdAt={x.createdAt} notiID={x.notificationID} />
+                            );
+                        })
+                    }
+
+                    <div
+                        id="observer"
+                        ref={loaderRef}
+                        className={isInfiniteScrollEnabled ? 'h-1 w-full' : 'hidden'}
+                    />
+
+                    {isInfiniteScrollEnabled && isLoading && <InlineSpinner />}
+
+                    {
+                        earlierNotifications.length > 0 && hasMorePage && !isInfiniteScrollEnabled &&
+                        <button
+                            onClick={enableInfiniteScroll}
+                            className="bg-orange-500 text-white text-sm p-3 shadow-sm w-full mt-3 mb-3 rounded-md hover:bg-orange-600 transition-color"
+                        >
+                            ดูการแจ้งเตือนที่ผ่านมา
+                        </button>
+                    }
+
+                    {!hasMorePage &&
+                        <div className="text-center text-gray-500 py-4 italic">
+                            หมดแล้วแจ้ 🖐️😛🤚
+                        </div>
+                    }
+                </div >
             </>
             , document.getElementById("noti-popup-root")!
         );
