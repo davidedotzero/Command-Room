@@ -6,7 +6,7 @@ import type { FilteringTask } from "../../types/types";
 import LogsView from "./task_detail/LogsView";
 import { ModalContainer, ModalContent, ModalFooter, ModalHeader, ModalLeft, ModalRight } from "./ModalComponents";
 
-function TaskDetailProductionModal({ isOpen, onClose, taskData, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: FilteringTask | null, parentUpdateCallback: () => {} }) {
+function TaskDetailProductionModal({ isOpen, onClose, taskData, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, taskData: FilteringTask | null, parentUpdateCallback: () => void }) {
     if (!isOpen) return null;
     if (!taskData) return null;
 

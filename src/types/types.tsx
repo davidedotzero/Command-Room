@@ -158,6 +158,8 @@ export interface NotificationDetailed {
     senderEmail: string;
     senderTeamID: number;
     senderTeamName: string;
+    receiverID: string;
+    receiverName: string;
     notificationTypeID: number;
     message: string;
     linkTargetID: string | null;
