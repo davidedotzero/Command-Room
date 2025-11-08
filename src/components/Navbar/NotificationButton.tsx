@@ -21,7 +21,6 @@ function NotificationButton() {
             return;
         }
 
-        console.log("hello!");
         const private_user_channel = pusher.channel("private-user-" + user.userID);
         private_user_channel.bind("private-user-unseenCount-event", function(data: unknown) {
             setUnseenCount(data.unseenCount);
@@ -30,7 +29,6 @@ function NotificationButton() {
 
     useEffect(() => {
         fetchData();
-        console.log("hello! 2");
     }, []);
 
     async function fetchData() {
@@ -40,11 +38,10 @@ function NotificationButton() {
 
     async function openPopup() {
         setIsOpen(isOpen => !isOpen);
-        // TODO: uncomment this later
-        // if (unseenCount > 0) {
-        //     await API.setUserNotiSeenAll(user?.userID!);
-        // }
-        // setUnseenCount(0);
+        if (unseenCount > 0) {
+            await API.setUserNotiSeenAll(user?.userID!);
+        }
+        setUnseenCount(0);
     }
 
     if (!(pusher && user)) {
