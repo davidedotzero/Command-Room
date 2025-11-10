@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { FilteringTask, Task, TaskStatus, Team, NewTask, EditLogDetailed, NotificationDetailed } from "../types/types";
+import type { FilteringTask, Task, TaskStatus, Team, NewTask, EditLogDetailed, NotificationDetailed, NotificationType } from "../types/types";
 import { ErrorAlertDetailed, SuccessAlert } from "../components/Swal2/CustomSwalCollection";
 import { removeLastZchar } from "../utils/functions";
 
@@ -53,6 +53,11 @@ api.interceptors.response.use(
 );
 
 export const API = {
+    setUserNotiVisited: async (notiID: number, userID: string) => {
+        let result = await api.patch(`/noti/mark-visited/${userID}/${notiID}`);
+        return result;
+    },
+
     getUserEarlierNotis: async (userID: string, pageNumber: number) => {
         let result = await api.get(`/noti/user/${userID}/page/${pageNumber}`);
         // TODO: type {hasMorePage, notifications} later
@@ -89,12 +94,21 @@ export const API = {
         return result.data;
     },
 
-    notify_all: async (senderID: string | null, notificationTypeID: number, message: string, linkTargetID: string | null) => {
+    /**
+     * Notify everyone on notify-all-* channels
+     * @param {string | null} senderID - Sender's userID. NULL if do not need to specify (eg. sent from SYSTEM).
+     * @param {number} notificationTypeID - NotificationType ID.
+     * @param {string} message - Message to be sent.
+     * @param {string | null} linkTargetID - 
+     *          ID of redirect destination when user clicked on the notification UI. NULL if do not need to redirect (eg. notificationTypeID = 1(generic))
+     *          For example if you want to notify user about new project, set notificationTypeID to 2(proj_new) and linkTargetID to the added projectID
+     */
+    notify_all: async (senderID: string | null, notificationTypeID: NotificationType, message: string, linkTargetID: string | null) => {
         let result = await api.post("/noti/all", { senderID: senderID, notificationTypeID: notificationTypeID, message: message, linkTargetID: linkTargetID });
         return result;
     },
 
-    notify_team: async (senderID: string | null, notificationTypeID: number, message: string, linkTargetID: string | null, teamID: number) => {
+    notify_team: async (senderID: string | null, notificationTypeID: NotificationType, message: string, linkTargetID: string | null, teamID: number) => {
         let result = await api.post("/noti/teams", { senderID: senderID, notificationTypeID: notificationTypeID, message: message, linkTargetID: linkTargetID, teamID: teamID });
         return result;
     },

@@ -1,9 +1,14 @@
 // TODO: make all this sheesh match database schema
 
-// TODO: make this id+name ????
-
-// TODO: will change this when i know what fields are supposed to be in projectTask
-// TODO: add preview log field
+export const NotificationType = {
+    GENERIC: 1,
+    PROJ_NEW: 2,
+    PROJ_EDIT_NAME: 3,
+    PROJ_DELETE: 4,
+    TASK_UPDATE: 5,
+    TASK_DELETE: 6,
+};
+export type NotificationType = typeof NotificationType[keyof typeof NotificationType];
 
 // for adding new task on creating project in frontend 
 export interface NewTask {
@@ -12,7 +17,7 @@ export interface NewTask {
     team: Team,
     deadline: Date,
     deleting?: boolean
-}
+};
 
 // DB types =================================
 export interface Task {

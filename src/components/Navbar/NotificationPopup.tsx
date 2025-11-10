@@ -52,6 +52,8 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
             setPage(1);
             setHasMorePage(true);
             setIsInfiniteScrollEnabled(false);
+            setTodayNotifications([]);
+            setEarlierNotifications([]);
         });
     }, [isOpen])
 
@@ -107,6 +109,7 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
 
 
     async function fetchData() {
+        setIsLoading(true);
         const data = await API.getUserNotis(user!.userID);
         // TODO: check no notification
 
@@ -127,6 +130,8 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
         if (earlier.length < 10) { // 10 = PAGE_SIZE
             setHasMorePage(false);
         }
+
+        setIsLoading(false);
     }
 
     async function fetchMoreNotis() {
@@ -135,6 +140,10 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
             const data = await API.getUserEarlierNotis(user!.userID, page);
             setEarlierNotifications(prevNotis => {
                 // const newPosts = data.posts.filter(p => !prevPosts.some(op => op.id === p.id)); ignore check duplicates for now
+                console.log("prev");
+                console.log(prevNotis);
+                console.log("next");
+                console.log(data.notifications);
                 return [...prevNotis, ...data.notifications];
             });
             setHasMorePage(data.hasMorePage);
@@ -152,6 +161,19 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
     }
 
     if (!isOpen) return null;
+
+    if (isLoading) {
+        return (
+            <>
+                <div
+                    ref={popupRef}
+                    className="fixed top-17 right-6 w-120 min-h-[20vh] max-h-[90vh] z-50 p-3 bg-gray-100 border border-gray-200 rounded-md shadow-lg overflow-y-auto flex justify-center items-center"
+                >
+                    <InlineSpinner />
+                </div>
+            </>
+        );
+    }
 
     if (todayNotifications.length === 0 && earlierNotifications.length === 0) {
         return (
@@ -180,7 +202,7 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
                     {
                         todayNotifications.map(x => {
                             return (
-                                <NotificationCard visited={x.visited} senderName={x.senderName} senderTeamName={x.senderTeamName} message={x.message} createdAt={x.createdAt} notiID={x.notificationID} />
+                                <NotificationCard key={x.notificationID} visited={x.visited} senderName={x.senderName} senderTeamName={x.senderTeamName} message={x.message} createdAt={x.createdAt} notiID={x.notificationID} linkTargetID={x.linkTargetID} notificationTypeID={x.notificationTypeID} />
                             );
                         })
                     }
@@ -189,7 +211,7 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
                     {
                         earlierNotifications.map(x => {
                             return (
-                                <NotificationCard visited={x.visited} senderName={x.senderName} senderTeamName={x.senderTeamName} message={x.message} createdAt={x.createdAt} notiID={x.notificationID} />
+                                <NotificationCard key={x.notificationID} visited={x.visited} senderName={x.senderName} senderTeamName={x.senderTeamName} message={x.message} createdAt={x.createdAt} notiID={x.notificationID} linkTargetID={x.linkTargetID} notificationTypeID={x.notificationTypeID} />
                             );
                         })
                     }

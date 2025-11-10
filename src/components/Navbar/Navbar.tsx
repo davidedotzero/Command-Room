@@ -3,6 +3,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { UserCircleIcon } from "../miscs/icons";
 import { API } from "../../services/api";
 import NotificationButton from "./NotificationButton";
+import { NotificationType } from "../../types/types";
 
 function Navbar() {
     const nav_active_class = (isActive: boolean) =>
@@ -90,7 +91,7 @@ function Navbar() {
             <button
                 className="border hover:bg-red-400"
                 onClick={async () => {
-                    API.notify_all(user?.userID!, 1, "omkuy", null);
+                    API.notify_all(user?.userID!, NotificationType.PROJ_NEW, "สร้างโปรเจกต์ใหม่นะจ๊ะ", "PROJ-2025-000092");
                     await API.getUserNotis(user!.userID);
                     // console.log(juan);
                 }}
