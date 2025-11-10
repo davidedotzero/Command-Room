@@ -7,6 +7,7 @@ export const NotificationType = {
     PROJ_DELETE: 4,
     TASK_UPDATE: 5,
     TASK_DELETE: 6,
+    TASK_NEW: 7,
 };
 export type NotificationType = typeof NotificationType[keyof typeof NotificationType];
 

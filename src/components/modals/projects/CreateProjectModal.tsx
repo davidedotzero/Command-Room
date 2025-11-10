@@ -4,21 +4,22 @@ import { CharCountInput, FormButton, FormField, FormFieldSetWrapper } from "../f
 import Select, { type SelectInstance, type SingleValue } from "react-select";
 import DatePicker from "react-datepicker";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
-import { getOnlyDate } from "../../../utils/functions";
-import type { DefaultTaskName, Team, NewTask } from "../../../types/types";
+import { arrayUnique, getOnlyDate } from "../../../utils/functions";
+import { type DefaultTaskName, type Team, type NewTask, NotificationType } from "../../../types/types";
 import DefaultTaskNamesSelect from "../forms/DefaultTaskNamesSelect";
 import TeamLabel from "../../miscs/TeamLabels";
 import { API } from "../../../services/api";
 import { DeleteIcon } from "../../miscs/icons";
 import { ConfirmAlert } from "../../../components/Swal2/CustomSwalCollection";
 import { useDatePickerFix } from "../../../hooks/useDatePickerFix";
+import { useAuth } from "../../../contexts/AuthContext";
 
 
 function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen: boolean, onClose: () => void, parentUpdateCallback: () => void }) {
-    if (!isOpen) return null;
+    const { DEFAULT_TASK_NAMES, TEAMS } = useDbConst();
+    const { user } = useAuth();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const { DEFAULT_TASK_NAMES, TEAMS } = useDbConst();
 
     const [selectedTask, setSelectedTask] = useState<{ value: DefaultTaskName | string, label: string } | null>(null);
     const [selectedTeam, setSelectedTeam] = useState<{ value: Team, label: string } | null>(null);
@@ -41,13 +42,24 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
             return;
         }
 
+        console.log(projectTasks);
+        console.log(projectTasks.map(x => x.team.teamID));
+        console.log(new Set(projectTasks.map(x => x.team.teamID)));
         if (!(await ConfirmAlert("คุณต้องการสร้างโปรเจกต์นี้ใช่ไหม")).isConfirmed) {
             return;
         }
         setIsLoading(true);
         // TODO: loading indicator here
 
-        const response = await API.addProjectAndTasks(projectName, projectTasks);
+        const teamIdsInProject = projectTasks.map(x => x.team.teamID);
+        const uniqueTeamIdsInProject = arrayUnique(teamIdsInProject);
+
+        // TODO: better var name
+        const data = await API.addProjectAndTasks(projectName, projectTasks);
+
+        if (projectTasks.length <= 0) { return; } // no need to notify anyone if no tasks on create
+        API.notify_team(user?.userID!, NotificationType.PROJ_NEW, `สร้างโปรเจกต์ใหม่ - ${projectName}`, data.insertedProjectID, uniqueTeamIdsInProject);
+
         // TODO: check response ok;
         parentUpdateCallback();
         onClose();
@@ -162,6 +174,8 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
     function isTaskExists(taskName: string) {
         return projectTasks.some(x => x.taskName === taskName);
     }
+
+    if (!isOpen) return null;
 
     return createPortal(
         <>

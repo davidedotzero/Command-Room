@@ -34,9 +34,7 @@ function NotificationCard({ visited, senderName, senderTeamName, message, create
             }
         }
 
-        if (_visited) {
-            return;
-        }
+        if (_visited) { return; }
 
         console.log(notiID, user?.userID);
         setVisited(true);

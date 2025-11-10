@@ -70,3 +70,6 @@ export function removeLastZchar(date: string): string | null {
     return date;
 }
 
+export function arrayUnique<T>(array: Array<T>): Array<T> {
+    return [...(new Set(array))];
+}

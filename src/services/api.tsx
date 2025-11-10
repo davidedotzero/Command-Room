@@ -108,8 +108,8 @@ export const API = {
         return result;
     },
 
-    notify_team: async (senderID: string | null, notificationTypeID: NotificationType, message: string, linkTargetID: string | null, teamID: number) => {
-        let result = await api.post("/noti/teams", { senderID: senderID, notificationTypeID: notificationTypeID, message: message, linkTargetID: linkTargetID, teamID: teamID });
+    notify_team: async (senderID: string | null, notificationTypeID: NotificationType, message: string, linkTargetID: string | null, teamIDs: number[]) => {
+        let result = await api.post("/noti/teams", { senderID: senderID, notificationTypeID: notificationTypeID, message: message, linkTargetID: linkTargetID, teamIDs: teamIDs });
         return result;
     },
 
@@ -259,7 +259,7 @@ export const API = {
             },
             { alert: true }
         );
-        return response;
+        return response.data;
     },
 
     markLogs: async (toMarkLogIDs: Array<string>, toUnmarkLogIDs: Array<string>) => {

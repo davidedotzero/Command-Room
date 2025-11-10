@@ -63,7 +63,7 @@ function ProjectDetail() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [currentProjectID]);
 
 
     // TODO: separate filtering tasks to multiple steps so we can useMemo separately

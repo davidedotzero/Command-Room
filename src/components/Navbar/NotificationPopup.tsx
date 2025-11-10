@@ -2,9 +2,7 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from "react"
 import { createPortal } from "react-dom";
 import { API } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
-import { formatDateYYYY_MM_DD_HH_MM_SS, isOnlyDateEqual, removeLastZchar, testDelay } from "../../utils/functions";
-import AssigneeLabels from "../miscs/AssigneeLabels";
-import TeamLabel from "../miscs/TeamLabels";
+import { isOnlyDateEqual, removeLastZchar } from "../../utils/functions";
 import type { NotificationDetailed } from "../../types/types";
 import NotificationCard from "./NotificationCard";
 import { usePusher } from "../../contexts/PusherContext";
