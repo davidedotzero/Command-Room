@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { FilteringTask } from "../../../types/types";
+import { TaskStatusID, type FilteringTask } from "../../../types/types";
 import { getOnlyDate } from "../../../utils/functions";
 
 export function filterTasks(
@@ -15,8 +15,7 @@ export function filterTasks(
         let filteringTasks = tasksDetailed;
 
         if (showOnlyIncompleteChecked) {
-            // TODO: use enum here
-            filteringTasks = filteringTasks.filter(t => t.taskStatusID != 2);
+            filteringTasks = filteringTasks.filter(t => t.taskStatusID != TaskStatusID.DONE);
         }
 
         if (teamIDFilter) {

@@ -1,6 +1,6 @@
 import { StatusColor } from "../../../utils/constants";
 import { formatDateYYYY_MM_DD } from "../../../utils/functions";
-import type { FilteringTask } from "../../../types/types";
+import { TaskStatusID, type FilteringTask } from "../../../types/types";
 import AssigneeLabels from "../../miscs/AssigneeLabels";
 import TeamLabel from "../../miscs/TeamLabels";
 
@@ -54,7 +54,7 @@ function TableDisplay(
                             return (
                                 <tr
                                     key={task.taskID}
-                                    className={`cursor-pointer ${task.taskStatusID === 3 ? "bg-purple-200 hover:bg-purple-100" : "bg-white hover:bg-orange-50"}`} // highlight help me row
+                                    className={`cursor-pointer ${task.taskStatusID === TaskStatusID.HELP_ME ? "bg-purple-200 hover:bg-purple-100" : "bg-white hover:bg-orange-50"}`} // highlight help me row
                                     data-selected-task={JSON.stringify(task)} // TODO: SUPER LOW IQ SOLUTION: JUST TAKE ALL ROW DATA, TURN IT TO JSON STRING, THROW TO MODAL AND PARSE THE SHEESH THERE LOLLLLLLLLLLLLLLL
                                     title={task.taskID}
                                     onClick={(e) => {

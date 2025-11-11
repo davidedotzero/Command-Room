@@ -121,7 +121,7 @@ function NotificationHandler() {
         notify_all_channel.bind("notify-all-toast-event", function(data: unknown) {
             NotificationToast(data.message);
         });
-        private_user_channel.bind("private-user-event", function(data: unknown) {
+        private_user_channel.bind("private-user-toast-event", function(data: unknown) {
             NotificationToast(data.message);
         });
         private_team_channel.bind("private-team-toast-event", function(data: unknown) {

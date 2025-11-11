@@ -1,40 +1,40 @@
 import { useEffect, useState, type ReactNode } from "react";
 import Select, { type SingleValue } from "react-select";
 
-import { createPortal, useFormStatus } from "react-dom";
+import { createPortal } from "react-dom";
 import { FormButton, FormField, FormFieldSetWrapper } from "../forms/FormItems";
-import CreatableSelect from "react-select/creatable";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
 import DatePicker from "react-datepicker";
 import { API } from "../../../services/api";
 import { getOnlyDate } from "../../../utils/functions";
 import DefaultTaskNamesSelect from "../forms/DefaultTaskNamesSelect";
-import type { DefaultTaskName } from "../../../types/types";
+import { NotificationType, TaskStatusID, type DefaultTaskName } from "../../../types/types";
 import { useDatePickerFix } from "../../../hooks/useDatePickerFix";
+import { useAuth } from "../../../contexts/AuthContext";
 
 
 // TODO: move this somewhere else better
 const baseInputClass = "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm ...";
 
 function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallback, children }: { isOpen: boolean, onClose: () => void, currentProjectID: string, parentUpdateCallback: () => {}, children?: ReactNode }) {
-    if (!isOpen) return null;
-    //
+
     // Close Modal on ESC key
-    useEffect(() => {
-        const handleKeyDown = (event) => {
-            if (event.key === "Escape") onClose();
-        }
-
-        if (isOpen)
-            document.addEventListener("keydown", handleKeyDown);
-
-        return () => {
-            document.removeEventListener("keydown", handleKeyDown);
-        }
-    }, [isOpen, onClose]);
+    // useEffect(() => {
+    //     const handleKeyDown = (event) => {
+    //         if (event.key === "Escape") onClose();
+    //     }
+    //
+    //     if (isOpen)
+    //         document.addEventListener("keydown", handleKeyDown);
+    //
+    //     return () => {
+    //         document.removeEventListener("keydown", handleKeyDown);
+    //     }
+    // }, [isOpen, onClose]);
 
     useDatePickerFix();
 
+    const { user } = useAuth();
     const { DEFAULT_TASK_NAMES, TEAMS } = useDbConst();
 
     const [selectedTask, setSelectedTask] = useState<{ value: DefaultTaskName | string, label: string } | null>(null);
@@ -47,19 +47,13 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
     const handleSubmit = async (formData: FormData) => {
         // IMPORTANT: FormData.get() return string | File so we need to parse it to Number and blabla
 
-        const inProgressStatusID = 1; // default to "In Progress"
-
-        // console.log("task: " + taskName);
-        // console.log("team: " + teamID);
-        // console.log("deadline: " + deadlineStr);
-
         if (!selectedTask || !selectedTeamID || !selectedDeadline) {
             // TODO: better error handling when backend is setup
             console.error("form grok mai krob dai ngai wa")
             return;
         }
 
-        // TODO: insert newTaskID in backend
+        // TODO: insert newTaskID in backend but need to return the insertedTaskID to front for using it later in notify_team
         const newTaskID = await API.getNewTaskID();
         const newTask =
         {
@@ -68,7 +62,7 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
             taskName: selectedTask.value.taskName ? selectedTask.value.taskName : selectedTask.value,
             teamID: selectedTeamID.value,
             deadline: getOnlyDate(selectedDeadline),
-            taskStatusID: inProgressStatusID,
+            taskStatusID: TaskStatusID.IN_PROGRESS, // default to "In Progress"
 
             // TODO: These 6 below properties are useless and should be deleted cuz we hardcoded these in backend anyway but i dont wanna messes with the types for now
             teamHelpID: null,
@@ -82,6 +76,14 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
         console.log(selectedDeadline);
 
         const res = await API.addTask(newTask);
+        API.notify_team(
+            user?.userID,
+            NotificationType.TASK_NEW,
+            `สร้าง Task ใหม่ใน project ${"PLACEHOLDER-PROJECT-NAME"} - ${selectedTask.value.taskName}`,
+            newTaskID,
+            [selectedTeamID.value]
+        );
+
         // TODO: handle result
         // await new Promise(resolve => setTimeout(resolve, 2000)); // TODO: delete this simulate delay
 
@@ -111,6 +113,8 @@ function CreateTaskModal({ isOpen, onClose, currentProjectID, parentUpdateCallba
 
         setSelectedTeamID({ value: foundTeam.teamID, label: foundTeam.teamName })
     }
+
+    if (!isOpen) return null;
 
     // TODO: when pending make controls to grey-ish or better color than this eieiei 
     return createPortal(

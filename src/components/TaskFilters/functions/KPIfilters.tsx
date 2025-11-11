@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { FilteringTask } from "../../../types/types";
+import { TaskStatusID, type FilteringTask } from "../../../types/types";
 import { getOnlyDate } from "../../../utils/functions";
 
 export function filteredByKPITasks(
@@ -15,8 +15,7 @@ export function filteredByKPITasks(
 
         if (activeStatFilter) {
             const incomplete = filteringTasks.filter(
-                // TODO: remove cancelled condition
-                (t) => t.taskStatusName !== "Done" && t.taskStatusName !== "Cancelled"
+                (t) => t.taskStatusID !== TaskStatusID.DONE
             );
             switch (activeStatFilter) {
                 case "Overdue":
@@ -33,10 +32,10 @@ export function filteredByKPITasks(
                     filteringTasks = incomplete;
                     break;
                 case "Done":
-                    filteringTasks = filteringTasks.filter((t) => t.taskStatusName === "Done");
+                    filteringTasks = filteringTasks.filter((t) => t.taskStatusID === TaskStatusID.DONE);
                     break;
                 case "Help Me":
-                    filteringTasks = filteringTasks.filter((t) => t.taskStatusName === "Help Me");
+                    filteringTasks = filteringTasks.filter((t) => t.taskStatusID === TaskStatusID.HELP_ME);
                     break;
                 default:
                     console.error("PROJECTDETIAL KPI FILTERING UNREACHABLE");

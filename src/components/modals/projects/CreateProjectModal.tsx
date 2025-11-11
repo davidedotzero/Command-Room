@@ -54,7 +54,6 @@ function CreateProjectModal({ isOpen, onClose, parentUpdateCallback }: { isOpen:
         const teamIdsInProject = projectTasks.map(x => x.team.teamID);
         const uniqueTeamIdsInProject = arrayUnique(teamIdsInProject);
 
-        // TODO: better var name
         const data = await API.addProjectAndTasks(projectName, projectTasks);
 
         if (projectTasks.length <= 0) { return; } // no need to notify anyone if no tasks on create

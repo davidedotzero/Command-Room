@@ -3,6 +3,8 @@ import { CharCountInput, FormButton, FormField } from "./forms/FormItems";
 import { useState, type ChangeEvent } from "react";
 import { API } from "../../services/api";
 import { ModalHeader } from "./ModalComponents";
+import { useAuth } from "../../contexts/AuthContext";
+import { NotificationType } from "../../types/types";
 
 function EditProjectModal(
     { isOpen, onClose, selectedProjectID, selectedProjectName, parentUpdateCallback }:
@@ -11,6 +13,7 @@ function EditProjectModal(
     if (!isOpen) return null;
     if (!selectedProjectID || !selectedProjectName) return null; // TODO: handle error better
 
+    const { user } = useAuth();
     const [isDisabled, setIsDisabled] = useState<boolean>(false);
     const [projectName, setProjectName] = useState<string>(selectedProjectName);
 
@@ -30,6 +33,13 @@ function EditProjectModal(
 
         // TODO: better api error handling
         const res = await API.updateProjectNameById(selectedProjectID, projectName);
+        API.notify_team_in_project(
+            selectedProjectID,
+            user?.userID!,
+            NotificationType.PROJ_EDIT_NAME,
+            `เปลี่ยนชื่อโปรเจกต์ - ${selectedProjectName} -> ${projectName}`,
+            selectedProjectID
+        );
 
         onClose();
         parentUpdateCallback();

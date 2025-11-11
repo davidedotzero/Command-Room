@@ -113,6 +113,16 @@ export const API = {
         return result;
     },
 
+    notify_team_in_project: async (projectID: string, senderID: string | null, notificationTypeID: NotificationType, message: string, linkTargetID: string | null) => {
+        let result = await api.post(`/noti/teams/${projectID}`, { senderID: senderID, notificationTypeID: notificationTypeID, message: message, linkTargetID: linkTargetID });
+        return result;
+    },
+
+    notify_users: async (senderID: string | null, notificationTypeID: NotificationType, message: string, linkTargetID: string | null, userIDs: string[]) => {
+        let result = await api.post(`/noti/users`, { senderID: senderID, notificationTypeID: notificationTypeID, message: message, linkTargetID: linkTargetID, userIDs: userIDs });
+        return result;
+    },
+
     getUser: async () => {
         let result = await api.get("/user/me");
         return result.data;

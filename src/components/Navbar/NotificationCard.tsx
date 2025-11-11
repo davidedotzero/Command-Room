@@ -26,10 +26,15 @@ function NotificationCard({ visited, senderName, senderTeamName, message, create
                 case NotificationType.PROJ_EDIT_NAME:
                     navigate(`/projects/p/${linkTargetID}`);
                     break;
-                case NotificationType.TASK_UPDATE:
+                case NotificationType.TASK_UPDATE_GENERIC:
+                case NotificationType.TASK_UPDATE_DEADLINE:
+                case NotificationType.TASK_UPDATE_STATUS:
+                case NotificationType.TASK_UPDATE_HELPREQ:
+                case NotificationType.TASK_NEW:
                     console.error("GO TO TASK MODAL NOT IMPLEMENTED YET");
                     break;
                 default:
+                    console.error("UNHANDLED NOTIFICATIONTYPE: " + notificationTypeID);
                     break;
             }
         }
@@ -48,9 +53,11 @@ function NotificationCard({ visited, senderName, senderTeamName, message, create
                 className={`${notificationCardStyle(_visited)} p-3 border border-gray-200 rounded-sm mt-0.5 shadow-sm transition-colors duration-200 hover:cursor-pointer`}
                 onClick={handleClick}
             >
-                <span><AssigneeLabels text={senderName} /> <TeamLabel text={senderTeamName} />{" ได้ทำการ "}</span>
-                <p>{`${message}`}</p>
-                <p className="text-sm text-gray-600">{formatDateYYYY_MM_DD_HH_MM_SS(createdAt)}</p>
+                <div className="space-y-2">
+                    <div><AssigneeLabels text={senderName} /> <TeamLabel text={senderTeamName} />{" ได้ทำการ "}</div>
+                    <p className="whitespace-pre-wrap">{`${message}`}</p>
+                    <p className="text-sm text-gray-600">{formatDateYYYY_MM_DD_HH_MM_SS(createdAt)}</p>
+                </div>
             </div>
         </>
     );

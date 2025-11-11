@@ -5,11 +5,21 @@ export const NotificationType = {
     PROJ_NEW: 2,
     PROJ_EDIT_NAME: 3,
     PROJ_DELETE: 4,
-    TASK_UPDATE: 5,
-    TASK_DELETE: 6,
-    TASK_NEW: 7,
+    TASK_UPDATE_DEADLINE: 5,
+    TASK_UPDATE_STATUS: 6,
+    TASK_UPDATE_GENERIC: 7,
+    TASK_UPDATE_HELPREQ: 8,
+    TASK_NEW: 9,
+    TASK_DELETE: 10,
 };
 export type NotificationType = typeof NotificationType[keyof typeof NotificationType];
+
+export const TaskStatusID = {
+    IN_PROGRESS: 1,
+    DONE: 2,
+    HELP_ME: 3
+};
+export type TaskStatusID = typeof TaskStatusID[keyof typeof TaskStatusID];
 
 // for adding new task on creating project in frontend 
 export interface NewTask {

@@ -1,7 +1,7 @@
 import { StatusColor } from "../../../utils/constants";
 import { calculateLeadTime, formatDateYYYY_MM_DD, formatDateYYYY_MM_DD_HH_MM_SS } from "../../../utils/functions";
 import { DetailItem } from "../forms/FormItems";
-import type { FilteringTask } from "../../../types/types";
+import { TaskStatusID, type FilteringTask } from "../../../types/types";
 import AssigneeLabels from "../../miscs/AssigneeLabels";
 import TeamLabel from "../../miscs/TeamLabels";
 
@@ -53,7 +53,7 @@ function TaskDetailsView({ task }: { task: FilteringTask }) {
                 </div>
 
                 {/* // TODO: abstract this to separate component */}
-                {currentTask.taskStatusName === "Help Me" && ( // TODO: compare by ID
+                {currentTask.taskStatusID === TaskStatusID.HELP_ME && (
                     <div className="pb-6 border-b">
                         <div className="p-5 bg-purple-50 border-l-4 border-purple-400 rounded-r-lg">
                             <h4 className="text-md font-bold text-purple-800 mb-4">

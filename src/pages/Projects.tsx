@@ -139,7 +139,7 @@ function Projects() {
                             </div>
                             <div className="flex items-center justify-between mt-auto">
                                 <p className="text-sm text-gray-500 font-mono">{p.projectID}</p>
-                                {user?.isAdmin && (
+                                {user?.isAdmin ? (
                                     <div className="flex items-center space-x-1">
                                         <button
                                             onClick={(e) => {
@@ -168,7 +168,7 @@ function Projects() {
                                             <DeleteIcon />
                                         </button>
                                     </div>
-                                )}
+                                ) : null}
                             </div>
                         </div>
                     ))}

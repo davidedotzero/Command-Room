@@ -71,7 +71,17 @@ function Navbar() {
             <button
                 className="border hover:bg-red-400"
                 onClick={async () => {
-                    let juan = await API.notify_team(user?.userID!, 1, "team noti naja 1", null, 1);
+                    let juan = await API.notify_users("USER-2025-000002", NotificationType.GENERIC, "wowowo", null, ["USER-2025-000001"]);
+                    console.log(juan);
+                }}
+            >
+                noti some users
+            </button>
+
+            <button
+                className="border hover:bg-red-400"
+                onClick={async () => {
+                    let juan = await API.notify_team(user?.userID!, 1, "team noti naja 1", null, [1]);
                     console.log(juan);
                 }}
             >
@@ -81,7 +91,7 @@ function Navbar() {
             <button
                 className="border hover:bg-red-400"
                 onClick={async () => {
-                    let juan = await API.notify_team(user?.userID!, 1, "team noti naja 2", null, 2);
+                    let juan = await API.notify_team(user?.userID!, 1, "team noti naja 2", null, [2]);
                     console.log(juan);
                 }}
             >

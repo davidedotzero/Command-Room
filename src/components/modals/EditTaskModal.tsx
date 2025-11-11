@@ -1,21 +1,22 @@
 import { createPortal } from "react-dom";
 import { CharCountInput, DetailItem, FormButton, FormField, FormFieldSetWrapper } from "./forms/FormItems";
-import { useEffect, useState, type ChangeEvent } from "react";
-import type { FilteringTask, User } from "../../types/types";
+import { useEffect, useState } from "react";
+import { NotificationType, TaskStatusID, type FilteringTask, type User } from "../../types/types";
 import { API } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
-import { calculateLeadTime, formatDateYYYY_MM_DD, getOnlyDate, isOnlyDateEqual, truncateText } from "../../utils/functions";
+import { calculateLeadTime, formatDateYYYY_MM_DD, isOnlyDateEqual, truncateText } from "../../utils/functions";
 import Select from "react-select";
 import { useDbConst } from "../../contexts/DbConstDataContext";
 import DatePicker from "react-datepicker";
 import AssigneeLabels from "../miscs/AssigneeLabels";
 import equal from "fast-deep-equal";
-import { ModalFooter, ModalHeader, ModalSmallContainer } from "./ModalComponents";
+import { ModalHeader, ModalSmallContainer } from "./ModalComponents";
 
 function EditTaskModal(
     { isOpen, onClose, taskData, parentUpdateCallback, customerAndPoData }:
         { isOpen: boolean, onClose: () => void, taskData: FilteringTask, parentUpdateCallback: () => {}, customerAndPoData?: any }) { // TODO: assign type to customerData
     if (!isOpen) return null;
+
     // Close Modal on ESC key
     // useEffect(() => {
     //     const handleKeyDown = (event) => {
@@ -55,7 +56,7 @@ function EditTaskModal(
 
     const prevSelectedWorkers = currentTask.workers === null ? [] : currentTask.workers;
 
-    const fetchData = async () => {
+    async function fetchData() {
         const _listWorkers = await API.getWorkers();
         // TODO: FilteringTask:workers | null add this sheesh 
         if (currentTask.workers === null) {
@@ -73,8 +74,6 @@ function EditTaskModal(
     }
 
     useEffect(() => {
-        console.log("kuy");
-
         const _helpleaddays = calculateLeadTime(
             new Date(selectedDeadline),
             currentTask.helpReqAt === null ? new Date() : new Date(currentTask.helpReqAt)
@@ -115,7 +114,7 @@ function EditTaskModal(
         });
 
         // handle when from something else ---> Help Me
-        if (currentTask.taskStatusID !== 3 && toStatusID === 3) { // handle help me
+        if (currentTask.taskStatusID !== TaskStatusID.HELP_ME && toStatusID === TaskStatusID.HELP_ME) { // handle help me
             console.log("case 1");
             teamHelpID = Number(formData.get("FormTeamHelp"));
             helpReqAt = new Date();
@@ -124,7 +123,7 @@ function EditTaskModal(
 
         // handle when changing from Help Me --> something else
         // we clear help related fields from Task record
-        if (currentTask.taskStatusID === 3 && toStatusID !== 3) {
+        if (currentTask.taskStatusID === TaskStatusID.HELP_ME && toStatusID !== TaskStatusID.HELP_ME) {
             // console.log("clearing");
             console.log("case 2");
             teamHelpID = null;
@@ -134,7 +133,7 @@ function EditTaskModal(
 
         // handle when Help Me --> Help Me
         // we use the old values
-        if (currentTask.taskStatusID === 3 && toStatusID === 3) {
+        if (currentTask.taskStatusID === TaskStatusID.HELP_ME && toStatusID === TaskStatusID.HELP_ME) {
             console.log("case 3");
 
             // doing currentTask.FOOBAR === null check cuz currently theres an anomaly in our data 
@@ -194,7 +193,7 @@ function EditTaskModal(
         // }
 
         const newLog = {
-            reason: formData.get("FormLogReason")!.toString(),
+            reason: reason,
             fromStatusID: toStatusID === null ? null : currentTask.taskStatusID,
             toStatusID: toStatusID,
             fromDeadline: toDeadline === null ? null : currentTask.deadline,
@@ -217,17 +216,122 @@ function EditTaskModal(
 
         console.log(updateTask);
 
-        // if (toDeleteUsers.length > 0) await API.deleteTaskUsers(currentTask.taskID, toDeleteUsers);
-        // if (toAddUsers.length > 0) await API.addTaskUsers(currentTask.taskID, toAddUsers);
-        // await API.addEditLog(newLog);
-        // await API.updateTaskByTaskID(updateTask);
-
         await API.updateTask(updateTask, newLog, toAddUsers, toDeleteUsers);
+
+        // we need this to notify workers who aren't in the owner team and helper team but are workers in this task
+        let workersNotInTeam_userIDs: string[] =
+            selectedWorkers === null
+                ? []
+                : selectedWorkers.filter(x => x.teamID != currentTask.teamID && x.teamID != currentTask.teamHelpID).map(x => x.userID);
+
+        let teamNotify = [selectedTeamID!.value];
+        if (teamHelpID) teamNotify.push(teamHelpID);
+
+        let notify_reason_msg = truncateText(reason, 50);
+        if (toDeadline) {
+            let notify_deadline_msg =
+                `เลื่อน deadline ของ task ${taskName} ใน project ${currentTask.projectName}\nจากวันที่ ${formatDateYYYY_MM_DD(currentTask.deadline)} -> ${formatDateYYYY_MM_DD(toDeadline)}: `;
+
+            let notify_msg = notify_deadline_msg + "\n\n" + notify_reason_msg;
+            sendNotification(NotificationType.TASK_UPDATE_DEADLINE, notify_msg, teamNotify, workersNotInTeam_userIDs);
+        }
+
+        if (toStatusID) {
+            if (toStatusID === TaskStatusID.HELP_ME) {
+                if (!teamHelpID) {
+                    throw new Error("FATAL ASF ERROR: Status is Help Me but teamHelpID is not found!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                }
+
+                let notify_status_msg_sender =
+                    `เปลี่ยนสถานะของ task ${taskName} ใน project ${currentTask.projectName}\nจาก ${TASK_STATUSES[currentTask.taskStatusID - 1].taskStatusName} -> ${TASK_STATUSES[toStatusID - 1].taskStatusName}: `;
+                let notify_status_msg_helper =
+                    `ขอความช่วยเหลือ task ${taskName} ใน project ${currentTask.projectName}\n: `;
+
+                let notify_msg_sender = notify_status_msg_sender + "\n\n" + notify_reason_msg;
+                let notify_msg_helper = notify_status_msg_helper + "\n\n" + notify_reason_msg;
+
+                sendHelpNotification(
+                    NotificationType.TASK_UPDATE_HELPREQ,
+                    notify_msg_sender,
+                    notify_msg_helper,
+                    selectedTeamID!.value,
+                    teamHelpID, // teamHelpID will always be true since we are reqesting help
+                    workersNotInTeam_userIDs
+                );
+
+            } else {
+                let notify_status_msg =
+                    `เปลี่ยนสถานะของ task ${taskName} ใน project ${currentTask.projectName}\nจาก ${TASK_STATUSES[currentTask.taskStatusID - 1].taskStatusName} -> ${TASK_STATUSES[toStatusID - 1].taskStatusName}: `;
+
+                let notify_msg = notify_status_msg + "\n\n" + notify_reason_msg;
+                sendNotification(NotificationType.TASK_UPDATE_STATUS, notify_msg, teamNotify, workersNotInTeam_userIDs);
+            }
+        }
+
+        if (!toDeadline && !toStatusID) {
+            let notify_generic_msg = `อัปเดต task ${taskName} ใน project ${currentTask.projectName}: `;
+            let notify_msg = notify_generic_msg + "\n\n" + notify_reason_msg;
+            sendNotification(NotificationType.GENERIC, notify_msg, teamNotify, workersNotInTeam_userIDs);
+        }
 
         onClose();
         parentUpdateCallback();
 
         // TODO: loading and confirm dialog and successful dialog
+    }
+
+    // send notification to all users in teamIDs and userIDs
+    function sendNotification(notiType: NotificationType, notify_msg: string, teamIDs: number[], userIDs: string[]) {
+        API.notify_team(
+            user?.userID!,
+            notiType,
+            notify_msg,
+            currentTask.taskID,
+            teamIDs,
+        );
+
+        if (userIDs.length <= 0) {
+            return;
+        }
+
+        API.notify_users(
+            user?.userID!,
+            notiType,
+            notify_msg,
+            currentTask.taskID,
+            userIDs,
+        );
+    }
+
+    // send notification to all users in teamIDs and userIDs
+    function sendHelpNotification(notiType: NotificationType, notify_msg_sender: string, notify_msg_helper: string, sender_teamID: number, helper_teamID: number, userIDs: string[]) {
+        API.notify_team(
+            user?.userID!,
+            notiType,
+            notify_msg_sender,
+            currentTask.taskID,
+            [sender_teamID],
+        );
+
+        API.notify_team(
+            user?.userID!,
+            notiType,
+            notify_msg_helper,
+            currentTask.taskID,
+            [helper_teamID],
+        );
+
+        if (userIDs.length <= 0) {
+            return;
+        }
+
+        API.notify_users(
+            user?.userID!,
+            notiType,
+            notify_msg_sender, // users who are not in helper team just need to know that this task's status has been set to HELP_ME
+            currentTask.taskID,
+            userIDs,
+        );
     }
 
     if (!listWorkers && !isLoading) {
@@ -365,8 +469,7 @@ function EditTaskModal(
                                     {/* </div> */}
 
                                     {/* Help me */}
-                                    {/* // TODO: change this to enum maybe */}
-                                    {selectedStatus === 3 && (
+                                    {selectedStatus === TaskStatusID.HELP_ME && (
                                         <div className="mt-3 p-5 bg-purple-50 border-l-4 border-purple-400 rounded-r-lg">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                                                 <DetailItem label="วันที่ร้องขอ">
@@ -380,7 +483,7 @@ function EditTaskModal(
                                                 <div className="md:col-span-3">
                                                     <FormField label="ผู้ช่วยเหลือ (Help Assignee)">
                                                         {
-                                                            currentTask.taskStatusID === 3 && currentTask.teamHelpID && currentTask.helpReqAt ? (
+                                                            currentTask.taskStatusID === TaskStatusID.HELP_ME && currentTask.teamHelpID && currentTask.helpReqAt ? (
                                                                 // editing help me task. user may not change help assignee again until this helpme is done
                                                                 <p className="font-semibold">{TEAMS.find(x => x.teamID === currentTask.teamHelpID)?.teamName || "-"}</p>
                                                             ) : (

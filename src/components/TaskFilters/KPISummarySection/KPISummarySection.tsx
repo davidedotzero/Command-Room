@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { FilteringTask } from "../../../types/types";
+import { TaskStatusID, type FilteringTask } from "../../../types/types";
 import StatDisplayCard from "./StatDisplayCard";
 import { RefreshIcon } from "../../miscs/icons";
 import { getOnlyDate } from "../../../utils/functions";
@@ -36,17 +36,17 @@ function KPISummarySection(
         let overdue = 0, warning = 0, incomplete = 0, done = 0, helpme = 0;
         tasks.forEach(task => {
             // TODO: rewrite this counting logic
-            if (task.deadline && task.deadline < getOnlyDate(TODAY) && task.taskStatusName !== "Done") {
+            if (task.deadline && task.deadline < getOnlyDate(TODAY) && task.taskStatusID !== TaskStatusID.DONE) {
                 overdue += 1;
             }
 
-            if (task.deadline >= getOnlyDate(TODAY) && task.deadline <= getOnlyDate(WARNING_DATE) && task.taskStatusName !== "Done") {
+            if (task.deadline >= getOnlyDate(TODAY) && task.deadline <= getOnlyDate(WARNING_DATE) && task.taskStatusID !== TaskStatusID.DONE) {
                 warning += 1;
             }
 
-            if (task.taskStatusName !== "Done") incomplete += 1;
-            if (task.taskStatusName === "Help Me") helpme += 1;
-            if (task.taskStatusName === "Done") done += 1;
+            if (task.taskStatusID !== TaskStatusID.DONE) incomplete += 1;
+            if (task.taskStatusID === TaskStatusID.HELP_ME) helpme += 1;
+            if (task.taskStatusID === TaskStatusID.DONE) done += 1;
         });
 
         return { overdue, warning, incomplete, done, helpme }
