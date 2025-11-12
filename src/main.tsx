@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router'
 import { AuthProvider } from './contexts/AuthContext.tsx'
 import { DbConstProvider } from './contexts/DbConstDataContext.tsx'
 import { PusherProvider } from './contexts/PusherContext.tsx'
-import { TaskModalProvider } from './contexts/ModalContext.tsx'
+import { TaskModalProvider } from './contexts/TaskModalContext.tsx'
 
 const GOOGLE_CLIENT_ID =
     "204454748483-qmf22ku4od938tvin5hm0ik2ch83v0ec.apps.googleusercontent.com";

@@ -30,8 +30,8 @@ function TaskDetailProductionModal({ isOpen, onClose, taskData, parentUpdateCall
 
     // TODO: this is ugly asf LMAOOOOOOOOOOOOOOOOOOOOO
     const parentUpdateCallback_eiei = async () => {
+        console.log("lnwjuazna");
         onClose();
-        parentUpdateCallback();
     }
 
     return createPortal(

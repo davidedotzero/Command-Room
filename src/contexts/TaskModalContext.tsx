@@ -10,31 +10,38 @@ interface TaskModalContextType {
     parentUpdateCallback: (() => void) | null;
     onCloseCallback: (() => void) | null;
     setModalTaskData: (taskData: FilteringTask) => void;
+    isTaskModalOpen: boolean
 };
 
 const TaskModalContext = createContext<TaskModalContextType | null>(null);
-export const useModal = () => useContext(TaskModalContext);
+export const useTaskModal = () => {
+    const context = useContext(TaskModalContext);
+    if (!context) {
+        throw new Error('useModal must be used within an TaskModalProvider.');
+    }
+    return context;
+}
 
 export function TaskModalProvider({ children }: { children: ReactNode }) {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
     const [onCloseCallback, _setOnCloseCallback] = useState<(() => void) | null>(null);
     const [parentUpdateCallback, _setParentUpdateCallback] = useState<(() => void) | null>(null);
     const [taskData, _setTaskData] = useState<FilteringTask | null>(null);
 
     const openTaskDetailModal = useCallback(() => {
-        setIsOpen(true);
+        setIsTaskModalOpen(true);
     }, []);
 
     const closeTaskDetailModal = useCallback(() => {
-        setIsOpen(false);
+        setIsTaskModalOpen(false);
     }, []);
 
     const setOnCloseCallback = useCallback((callback: () => void) => {
-        setOnCloseCallback(callback);
+        _setOnCloseCallback(callback);
     }, []);
 
     const setParentUpdateCallback = useCallback((callback: () => void) => {
-        setParentUpdateCallback(callback);
+        _setParentUpdateCallback(callback);
     }, []);
 
     const setModalTaskData = useCallback((t: FilteringTask) => {
@@ -50,13 +57,14 @@ export function TaskModalProvider({ children }: { children: ReactNode }) {
                 setParentUpdateCallback,
                 parentUpdateCallback,
                 onCloseCallback,
-                setModalTaskData
+                setModalTaskData,
+                isTaskModalOpen,
             }}
         >
             {children}
             <TaskDetailProductionModal
-                isOpen={isOpen}
-                onClose={onCloseCallback === null ? () => { } : onCloseCallback}
+                isOpen={isTaskModalOpen}
+                onClose={onCloseCallback === null ? closeTaskDetailModal : onCloseCallback}
                 taskData={taskData}
                 parentUpdateCallback={parentUpdateCallback === null ? () => { } : parentUpdateCallback}
             />

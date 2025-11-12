@@ -4,7 +4,7 @@ import { XIcon } from "../miscs/icons";
 export function ModalContainer({ children }: { children: ReactNode }) {
     return (
         <>
-            <div className="fixed inset-0 z-50 bg-white/70 bg-opacity-50 flex items-center justify-center">
+            <div className="fixed inset-0 z-[60] bg-white/70 bg-opacity-50 flex items-center justify-center">
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-7xl flex flex-col max-h-[90vh] min-h-[90vh]">
                     {children}
                 </div>
@@ -16,7 +16,7 @@ export function ModalContainer({ children }: { children: ReactNode }) {
 export function ModalSmallContainer({ children }: { children: ReactNode }) {
     return (
         <>
-            <div className="fixed inset-0 z-50 bg-white/50 bg-opacity-50 flex items-center justify-center">
+            <div className="fixed inset-0 z-[60] bg-white/50 bg-opacity-50 flex items-center justify-center">
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
                     {children}
                 </div>

@@ -11,6 +11,7 @@ import DatePicker from "react-datepicker";
 import AssigneeLabels from "../miscs/AssigneeLabels";
 import equal from "fast-deep-equal";
 import { ModalHeader, ModalSmallContainer } from "./ModalComponents";
+import { useRefreshSignalStore } from "../../hooks/useRefreshSignalStore";
 
 function EditTaskModal(
     { isOpen, onClose, taskData, parentUpdateCallback, customerAndPoData }:
@@ -40,6 +41,7 @@ function EditTaskModal(
 
     const { user } = useAuth();
     const { TASK_STATUSES, TEAMS } = useDbConst();
+    const triggerRefresh = useRefreshSignalStore(state => state.triggerRefresh);
 
     const [selectedStatus, setSelectedStatus] = useState<number>(currentTask.taskStatusID);
     const [taskName, setTaskName] = useState<string>(currentTask.taskName);
@@ -243,7 +245,7 @@ function EditTaskModal(
                 }
 
                 let notify_status_msg_sender =
-                    `เปลี่ยนสถานะของ task ${taskName} ใน project ${currentTask.projectName}\nจาก ${TASK_STATUSES[currentTask.taskStatusID - 1].taskStatusName} -> ${TASK_STATUSES[toStatusID - 1].taskStatusName}: `;
+                    `เปลี่ยนสถานะ task ${taskName} ใน project ${currentTask.projectName}\nจาก ${TASK_STATUSES[currentTask.taskStatusID - 1].taskStatusName} -> ${TASK_STATUSES[toStatusID - 1].taskStatusName}: `;
                 let notify_status_msg_helper =
                     `ขอความช่วยเหลือ task ${taskName} ใน project ${currentTask.projectName}\n: `;
 
@@ -261,7 +263,7 @@ function EditTaskModal(
 
             } else {
                 let notify_status_msg =
-                    `เปลี่ยนสถานะของ task ${taskName} ใน project ${currentTask.projectName}\nจาก ${TASK_STATUSES[currentTask.taskStatusID - 1].taskStatusName} -> ${TASK_STATUSES[toStatusID - 1].taskStatusName}: `;
+                    `เปลี่ยนสถานะ task ${taskName} ใน project ${currentTask.projectName}\nจาก ${TASK_STATUSES[currentTask.taskStatusID - 1].taskStatusName} -> ${TASK_STATUSES[toStatusID - 1].taskStatusName}: `;
 
                 let notify_msg = notify_status_msg + "\n\n" + notify_reason_msg;
                 sendNotification(NotificationType.TASK_UPDATE_STATUS, notify_msg, teamNotify, workersNotInTeam_userIDs);
@@ -271,11 +273,12 @@ function EditTaskModal(
         if (!toDeadline && !toStatusID) {
             let notify_generic_msg = `อัปเดต task ${taskName} ใน project ${currentTask.projectName}: `;
             let notify_msg = notify_generic_msg + "\n\n" + notify_reason_msg;
-            sendNotification(NotificationType.GENERIC, notify_msg, teamNotify, workersNotInTeam_userIDs);
+            sendNotification(NotificationType.TASK_UPDATE_GENERIC, notify_msg, teamNotify, workersNotInTeam_userIDs);
         }
 
         onClose();
         parentUpdateCallback();
+        triggerRefresh();
 
         // TODO: loading and confirm dialog and successful dialog
     }

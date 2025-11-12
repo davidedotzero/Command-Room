@@ -7,6 +7,7 @@ import type { NotificationDetailed } from "../../types/types";
 import NotificationCard from "./NotificationCard";
 import { usePusher } from "../../contexts/PusherContext";
 import InlineSpinner from "../Spinners/InlineSpinner";
+import { useTaskModal } from "../../contexts/TaskModalContext";
 
 function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boolean, onCloseCallback: () => void, ignoreRef: RefObject<HTMLElement | null> }) {
     // useOutsideClick(popupRef, onCloseCallback, ignoreRef);
@@ -14,6 +15,7 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
     const popupRef = useRef<HTMLDivElement | null>(null);
     const pusher = usePusher();
     const { user } = useAuth();
+    const { isTaskModalOpen } = useTaskModal();
 
     const [isLoading, setIsLoading] = useState(false);
     const [todayNotifications, setTodayNotifications] = useState<NotificationDetailed[]>([]);
@@ -31,7 +33,6 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
 
         observer.current = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
             if (entries[0].isIntersecting && hasMorePage && isInfiniteScrollEnabled) {
-                console.log("juan");
                 setPage(prevPage => prevPage + 1);
             }
         });
@@ -46,7 +47,6 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
         }
 
         return (() => {
-            console.log("popup closing");
             setPage(1);
             setHasMorePage(true);
             setIsInfiniteScrollEnabled(false);
@@ -77,7 +77,6 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
         });
 
         return () => {
-            console.log("Unbinding from Pusher channel: " + "private-user-" + user.userID);
             private_user_channel.unbind("private-user-notiCard-event");
         }
     }, [pusher, user, isOpen])
@@ -87,6 +86,11 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
     useEffect(() => {
         const handleClick = (e: MouseEvent) => {
             const target = e.target as Node;
+
+            if (isTaskModalOpen) {
+                return;
+            }
+
             if (ignoreRef && ignoreRef.current && ignoreRef.current.contains(target)) {
                 return;
             }
@@ -103,7 +107,7 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
         return () => {
             document.removeEventListener('mousedown', handleClick);
         }
-    }, [popupRef, onCloseCallback, ignoreRef, isOpen])
+    }, [popupRef, onCloseCallback, ignoreRef, isOpen, isTaskModalOpen])
 
 
     async function fetchData() {
@@ -138,10 +142,6 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
             const data = await API.getUserEarlierNotis(user!.userID, page);
             setEarlierNotifications(prevNotis => {
                 // const newPosts = data.posts.filter(p => !prevPosts.some(op => op.id === p.id)); ignore check duplicates for now
-                console.log("prev");
-                console.log(prevNotis);
-                console.log("next");
-                console.log(data.notifications);
                 return [...prevNotis, ...data.notifications];
             });
             setHasMorePage(data.hasMorePage);
@@ -242,11 +242,5 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
             , document.getElementById("noti-popup-root")!
         );
 }
-
-/*
-[ชื่อuser] กำลัง/ได้ทำการ [ชื่อโปรเจกต์ ]
-อัพเดท/สร้างใหม่[ชื่อTask]
-วันที่อัพเดท
-*/
 
 export default NotificationPopup;

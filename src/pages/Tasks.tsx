@@ -10,6 +10,7 @@ import { useAuth } from "../contexts/AuthContext";
 import FullscreenSpinner from "../components/Spinners/FullscreenSpinner";
 import { filterTasks } from "../components/TaskFilters/functions/filters";
 import { filteredByKPITasks } from "../components/TaskFilters/functions/KPIfilters";
+import { useRefreshSignalStore } from "../hooks/useRefreshSignalStore";
 
 function Tasks() {
     const [allTasks, setAllTasks] = useState<FilteringTask[]>([]); // TODO: rename this
@@ -27,6 +28,7 @@ function Tasks() {
     const [showOnlyIncompleteChecked, setShowOnlyIncompleteChecked] = useState<boolean>(true);
 
     const { user, isLoading: isAuthLoading } = useAuth();
+    const refreshKey = useRefreshSignalStore(state => state.refreshKey);
 
     const fetchData = async () => {
         if (!user) return;
@@ -52,7 +54,7 @@ function Tasks() {
 
     useEffect(() => {
         fetchData();
-    }, [user, isAuthLoading]);
+    }, [user, isAuthLoading, refreshKey]);
 
     const filteredTasks: FilteringTask[] = filterTasks(allTasks, teamIDFilter, searchFilter, startDateFilter, endDateFilter, showOnlyIncompleteChecked, projectFilter);
     const eiei: FilteringTask[] = filteredByKPITasks(filteredTasks, activeStatFilter); // TODO: rename this

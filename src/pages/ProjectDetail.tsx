@@ -16,6 +16,7 @@ import FullscreenSpinner from "../components/Spinners/FullscreenSpinner";
 import LegacyCreateTaskModal from "../components/modals/Legacy/LegacyCreateTaskModal.tsx";
 import { filterTasks } from "../components/TaskFilters/functions/filters.tsx";
 import { filteredByKPITasks } from "../components/TaskFilters/functions/KPIfilters.tsx";
+import { useRefreshSignalStore } from "../hooks/useRefreshSignalStore.tsx";
 
 // TODO: fix re-renders on open CreateTaskModal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 function ProjectDetail() {
@@ -24,6 +25,8 @@ function ProjectDetail() {
         // TODO: better error page
         return <p>NO PROJECT SELECTED</p>;
     }
+
+    const refreshKey = useRefreshSignalStore(state => state.refreshKey);
 
     const currentProjectID: string = param.projectID; // TODO: should i pass this as props or urlParams?
     const [currentProjectName, setCurrentProjectName] = useState<string>("");
@@ -63,7 +66,7 @@ function ProjectDetail() {
 
     useEffect(() => {
         fetchData();
-    }, [currentProjectID]);
+    }, [currentProjectID, refreshKey]);
 
 
     // TODO: separate filtering tasks to multiple steps so we can useMemo separately
