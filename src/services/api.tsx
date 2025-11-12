@@ -234,6 +234,23 @@ export const API = {
         return data;
     },
 
+    getTasksByTaskIdDetailed: async (taskID: string): Promise<FilteringTask[]> => {
+        const response = await api.get(`/tasks/tid/${taskID}`);
+        let data: FilteringTask[] = response.data;
+
+        // need to parse date here cuz backend cant send Date obj to us sadge
+        data = data.map(row => {
+            return {
+                ...row,
+                deadline: new Date(row.deadline),
+                createdAt: row.createdAt !== null ? new Date(row.createdAt) : null,
+                updatedAt: row.updatedAt !== null ? new Date(row.updatedAt) : null
+            };
+        })
+
+        return data;
+    },
+
     // TODO: this should be handled in the database instead but it works so im not gonna touch it xdddd
     getNewTaskID: async () => {
         const response = await api.get("/gen_ids/task");
