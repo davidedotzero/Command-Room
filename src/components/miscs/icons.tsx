@@ -136,6 +136,36 @@ export const BellIcon: React.FC<{ className?: string }> = ({ className }) => (
     </svg>
 );
 
+export const DotIcon = () => (
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="6"
+        height="6"
+        viewBox="0 0 10 10"
+    >
+        <circle cx="5" cy="5" r="4" fill="black" />
+    </svg>
+);
+
+export const ArrowIcon = () => (
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5" // A slightly thicker line
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        // 'inline-block' makes it flow with text.
+        // 'align-middle' vertically centers it with the text.
+        className={`inline-block align-middle w-4 h-4`}
+        aria-hidden="true"
+    >
+        <path d="M5 12h14" />
+        <path d="m12 5 7 7-7 7" />
+    </svg>
+);
+
 // ======================================================================================
 
 export const ChartBarIcon: React.FC = () => (

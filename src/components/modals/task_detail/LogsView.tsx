@@ -4,7 +4,7 @@ import { API } from "../../../services/api";
 import { useDbConst } from "../../../contexts/DbConstDataContext";
 import { formatDateYYYY_MM_DD } from "../../../utils/functions";
 import type { EditLog, EditLogDetailed } from "../../../types/types";
-import { CopyIcon } from "../../miscs/icons";
+import { ArrowIcon, CopyIcon, DotIcon } from "../../miscs/icons";
 import InlineSpinner from "../../Spinners/InlineSpinner";
 import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
@@ -12,6 +12,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 import equal from "fast-deep-equal";
 import { useDatePickerFix } from "../../../hooks/useDatePickerFix";
 import { ErrorToast, InfoToast } from "../../Swal2/CustomSwalCollection";
+import AssigneeLabels from "../../miscs/AssigneeLabels";
+import { StatusColor } from "../../../utils/constants";
 
 function LogsView({ taskID, taskRecentUpdate }: { taskID: string, taskRecentUpdate: number }) {
     const { TASK_STATUSES } = useDbConst();
@@ -218,14 +220,6 @@ function LogsView({ taskID, taskRecentUpdate }: { taskID: string, taskRecentUpda
                                 <div className="space-y-2 mt-2">
                                     {
                                         filteredLogs.map(x => {
-                                            let displayLog = "";
-
-                                            displayLog += `--- อัปเดตเมื่อ ${x.date === null ? "N/A" : x.date.toLocaleString("en-CA", { timeZone: "Asia/Bangkok", hour12: false })} โดย ${x.userName === null || x.userID === "USER-0000-000000" ? "N/A" : x.userName}---\n`
-
-                                            if (x.fromDeadline && x.toDeadline) displayLog += `* เปลี่ยน Deadline: ${formatDateYYYY_MM_DD(x.fromDeadline!)} -> ${formatDateYYYY_MM_DD(x.toDeadline)} \"\n`
-                                            if (x.fromStatusID && x.toStatusID) displayLog += `* เปลี่ยน Status: ${TASK_STATUSES.find(t => t.taskStatusID === x.fromStatusID)?.taskStatusName} -> ${TASK_STATUSES.find(t => t.taskStatusID === x.toStatusID)?.taskStatusName}\n`
-                                            displayLog += `รายละเอียด / เหตุผล: ${x.reason}\n`
-
                                             return (
                                                 <>
                                                     <div className={`p-3 rounded-md border relative ${x.markedDone ? "bg-green-200" : "bg-gray-50"}`} title={x.eLogID}>
@@ -269,7 +263,44 @@ function LogsView({ taskID, taskRecentUpdate }: { taskID: string, taskRecentUpda
                                                             : ""}
 
                                                         <div className="min-h-[100px] max-h-[500px] whitespace-pre-wrap disabled overflow-y-scroll">
-                                                            {displayLog}
+                                                            <div>
+                                                                {x.userName === null || x.userID === "USER-0000-000000" ? "N/A" : <AssigneeLabels text={x.userName} />}
+                                                                {` อัปเดตเมื่อ ${x.date === null ? "N/A" : x.date.toLocaleString("en-CA", { timeZone: "Asia/Bangkok", hour12: false })}`}
+                                                            </div>
+                                                            <div className="flex flex-row">
+                                                                {
+                                                                    x.fromDeadline && x.toDeadline &&
+                                                                    <>
+                                                                        <div className="flex justify-center items-center">
+                                                                            <DotIcon />
+                                                                        </div>
+                                                                        {` เลื่อน Deadline: ${formatDateYYYY_MM_DD(x.fromDeadline!)} `}
+                                                                        <div className="flex justify-center items-center">
+                                                                            <ArrowIcon />
+                                                                        </div>
+                                                                        {` ${formatDateYYYY_MM_DD(x.toDeadline)}`}
+                                                                    </>
+                                                                }
+                                                            </div>
+                                                            <div className="flex flex-row">
+                                                                {
+                                                                    x.fromStatusID && x.toStatusID &&
+                                                                    <>
+                                                                        <div className="flex justify-center items-center"> <DotIcon /> </div>
+                                                                        {" Status: "}
+                                                                        <span className={`font-bold text-base ${StatusColor.get(TASK_STATUSES.find(t => t.taskStatusID === x.fromStatusID)?.taskStatusName!)}`}>
+                                                                            {TASK_STATUSES.find(t => t.taskStatusID === x.fromStatusID)?.taskStatusName + " "}
+                                                                        </span>
+                                                                        <div className="flex justify-center items-center"> <ArrowIcon /> </div>
+                                                                        <span className={`font-bold text-base ${StatusColor.get(TASK_STATUSES.find(t => t.taskStatusID === x.toStatusID)?.taskStatusName!)}`}>
+                                                                            {" " + TASK_STATUSES.find(t => t.taskStatusID === x.toStatusID)?.taskStatusName + " "}
+                                                                        </span>
+                                                                    </>
+                                                                }
+                                                            </div>
+                                                            <div>
+                                                                {`รายละเอียด / เหตุผล: ${x.reason}\n`}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </>
