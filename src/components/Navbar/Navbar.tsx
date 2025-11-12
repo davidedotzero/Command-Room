@@ -67,48 +67,48 @@ function Navbar() {
             </div>
 
 
-            {/* <div className="hidden"> */}
-            <button
-                className="border hover:bg-red-400"
-                onClick={async () => {
-                    let juan = await API.notify_users("USER-2025-000002", NotificationType.GENERIC, "wowowo", null, ["USER-2025-000001"]);
-                    console.log(juan);
-                }}
-            >
-                noti some users
-            </button>
+            <div className="hidden">
+                <button
+                    className="border hover:bg-red-400"
+                    onClick={async () => {
+                        let juan = await API.notify_users("USER-2025-000002", NotificationType.GENERIC, "wowowo", null, ["USER-2025-000001"]);
+                        console.log(juan);
+                    }}
+                >
+                    noti some users
+                </button>
 
-            <button
-                className="border hover:bg-red-400"
-                onClick={async () => {
-                    let juan = await API.notify_team(user?.userID!, 1, "team noti naja 1", null, [1]);
-                    console.log(juan);
-                }}
-            >
-                noti team 1
-            </button>
+                <button
+                    className="border hover:bg-red-400"
+                    onClick={async () => {
+                        let juan = await API.notify_team(user?.userID!, 1, "team noti naja 1", null, [1]);
+                        console.log(juan);
+                    }}
+                >
+                    noti team 1
+                </button>
 
-            <button
-                className="border hover:bg-red-400"
-                onClick={async () => {
-                    let juan = await API.notify_team(user?.userID!, 1, "team noti naja 2", null, [2]);
-                    console.log(juan);
-                }}
-            >
-                noti team 2
-            </button>
+                <button
+                    className="border hover:bg-red-400"
+                    onClick={async () => {
+                        let juan = await API.notify_team(user?.userID!, 1, "team noti naja 2", null, [2]);
+                        console.log(juan);
+                    }}
+                >
+                    noti team 2
+                </button>
 
-            <button
-                className="border hover:bg-red-400"
-                onClick={async () => {
-                    API.notify_all(user?.userID!, NotificationType.PROJ_NEW, "สร้างโปรเจกต์ใหม่นะจ๊ะ", "PROJ-2025-000092");
-                    await API.getUserNotis(user!.userID);
-                    // console.log(juan);
-                }}
-            >
-                noti all
-            </button>
-            {/* </div> */}
+                <button
+                    className="border hover:bg-red-400"
+                    onClick={async () => {
+                        API.notify_all(user?.userID!, NotificationType.PROJ_NEW, "สร้างโปรเจกต์ใหม่นะจ๊ะ", "PROJ-2025-000092");
+                        await API.getUserNotis(user!.userID);
+                        // console.log(juan);
+                    }}
+                >
+                    noti all
+                </button>
+            </div>
         </>
     );
 }

@@ -160,7 +160,7 @@ function NotificationPopup({ isOpen, onCloseCallback, ignoreRef }: { isOpen: boo
 
     if (!isOpen) return null;
 
-    if (isLoading) {
+    if (isLoading && !isInfiniteScrollEnabled) {
         return (
             <>
                 <div
