@@ -18,7 +18,7 @@ function Navbar() {
                 <div className="flex flex-row gap-2">
                     <NavLink to="/tasks" className={({ isActive }) => nav_active_class(isActive)} > {"รายการทั้งหมด"} </NavLink>
                     <NavLink to="/projects" className={({ isActive }) => nav_active_class(isActive)}> {"โปรเจกต์"} </NavLink>
-                    {/* <NavLink to="/customers" className={({ isActive }) => nav_active_class(isActive)}> {"ลูกค้า"} </NavLink> */}
+                    <NavLink to="/customers" className={({ isActive }) => nav_active_class(isActive)}> {"ลูกค้า"} </NavLink>
                 </div>
 
                 <div className="flex flex-row gap-2">

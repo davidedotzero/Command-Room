@@ -124,9 +124,19 @@ export interface TaskUser {
 }
 
 export interface Customer {
-    customerID: string;
-    customerName: string;
-    address: string;
+    ID: integer;  //ID ของลูกค้า
+    CustomerName: char 150;  // ชื่อลูกค้า เช่น สมชาย
+    CusotmerCode: char 50;  //รหัสลูกค้า
+    ContactName: char 100;  // ชื่อผู้ติดต่อ เช่น บอย
+    RDBranchName: char 150;  // ชื่อสาขาตามกรมสรรพากร
+    FullAddress: char 300;  //ที่อยู่ลูกค้า เช่น 11 / 2 ถ.พหลโยธิน ต.คูคต อ.ลำลูกา จ.ปทุมธานี 12130
+    Mobile: char 50;  //เบอร์โทรลูกค้า เช่น 0891234567
+    TaxCode: char 20;  //เลขผู้เสียภาษี เช่น 1234567890123
+    PriceType: integer;  //ช่องราคาขาย มีได้ 5 ช่องคือ 1, 2, 3, 4, 5
+    CreditDay: integer;  //จำนวนวันที่ให้เครดิตลูกค้า
+    Point: decimal;  //แต้มคงเหลือ
+    MemberLevel: integer;  //ระดับสมาชิก(0 = ไม่ได้เป็นสมาชิก)
+    Status: integer;  //สถานะ(0 = ไม่ได้ใช้แล้ว, 1 = ใช้อยู่)
     customerTypeID: number;
 }
 
